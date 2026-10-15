@@ -1,0 +1,305 @@
+@import "tailwindcss";
+
+/*
+ * Tokens de design. Direção: editorial monocromático. As imagens dos projetos
+ * são a cor da página; a interface fica em preto, branco e cinzas.
+ * Claro é o padrão; o escuro segue o sistema operacional ou o botão do
+ * cabeçalho (atributo data-theme no <html>).
+ * Contraste conferido: --muted sobre --bg >= 4.5:1 nos dois temas.
+ */
+:root {
+  color-scheme: light;
+  --bg: #fafafa;
+  --surface: #ededed;
+  --surface-2: #e2e2e2;
+  --ink: #000000;
+  --muted: #646464; /* 5.7:1 sobre #fafafa, 5.1:1 sobre #ededed */
+  --line: #d4d4d4; /* separadores (decorativos, não carregam informação) */
+  --focus: #000000;
+  --danger: #b3261e; /* 6.2:1 sobre #fafafa */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0e0e0e;
+    --surface: #1b1b1b;
+    --surface-2: #262626;
+    --ink: #fafafa;
+    --muted: #a3a3a3; /* 7.9:1 sobre #0e0e0e, 7.0:1 sobre #1b1b1b */
+    --line: #2e2e2e;
+    --focus: #fafafa;
+    --danger: #ff8a80;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0e0e0e;
+  --surface: #1b1b1b;
+  --surface-2: #262626;
+  --ink: #fafafa;
+  --muted: #a3a3a3;
+  --line: #2e2e2e;
+  --focus: #fafafa;
+    --danger: #ff8a80;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-danger: var(--danger);
+
+  --font-display: var(--font-space-grotesk), "Arial Narrow", Arial, sans-serif;
+  --font-sans: var(--font-inter-tight), Inter, "Segoe UI", Arial, sans-serif;
+  --font-mono: var(--font-space-mono), ui-monospace, "Cascadia Mono", Consolas, monospace;
+
+  /* Escala: rótulo, corpo, destaque, título, display. */
+  --text-label: 0.875rem;
+  --text-label--line-height: 1.4;
+  --text-body: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+  --text-body--line-height: 1.6;
+  --text-lead: clamp(1.25rem, 1.12rem + 0.55vw, 1.5rem);
+  --text-lead--line-height: 1.35;
+  --text-head: clamp(1.875rem, 1.4rem + 2vw, 3rem);
+  --text-head--line-height: 1.08;
+  --text-display: clamp(3rem, 11.2vw, 10.5rem);
+  --text-display--line-height: 0.86;
+
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+html {
+  background: var(--bg);
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 400;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+[id] {
+  scroll-margin-top: 1.5rem;
+}
+
+::selection {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Rótulos técnicos (ano, empresa, tags) em mono. */
+.label {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.text-link {
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+  transition: text-decoration-color 200ms var(--ease-out-quart);
+}
+.text-link:hover {
+  text-decoration-color: currentColor;
+}
+
+/* Botão primário: preenchido com a cor do texto. Pílula. */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 3rem;
+  padding: 0 1.5rem;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--bg);
+  touch-action: manipulation;
+  transition: opacity 180ms var(--ease-out-quart), transform 180ms var(--ease-out-quart);
+}
+.btn-primary:hover {
+  opacity: 0.85;
+}
+.btn-primary:active {
+  transform: scale(0.98);
+}
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+/* Botão discreto (filtros, alternâncias). */
+.btn-quiet {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  touch-action: manipulation;
+  transition: background-color 180ms var(--ease-out-quart), color 180ms var(--ease-out-quart);
+}
+.btn-quiet:hover {
+  background: var(--surface-2);
+}
+.btn-quiet[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: 0 0.75rem;
+  border-radius: 999px;
+  background: var(--surface);
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: var(--ink);
+}
+
+/*
+ * "Text roll": no hover, o texto sobe e uma cópia entra por baixo.
+ * A cópia é aria-hidden; leitores de tela leem o texto uma vez só.
+ */
+.roll {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+.roll > span {
+  display: block;
+  transition: transform 420ms var(--ease-out-quart);
+}
+.roll > span + span {
+  position: absolute;
+  inset: 0;
+  transform: translateY(105%);
+}
+:is(a, button):hover .roll > span:first-child,
+:is(a, button):focus-visible .roll > span:first-child {
+  transform: translateY(-105%);
+}
+:is(a, button):hover .roll > span + span,
+:is(a, button):focus-visible .roll > span + span {
+  transform: translateY(0);
+}
+
+/* Imagens de trabalho: zoom curto no hover do link. */
+.zoom-on-hover img {
+  transition: transform 700ms var(--ease-out-quart);
+}
+.zoom-on-hover:hover img,
+.zoom-on-hover:focus-visible img {
+  transform: scale(1.035);
+}
+
+/*
+ * Entradas por seção. O conteúdo é SEMPRE visível por padrão (sem JS, para
+ * buscadores, impressão e capturas de página inteira). A animação só toca
+ * quando o elemento está chegando à tela durante a rolagem.
+ */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+[data-reveal].is-playing {
+  animation: rise 450ms var(--ease-out-quart) both;
+  animation-delay: calc(var(--i, 0) * 80ms);
+}
+
+/* Acordeão: a altura anima por grid-template-rows (0fr → 1fr). Fechado,
+   o conteúdo fica invisível e inerte (fora do teclado e do leitor de tela). */
+.accordion-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    grid-template-rows 360ms var(--ease-out-quart),
+    opacity 260ms var(--ease-out-quart),
+    visibility 0s linear 360ms;
+}
+.accordion-panel.is-open {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  opacity: 1;
+  transition:
+    grid-template-rows 360ms var(--ease-out-quart),
+    opacity 260ms var(--ease-out-quart) 80ms,
+    visibility 0s;
+}
+
+/* Transições entre páginas (View Transitions): capa e título "crescem". */
+::view-transition-group(.morph) {
+  animation-duration: 450ms;
+  animation-timing-function: var(--ease-out-quart);
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 220ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+}

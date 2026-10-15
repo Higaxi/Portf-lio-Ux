@@ -1,0 +1,518 @@
+import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { Suspense, ViewTransition, type ReactNode } from "react";
+import {
+  caseStudies,
+  categoryLabels,
+  getCaseStudy,
+  moreProjects,
+  type CaseStudy,
+  type Chapter,
+  type MoreProject,
+} from "@/content/projects";
+import { profile } from "@/content/profile";
+import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
+import { CaseCover, DesignSystemArt } from "@/components/case-art";
+import { FlowDiagram, JourneyDiagram, Wireframes } from "@/components/case-diagrams";
+import { published, showTodos } from "@/lib/todo";
+
+type Params = { slug: string };
+
+const miniProjects = moreProjects.filter((p) => p.case);
+
+export function generateStaticParams(): Params[] {
+  return [...caseStudies.map((c) => ({ slug: c.slug })), ...miniProjects.map((p) => ({ slug: p.slug }))];
+}
+
+export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
+  const { slug } = await params;
+  const c = getCaseStudy(slug);
+  const m = miniProjects.find((p) => p.slug === slug);
+  if (!c && !m) return {};
+  const title = c ? c.title : m!.name;
+  const description = c ? c.summary : m!.description;
+  const image = c ? c.cover?.src : m!.image.src;
+  return {
+    title,
+    description,
+    alternates: { canonical: `/projetos/${slug}` },
+    openGraph: {
+      title,
+      description,
+      url: `/projetos/${slug}`,
+      type: "article",
+      images: [image ?? "/opengraph-image"],
+    },
+  };
+}
+
+export default function ProjectPage({ params }: { params: Promise<Params> }) {
+  return (
+    <>
+      <SiteHeader />
+      <main id="conteudo" className="mx-auto max-w-[90rem] px-4 pt-10 md:px-10 md:pt-16">
+        <Link href="/#projetos" className="text-link label inline-flex min-h-11 items-center">
+          ← Todos os projetos
+        </Link>
+        <Suspense fallback={<div className="min-h-[80vh]" />}>
+          <ProjectContent params={params} />
+        </Suspense>
+      </main>
+      <SiteFooter />
+    </>
+  );
+}
+
+/** Lê o slug dentro do Suspense: a casca da página fica estática e instantânea. */
+async function ProjectContent({ params }: { params: Promise<Params> }) {
+  const { slug } = await params;
+  const c = getCaseStudy(slug);
+  const m = miniProjects.find((p) => p.slug === slug);
+  if (!c && !m) notFound();
+  return (
+    <>
+      {c ? <FullCase c={c} /> : <MiniCasePage p={m!} />}
+      <NextProject current={slug} />
+    </>
+  );
+}
+
+/* ---------- Peças comuns ---------- */
+
+function DraftNotice({ show }: { show: boolean }) {
+  if (!show || !showTodos) return null;
+  return (
+    <p className="mt-6 rounded-lg bg-surface p-4 font-mono text-[0.875rem]">
+      Rascunho (visível só em desenvolvimento): este texto foi reconstruído e precisa da sua revisão em
+      src/content. Mude draft para false quando estiver pronto.
+    </p>
+  );
+}
+
+function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
+  return (
+    <section id={id} aria-labelledby={`${id}-titulo`} className="grid gap-6 border-t border-line py-14 md:grid-cols-12 md:gap-x-6 md:py-20">
+      <h2 id={`${id}-titulo`} className="text-lead md:col-span-4">
+        {title}
+      </h2>
+      <div className="md:col-span-8">{children}</div>
+    </section>
+  );
+}
+
+function Paragraphs({ items }: { items: string[] }) {
+  return (
+    <div className="flex max-w-[64ch] flex-col gap-4">
+      {published(items).map((t) => (
+        <p key={t} className={t.startsWith("TODO") ? "rounded-lg bg-surface p-3 font-mono text-[0.875rem]" : "text-body"}>
+          {t}
+        </p>
+      ))}
+    </div>
+  );
+}
+
+function Bullets({ items }: { items: string[] }) {
+  return (
+    <ul className="flex max-w-[64ch] flex-col gap-3">
+      {items.map((t) => (
+        <li key={t} className="grid grid-cols-[1.25rem_1fr] text-body">
+          <span aria-hidden="true" className="font-mono text-muted">
+            –
+          </span>
+          {t}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function Facts({ rows }: { rows: [string, string][] }) {
+  return (
+    <dl className="grid grid-cols-2 gap-x-6 gap-y-6 md:grid-cols-4">
+      {rows
+        .filter(([, v]) => showTodos || !v.startsWith("TODO"))
+        .map(([k, v]) => (
+          <div key={k}>
+            <dt className="label">{k}</dt>
+            <dd className="mt-1 text-body">{v}</dd>
+          </div>
+        ))}
+    </dl>
+  );
+}
+
+function Figure({ img, sizes }: { img: NonNullable<CaseStudy["problem"]["image"]>; sizes: string }) {
+  return (
+    <figure className="mt-10">
+      <div className="relative overflow-hidden rounded-xl bg-surface" style={{ aspectRatio: `${img.width} / ${img.height}` }}>
+        <Image src={img.src} alt={img.alt} fill sizes={sizes} loading="eager" className="object-cover" />
+      </div>
+      {img.caption ? <figcaption className="label mt-3">{img.caption}</figcaption> : null}
+    </figure>
+  );
+}
+
+/* ---------- Estudo de caso completo ---------- */
+
+function FullCase({ c }: { c: CaseStudy }) {
+  const d = c.deep;
+  const toc: [string, string][] = c.chapters
+    ? c.chapters.map((ch) => [ch.id, ch.title] as [string, string])
+    : d
+    ? [
+        ["contexto", "Contexto e problema"],
+        ["objetivos", "Objetivos"],
+        ["descoberta", "Descoberta"],
+        ["persona", "Proto-persona"],
+        ["jornada", "Jornada atual e futura"],
+        ["fluxo", "Fluxo do app"],
+        ["wireframes", "Wireframes"],
+        ["interface", "Interface"],
+        ["testes", "Testes e iteração"],
+        ["resultado", "Resultado"],
+        ["aprendizados", "Aprendizados"],
+      ]
+    : [
+        ["contexto", "Contexto e problema"],
+        ["processo", "Processo"],
+        ["solucao", "Solução"],
+        ["resultado", "Resultado"],
+      ];
+
+  return (
+    <article className="mt-6">
+      <header>
+        <p className="label">
+          {c.context} · {c.year}
+        </p>
+        <ViewTransition name={`titulo-${c.slug}`} share="morph" default="none">
+          <h1 className="mt-3 max-w-[16ch] font-display text-[clamp(2.5rem,1.5rem+5vw,6.5rem)] font-medium uppercase leading-[0.9] tracking-[-0.04em]">
+            {c.title}
+          </h1>
+        </ViewTransition>
+        <p className="mt-6 max-w-[44ch] text-lead">{c.summary}</p>
+        <DraftNotice show={c.draft} />
+      </header>
+
+      <ViewTransition name={`capa-${c.slug}`} share="morph" default="none">
+        <div className="relative mt-10 aspect-video overflow-hidden rounded-xl bg-surface">
+          <CaseCover project={c} sizes="(min-width: 1440px) 1360px, 100vw" priority />
+        </div>
+      </ViewTransition>
+
+      {/* Resumo */}
+      <section aria-labelledby="resumo-titulo" className="mt-10 grid gap-10 md:grid-cols-12 md:gap-x-6">
+        <h2 id="resumo-titulo" className="sr-only">
+          Resumo
+        </h2>
+        <div className="md:col-span-8">
+          <Facts
+            rows={[
+              ["Papel", c.role],
+              ["Período", c.year],
+              ["Plataforma", c.platforms],
+              ...(c.facts ?? []),
+              ...(d ? ([["Time", d.team], ["Ferramentas", d.tools.join(", ")]] as [string, string][]) : []),
+            ]}
+          />
+        </div>
+        <div className="rounded-xl bg-ink p-6 text-bg md:col-span-4">
+          <p className="font-mono text-[0.875rem] opacity-80">Resultado</p>
+          <p className="mt-2 font-display text-head font-medium tracking-tight">{c.metric.value}</p>
+          <p className="mt-1 text-body">{c.metric.label}</p>
+        </div>
+      </section>
+
+      <nav aria-label="Neste estudo de caso" className="mt-12">
+        <ol className="flex flex-wrap gap-2">
+          {toc.map(([id, label]) => (
+            <li key={id}>
+              <a href={`#${id}`} className="btn-quiet !min-h-10 text-[0.9375rem]">
+                {label}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+
+      {c.chapters ? (
+        <div className="mt-12">
+          {c.chapters.map((ch) => (
+            <ChapterSection key={ch.id} ch={ch} />
+          ))}
+          <CaseLinks links={c.links} />
+        </div>
+      ) : (
+      <div className="mt-12">
+        <Section id="contexto" title="Contexto e problema">
+          <Paragraphs items={c.problem.paragraphs} />
+          {c.problem.image ? <Figure img={c.problem.image} sizes="(min-width: 768px) 60vw, 100vw" /> : null}
+        </Section>
+
+        {d ? (
+          <>
+            <Section id="objetivos" title="Objetivos">
+              <div className="grid gap-8 sm:grid-cols-2">
+                <div>
+                  <h3 className="label">Para o negócio</h3>
+                  <div className="mt-3">
+                    <Bullets items={d.objectives.business} />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="label">Para quem usa</h3>
+                  <div className="mt-3">
+                    <Bullets items={d.objectives.user} />
+                  </div>
+                </div>
+              </div>
+            </Section>
+            <Section id="descoberta" title="Descoberta">
+              <Bullets items={d.discovery} />
+            </Section>
+            <Section id="persona" title="Proto-persona">
+              <div className="rounded-xl bg-surface p-6 md:p-8">
+                <p className="label">Proto-persona: hipótese construída com o time, não resultado de pesquisa quantitativa</p>
+                <h3 className="mt-3 font-display text-head font-medium tracking-tight">{d.persona.name}</h3>
+                <p className="mt-3 max-w-[60ch] text-body">{d.persona.context}</p>
+                <div className="mt-6 grid gap-6 sm:grid-cols-2">
+                  <div>
+                    <h4 className="label">Quer</h4>
+                    <div className="mt-2">
+                      <Bullets items={d.persona.goals} />
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="label">Sofre com</h4>
+                    <div className="mt-2">
+                      <Bullets items={d.persona.pains} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Section>
+            <Section id="jornada" title="Jornada atual e futura">
+              <JourneyDiagram journey={d.journey} />
+            </Section>
+            <Section id="fluxo" title="Fluxo do app">
+              <FlowDiagram flow={d.flow} />
+            </Section>
+            <Section id="wireframes" title="Wireframes">
+              <Wireframes items={d.wireframes} />
+              <p className="label mt-6">Representação dos wireframes, redesenhada para este estudo.</p>
+            </Section>
+            <Section id="interface" title="Interface de alta fidelidade">
+              <Paragraphs items={c.solution.paragraphs} />
+              {c.gallery.length === 0 ? (
+                <div className="mt-8 flex aspect-video flex-col items-center justify-center gap-2 rounded-xl bg-surface p-6 text-center">
+                  <p className="max-w-[40ch] text-body">Telas finais em preparação para esta página.</p>
+                  {showTodos ? <p className="label">TODO: adicione as imagens em public/projetos/{c.slug}/ e preencha gallery.</p> : null}
+                </div>
+              ) : null}
+            </Section>
+            <Section id="testes" title="Testes e iteração">
+              <Bullets items={d.testing} />
+            </Section>
+          </>
+        ) : (
+          <>
+            <Section id="processo" title="Processo">
+              <Paragraphs items={c.process.paragraphs} />
+            </Section>
+            <Section id="solucao" title="Solução">
+              <Paragraphs items={c.solution.paragraphs} />
+              {c.solution.image ? <Figure img={c.solution.image} sizes="(min-width: 768px) 60vw, 100vw" /> : null}
+            </Section>
+          </>
+        )}
+
+        <Section id="resultado" title="Resultado">
+          <p className="font-display text-[clamp(2.5rem,1.5rem+4vw,5.5rem)] font-medium leading-[0.95] tracking-[-0.04em]">
+            {c.metric.value}
+          </p>
+          <p className="label mt-2">{c.metric.label}</p>
+          <div className="mt-8">
+            <Paragraphs items={c.result.paragraphs} />
+          </div>
+        </Section>
+
+        {d ? (
+          <Section id="aprendizados" title="Aprendizados">
+            <Bullets items={d.learnings} />
+          </Section>
+        ) : null}
+
+        {c.gallery.length > 0 ? (
+          <section aria-labelledby="galeria-titulo" className="border-t border-line py-14 md:py-20">
+            <h2 id="galeria-titulo" className="text-lead">
+              Detalhes
+            </h2>
+            <ul className="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-6">
+              {c.gallery.map((g) => (
+                <li key={g.src}>
+                  <Image src={g.src} alt={g.alt} width={g.width} height={g.height} sizes="(min-width: 768px) 15vw, 45vw" loading="eager" className="h-auto w-full rounded-lg" />
+                  {g.caption ? <p className="mt-2 text-[0.9375rem] leading-snug text-muted">{g.caption}</p> : null}
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
+        {!d && c.links.length > 0 ? (
+          <div className="flex flex-wrap gap-4 border-t border-line py-10">
+            {c.links.map((l) => (
+              <a key={l.href} href={l.href} target="_blank" rel="noopener noreferrer" className="btn-primary">
+                {l.label}
+                <span className="sr-only"> (abre em nova aba)</span>
+              </a>
+            ))}
+          </div>
+        ) : null}
+      </div>
+      )}
+    </article>
+  );
+}
+
+function CaseLinks({ links }: { links: CaseStudy["links"] }) {
+  if (links.length === 0) return null;
+  return (
+    <div className="flex flex-wrap gap-3 border-t border-line py-10">
+      {links.map((l, i) => (
+        <a
+          key={l.href}
+          href={l.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={i === 0 ? "btn-primary" : "btn-quiet !min-h-12 !px-6"}
+        >
+          {l.label}
+          <span className="sr-only"> (abre em nova aba)</span>
+        </a>
+      ))}
+    </div>
+  );
+}
+
+function ChapterSection({ ch }: { ch: Chapter }) {
+  return (
+    <Section id={ch.id} title={ch.title}>
+      <div className="flex flex-col gap-8">
+        {ch.paragraphs ? <Paragraphs items={ch.paragraphs} /> : null}
+        {ch.columns ? (
+          <div className="grid gap-6 sm:grid-cols-2">
+            {ch.columns.map((col) => (
+              <div key={col.title} className="rounded-xl bg-surface p-6">
+                <h3 className="label">{col.title}</h3>
+                <ul className="mt-3 flex flex-col gap-1">
+                  {col.items.map((it) => (
+                    <li key={it} className="font-display text-lead font-medium">
+                      {it}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        ) : null}
+        {ch.bullets ? <Bullets items={ch.bullets} /> : null}
+        {ch.quotes ? (
+          <div className="grid gap-4 md:grid-cols-2">
+            {ch.quotes.map((q) => (
+              <figure key={q.text} className="rounded-xl bg-surface p-6">
+                <blockquote className="text-lead">“{q.text}”</blockquote>
+                <figcaption className="label mt-4">{q.who}</figcaption>
+              </figure>
+            ))}
+          </div>
+        ) : null}
+        {ch.chips ? (
+          <ul className="flex flex-wrap gap-2">
+            {ch.chips.map((t) => (
+              <li key={t} className="chip !min-h-10 !px-4">
+                {t}
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        {ch.art === "design-system" ? (
+          <div className="relative aspect-video overflow-hidden rounded-xl">
+            <DesignSystemArt />
+          </div>
+        ) : null}
+        {ch.image ? <Figure img={ch.image} sizes="(min-width: 768px) 60vw, 100vw" /> : null}
+        {ch.note ? <p className="label">{ch.note}</p> : null}
+      </div>
+    </Section>
+  );
+}
+
+/* ---------- Case resumido ---------- */
+
+function MiniCasePage({ p }: { p: MoreProject }) {
+  const mc = p.case!;
+  return (
+    <article className="mt-6">
+      <header>
+        <p className="label">{p.categories.map((x) => categoryLabels[x]).join(" · ")}</p>
+        <ViewTransition name={`titulo-${p.slug}`} share="morph" default="none">
+          <h1 className="mt-3 font-display text-[clamp(2.5rem,1.5rem+5vw,6.5rem)] font-medium uppercase leading-[0.9] tracking-[-0.04em]">
+            {p.name}
+          </h1>
+        </ViewTransition>
+        <p className="mt-6 max-w-[44ch] text-lead">{p.description}</p>
+        <DraftNotice show />
+      </header>
+      <ViewTransition name={`capa-${p.slug}`} share="morph" default="none">
+      <div className="relative mt-10 aspect-video overflow-hidden rounded-xl bg-surface">
+        <Image src={p.image.src} alt={p.image.alt} fill preload sizes="(min-width: 1440px) 1360px, 100vw" className="object-cover" />
+      </div>
+      </ViewTransition>
+      <div className="mt-12">
+        <Section id="desafio" title="Desafio">
+          <p className="max-w-[64ch] text-body">{mc.challenge}</p>
+        </Section>
+        <Section id="publico" title="Público">
+          <p className="max-w-[64ch] text-body">{mc.audience}</p>
+        </Section>
+        <Section id="processo" title="Processo">
+          <Bullets items={mc.process} />
+        </Section>
+        <Section id="decisoes" title="Decisões de design">
+          <Bullets items={mc.decisions} />
+        </Section>
+        <Section id="entrega" title="Entrega">
+          <p className="max-w-[64ch] text-body">{mc.delivery}</p>
+        </Section>
+      </div>
+    </article>
+  );
+}
+
+/* ---------- Próximo projeto ---------- */
+
+function NextProject({ current }: { current: string }) {
+  const order = [...caseStudies.map((c) => ({ slug: c.slug, name: c.title })), ...miniProjects.map((p) => ({ slug: p.slug, name: p.name }))];
+  const i = order.findIndex((o) => o.slug === current);
+  const next = order[(i + 1) % order.length];
+  return (
+    <nav aria-label="Próximo projeto" className="border-t border-line pt-10">
+      <Link href={`/projetos/${next.slug}`} className="group block">
+        <span className="label">Próximo projeto</span>
+        <span className="mt-2 block font-display text-head font-medium uppercase tracking-tight group-hover:underline group-hover:decoration-2 group-hover:underline-offset-8">
+          {next.name} →
+        </span>
+      </Link>
+      <p className="label mt-8">
+        Quer conversar sobre este projeto?{" "}
+        <a className="text-link" href={`mailto:${profile.email}`}>
+          {profile.email}
+        </a>
+      </p>
+    </nav>
+  );
+}
