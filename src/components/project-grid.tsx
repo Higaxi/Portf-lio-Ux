@@ -8,7 +8,7 @@ import { isTodo, showTodos } from "@/lib/todo";
 import { RollText } from "./roll-text";
 import { ProjectCarousel } from "./project-carousel";
 import { CategoryTabs } from "./category-tabs";
-import { SocialGallery } from "./social-gallery";
+import { WebShowcase } from "./web-showcase";
 import { BrandTiles } from "./brand-tiles";
 
 /** Os 6 projetos de maior impacto, nesta ordem. */
@@ -135,14 +135,7 @@ export function ProjectGrid() {
     </>
   );
 
-  const social = (
-    <>
-      <p className="mb-8 max-w-[60ch] text-body text-muted">
-        Peças de social media para marcas de música, gastronomia, contabilidade e fitness, e pranchas de landing pages. Clique para ver em tela cheia.
-      </p>
-      <SocialGallery />
-    </>
-  );
+  const web = <WebShowcase />;
 
   return (
     <section id="projetos" aria-labelledby="projetos-titulo" className="pt-28 md:pt-40">
@@ -156,7 +149,7 @@ export function ProjectGrid() {
           tabs={[
             { id: "produto", label: "Product Design", panel: product },
             { id: "marca", label: "Design Gráfico · Construção de marca", panel: brand },
-            { id: "social", label: "Social Media", panel: social },
+            { id: "web", label: "Web Design", panel: web },
           ]}
         />
       </div>

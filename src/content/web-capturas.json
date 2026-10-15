@@ -1,0 +1,428 @@
+{
+ "despertarpsicologia-br": {
+  "thumb": "/projetos/web/despertarpsicologia-br-thumb.webp",
+  "height": 7681,
+  "slices": [
+   {
+    "src": "/projetos/web/despertarpsicologia-br-1.webp",
+    "w": 1600,
+    "h": 7681,
+    "bytes": 597666
+   }
+  ]
+ },
+ "ginoclin-med-br": {
+  "thumb": "/projetos/web/ginoclin-med-br-thumb.webp",
+  "height": 8683,
+  "slices": [
+   {
+    "src": "/projetos/web/ginoclin-med-br-1.webp",
+    "w": 1600,
+    "h": 8000,
+    "bytes": 561664
+   },
+   {
+    "src": "/projetos/web/ginoclin-med-br-2.webp",
+    "w": 1600,
+    "h": 683,
+    "bytes": 56220
+   }
+  ]
+ },
+ "hominem-br": {
+  "thumb": "/projetos/web/hominem-br-thumb.webp",
+  "height": 5648,
+  "slices": [
+   {
+    "src": "/projetos/web/hominem-br-1.webp",
+    "w": 1600,
+    "h": 5648,
+    "bytes": 365792
+   }
+  ]
+ },
+ "l-advrodrigoazevedo-br": {
+  "thumb": "/projetos/web/l-advrodrigoazevedo-br-thumb.webp",
+  "height": 9667,
+  "slices": [
+   {
+    "src": "/projetos/web/l-advrodrigoazevedo-br-1.webp",
+    "w": 1600,
+    "h": 8000,
+    "bytes": 504296
+   },
+   {
+    "src": "/projetos/web/l-advrodrigoazevedo-br-2.webp",
+    "w": 1600,
+    "h": 1667,
+    "bytes": 167658
+   }
+  ]
+ },
+ "l-checkup-urologico-br": {
+  "thumb": "/projetos/web/l-checkup-urologico-br-thumb.webp",
+  "height": 7580,
+  "slices": [
+   {
+    "src": "/projetos/web/l-checkup-urologico-br-1.webp",
+    "w": 1600,
+    "h": 7580,
+    "bytes": 641380
+   }
+  ]
+ },
+ "l-clinicanutrit-br": {
+  "thumb": "/projetos/web/l-clinicanutrit-br-thumb.webp",
+  "height": 5994,
+  "slices": [
+   {
+    "src": "/projetos/web/l-clinicanutrit-br-1.webp",
+    "w": 1600,
+    "h": 5994,
+    "bytes": 492312
+   }
+  ]
+ },
+ "l-ericacintra-br": {
+  "thumb": "/projetos/web/l-ericacintra-br-thumb.webp",
+  "height": 6591,
+  "slices": [
+   {
+    "src": "/projetos/web/l-ericacintra-br-1.webp",
+    "w": 1600,
+    "h": 6591,
+    "bytes": 384446
+   }
+  ]
+ },
+ "l-espacoseniordf-br": {
+  "thumb": "/projetos/web/l-espacoseniordf-br-thumb.webp",
+  "height": 11703,
+  "slices": [
+   {
+    "src": "/projetos/web/l-espacoseniordf-br-1.webp",
+    "w": 1600,
+    "h": 8000,
+    "bytes": 731386
+   },
+   {
+    "src": "/projetos/web/l-espacoseniordf-br-2.webp",
+    "w": 1600,
+    "h": 3703,
+    "bytes": 337880
+   }
+  ]
+ },
+ "l-gofind-online": {
+  "thumb": "/projetos/web/l-gofind-online-thumb.webp",
+  "height": 9366,
+  "slices": [
+   {
+    "src": "/projetos/web/l-gofind-online-1.webp",
+    "w": 1600,
+    "h": 8000,
+    "bytes": 742474
+   },
+   {
+    "src": "/projetos/web/l-gofind-online-2.webp",
+    "w": 1600,
+    "h": 1366,
+    "bytes": 133334
+   }
+  ]
+ },
+ "l-gofind-online-localizador": {
+  "thumb": "/projetos/web/l-gofind-online-localizador-thumb.webp",
+  "height": 10338,
+  "slices": [
+   {
+    "src": "/projetos/web/l-gofind-online-localizador-1.webp",
+    "w": 1600,
+    "h": 8000,
+    "bytes": 649522
+   },
+   {
+    "src": "/projetos/web/l-gofind-online-localizador-2.webp",
+    "w": 1600,
+    "h": 2338,
+    "bytes": 241134
+   }
+  ]
+ },
+ "l-lrcentroesportivo-br": {
+  "thumb": "/projetos/web/l-lrcentroesportivo-br-thumb.webp",
+  "height": 10272,
+  "slices": [
+   {
+    "src": "/projetos/web/l-lrcentroesportivo-br-1.webp",
+    "w": 1600,
+    "h": 8000,
+    "bytes": 747426
+   },
+   {
+    "src": "/projetos/web/l-lrcentroesportivo-br-2.webp",
+    "w": 1600,
+    "h": 2272,
+    "bytes": 161190
+   }
+  ]
+ },
+ "l-lrcentroesportivo-br-fisio": {
+  "thumb": "/projetos/web/l-lrcentroesportivo-br-fisio-thumb.webp",
+  "height": 9220,
+  "slices": [
+   {
+    "src": "/projetos/web/l-lrcentroesportivo-br-fisio-1.webp",
+    "w": 1600,
+    "h": 8000,
+    "bytes": 592358
+   },
+   {
+    "src": "/projetos/web/l-lrcentroesportivo-br-fisio-2.webp",
+    "w": 1600,
+    "h": 1220,
+    "bytes": 84006
+   }
+  ]
+ },
+ "l-lrcentroesportivo-br-recovery-completo": {
+  "thumb": "/projetos/web/l-lrcentroesportivo-br-recovery-completo-thumb.webp",
+  "height": 12254,
+  "slices": [
+   {
+    "src": "/projetos/web/l-lrcentroesportivo-br-recovery-completo-1.webp",
+    "w": 1600,
+    "h": 8000,
+    "bytes": 689060
+   },
+   {
+    "src": "/projetos/web/l-lrcentroesportivo-br-recovery-completo-2.webp",
+    "w": 1600,
+    "h": 4254,
+    "bytes": 326748
+   }
+  ]
+ },
+ "l-movementme": {
+  "thumb": "/projetos/web/l-movementme-thumb.webp",
+  "height": 6908,
+  "slices": [
+   {
+    "src": "/projetos/web/l-movementme-1.webp",
+    "w": 1600,
+    "h": 6908,
+    "bytes": 521832
+   }
+  ]
+ },
+ "l-planaltocentralimoveis-br": {
+  "thumb": "/projetos/web/l-planaltocentralimoveis-br-thumb.webp",
+  "height": 3805,
+  "slices": [
+   {
+    "src": "/projetos/web/l-planaltocentralimoveis-br-1.webp",
+    "w": 1600,
+    "h": 3805,
+    "bytes": 376054
+   }
+  ]
+ },
+ "l-planaltocentralimoveis-br-venda": {
+  "thumb": "/projetos/web/l-planaltocentralimoveis-br-venda-thumb.webp",
+  "height": 3805,
+  "slices": [
+   {
+    "src": "/projetos/web/l-planaltocentralimoveis-br-venda-1.webp",
+    "w": 1600,
+    "h": 3805,
+    "bytes": 384512
+   }
+  ]
+ },
+ "l-raquelnutricionista-br": {
+  "thumb": "/projetos/web/l-raquelnutricionista-br-thumb.webp",
+  "height": 4915,
+  "slices": [
+   {
+    "src": "/projetos/web/l-raquelnutricionista-br-1.webp",
+    "w": 1600,
+    "h": 4915,
+    "bytes": 339910
+   }
+  ]
+ },
+ "l-raquelnutricionista-br-emagrecimento": {
+  "thumb": "/projetos/web/l-raquelnutricionista-br-emagrecimento-thumb.webp",
+  "height": 5488,
+  "slices": [
+   {
+    "src": "/projetos/web/l-raquelnutricionista-br-emagrecimento-1.webp",
+    "w": 1600,
+    "h": 5488,
+    "bytes": 434022
+   }
+  ]
+ },
+ "l-raquelnutricionista-br-nutricao-esportiva": {
+  "thumb": "/projetos/web/l-raquelnutricionista-br-nutricao-esportiva-thumb.webp",
+  "height": 7608,
+  "slices": [
+   {
+    "src": "/projetos/web/l-raquelnutricionista-br-nutricao-esportiva-1.webp",
+    "w": 1600,
+    "h": 7608,
+    "bytes": 621774
+   }
+  ]
+ },
+ "l-raquelnutricionista-br-transtornos-alimentares": {
+  "thumb": "/projetos/web/l-raquelnutricionista-br-transtornos-alimentares-thumb.webp",
+  "height": 5010,
+  "slices": [
+   {
+    "src": "/projetos/web/l-raquelnutricionista-br-transtornos-alimentares-1.webp",
+    "w": 1600,
+    "h": 5010,
+    "bytes": 356290
+   }
+  ]
+ },
+ "l-renovedermatologia-br": {
+  "thumb": "/projetos/web/l-renovedermatologia-br-thumb.webp",
+  "height": 7716,
+  "slices": [
+   {
+    "src": "/projetos/web/l-renovedermatologia-br-1.webp",
+    "w": 1600,
+    "h": 7716,
+    "bytes": 660674
+   }
+  ]
+ },
+ "l-renovedermatologia-br-procedimentos": {
+  "thumb": "/projetos/web/l-renovedermatologia-br-procedimentos-thumb.webp",
+  "height": 9488,
+  "slices": [
+   {
+    "src": "/projetos/web/l-renovedermatologia-br-procedimentos-1.webp",
+    "w": 1600,
+    "h": 8000,
+    "bytes": 597450
+   },
+   {
+    "src": "/projetos/web/l-renovedermatologia-br-procedimentos-2.webp",
+    "w": 1600,
+    "h": 1488,
+    "bytes": 160848
+   }
+  ]
+ },
+ "lp-fonoaudiologiafoz-br": {
+  "thumb": "/projetos/web/lp-fonoaudiologiafoz-br-thumb.webp",
+  "height": 7844,
+  "slices": [
+   {
+    "src": "/projetos/web/lp-fonoaudiologiafoz-br-1.webp",
+    "w": 1600,
+    "h": 7844,
+    "bytes": 652212
+   }
+  ]
+ },
+ "lp-neuromaster-br": {
+  "thumb": "/projetos/web/lp-neuromaster-br-thumb.webp",
+  "height": 4283,
+  "slices": [
+   {
+    "src": "/projetos/web/lp-neuromaster-br-1.webp",
+    "w": 1600,
+    "h": 4283,
+    "bytes": 277972
+   }
+  ]
+ },
+ "lp-neuromaster-br-b": {
+  "thumb": "/projetos/web/lp-neuromaster-br-b-thumb.webp",
+  "height": 6423,
+  "slices": [
+   {
+    "src": "/projetos/web/lp-neuromaster-br-b-1.webp",
+    "w": 1600,
+    "h": 6423,
+    "bytes": 442928
+   }
+  ]
+ },
+ "lp-neuromaster-br-instituto-do-sono": {
+  "thumb": "/projetos/web/lp-neuromaster-br-instituto-do-sono-thumb.webp",
+  "height": 6713,
+  "slices": [
+   {
+    "src": "/projetos/web/lp-neuromaster-br-instituto-do-sono-1.webp",
+    "w": 1600,
+    "h": 6713,
+    "bytes": 470840
+   }
+  ]
+ },
+ "lrcentroesportivo-br": {
+  "thumb": "/projetos/web/lrcentroesportivo-br-thumb.webp",
+  "height": 10358,
+  "slices": [
+   {
+    "src": "/projetos/web/lrcentroesportivo-br-1.webp",
+    "w": 1600,
+    "h": 8000,
+    "bytes": 745944
+   },
+   {
+    "src": "/projetos/web/lrcentroesportivo-br-2.webp",
+    "w": 1600,
+    "h": 2358,
+    "bytes": 166430
+   }
+  ]
+ },
+ "luminaspsicologia-br": {
+  "thumb": "/projetos/web/luminaspsicologia-br-thumb.webp",
+  "height": 12506,
+  "slices": [
+   {
+    "src": "/projetos/web/luminaspsicologia-br-1.webp",
+    "w": 1600,
+    "h": 8000,
+    "bytes": 684732
+   },
+   {
+    "src": "/projetos/web/luminaspsicologia-br-2.webp",
+    "w": 1600,
+    "h": 4506,
+    "bytes": 428032
+   }
+  ]
+ },
+ "otorrinoasanorte-br": {
+  "thumb": "/projetos/web/otorrinoasanorte-br-thumb.webp",
+  "height": 6376,
+  "slices": [
+   {
+    "src": "/projetos/web/otorrinoasanorte-br-1.webp",
+    "w": 1600,
+    "h": 6376,
+    "bytes": 492920
+   }
+  ]
+ },
+ "procedimentosfaciais-br": {
+  "thumb": "/projetos/web/procedimentosfaciais-br-thumb.webp",
+  "height": 5918,
+  "slices": [
+   {
+    "src": "/projetos/web/procedimentosfaciais-br-1.webp",
+    "w": 1600,
+    "h": 5918,
+    "bytes": 649302
+   }
+  ]
+ }
+}

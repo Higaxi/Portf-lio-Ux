@@ -34,6 +34,10 @@ Os 4 projetos em destaque são definidos em `FEATURED`, no topo de `src/componen
 - As capas de Premium League e Hora do Lar são composições em HTML (`design/capas/pl.html` e `hl.html`) com telas reais, renderizadas em 2x para `public/projetos/<case>/capa.webp`. A imagem de compartilhamento de cada case é `og.jpg`, na mesma pasta.
 - Os protótipos animados dos cases ficam em `src/components/prototypes.tsx` e `prototypes-extra.tsx`. São recriações ilustrativas (o site avisa isso), não as telas originais.
 
+## Web Design
+
+As capturas full-page dos sites ficam em `public/projetos/web/` (WebP a 1600px, fatias de até 8000px e thumb do topo), geradas por `node scripts/otimizar-web.mjs <pasta-das-capturas>`. Clientes, segmentos e páginas ficam em `src/content/web-design.ts`.
+
 ## Variáveis de ambiente
 
 Copie `.env.example` para `.env.local` (que nunca vai para o Git).

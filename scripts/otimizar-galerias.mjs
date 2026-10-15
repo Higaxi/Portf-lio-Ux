@@ -1,5 +1,5 @@
 /**
- * Otimiza as imagens dos manuais de marca e da galeria de social media.
+ * Otimiza as imagens dos manuais de marca.
  *
  *   node scripts/otimizar-galerias.mjs <pasta-brand>
  *
@@ -17,7 +17,6 @@ const sets = [
   ["nurotulo", "marca/nurotulo"],
   ["startingstars", "marca/starting-stars"],
   ["ivy", "marca/grupo-ivy"],
-  ["social", "social"],
 ];
 
 const manifest = {};
