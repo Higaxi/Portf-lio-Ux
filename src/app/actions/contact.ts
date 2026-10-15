@@ -74,8 +74,8 @@ export async function sendContact(_prev: ContactState, form: FormData): Promise<
   }
 
   const apiKey = process.env.RESEND_API_KEY;
-  const to = process.env.CONTACT_TO_EMAIL;
-  if (!apiKey || !to) {
+  const to = process.env.CONTACT_TO_EMAIL || profile.email;
+  if (!apiKey) {
     return {
       status: "unconfigured",
       message: `O envio pelo formulário ainda não está ativo. Escreva direto para ${profile.email}; sua mensagem continua aqui para você copiar.`,
@@ -92,9 +92,9 @@ export async function sendContact(_prev: ContactState, form: FormData): Promise<
         from,
         to: [to],
         reply_to: values.email,
-        subject: `Portfólio: mensagem de ${values.name}`,
-        text: `${values.message}\n\n— ${values.name} <${values.email}>`,
-        html: `<p>${escapeHtml(values.message).replace(/\n/g, "<br>")}</p><p>— ${escapeHtml(values.name)} &lt;${escapeHtml(values.email)}&gt;</p>`,
+        subject: "Veio do site de portfólio",
+        text: `Nome: ${values.name}\nE-mail: ${values.email}\n\n${values.message}\n\nPara responder, é só usar "Responder": vai direto para quem escreveu.`,
+        html: `<p><strong>Nome:</strong> ${escapeHtml(values.name)}<br><strong>E-mail:</strong> ${escapeHtml(values.email)}</p><p>${escapeHtml(values.message).replace(/\n/g, "<br>")}</p><p style="color:#646464">Para responder, é só usar "Responder": vai direto para quem escreveu.</p>`,
       }),
       signal: AbortSignal.timeout(10_000),
     });
