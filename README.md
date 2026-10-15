@@ -30,8 +30,9 @@ Os 4 projetos em destaque são definidos em `FEATURED`, no topo de `src/componen
 
 ## Capas e protótipos
 
-- As capas de Premium League e Pormade são ilustrações em SVG geradas por `scripts/gerar-capas.mjs`, que também gera as imagens de compartilhamento (`og.png`). Depois de editar o script, rode `node scripts/gerar-capas.mjs`.
-- Os protótipos animados dos cases ficam em `src/components/prototypes.tsx`. São recriações ilustrativas (o site avisa isso), não as telas originais.
+- Capas dos cards: as capas publicadas no Behance, ajustadas para 16:9 por `scripts/capas-behance.mjs`, ficam em `public/projetos/capas/`.
+- As capas de Premium League e Hora do Lar são composições em HTML (`design/capas/pl.html` e `hl.html`) com telas reais, renderizadas em 2x para `public/projetos/<case>/capa.webp`. A imagem de compartilhamento de cada case é `og.jpg`, na mesma pasta.
+- Os protótipos animados dos cases ficam em `src/components/prototypes.tsx` e `prototypes-extra.tsx`. São recriações ilustrativas (o site avisa isso), não as telas originais.
 
 ## Variáveis de ambiente
 
