@@ -27,12 +27,12 @@ export const premiumLeague: CaseStudy = {
   // mínimo para valorizar, estatísticas e notificações).
   metric: { value: "5 de 8", label: "oportunidades das entrevistas hoje fazem parte do plano PRO" },
   cover: {
-    src: `${dir}/capa.svg`,
-    alt: "Ilustração da nova tela de escalação do Premium League num celular: campo verde com a formação 4-3-3, cards de jogadores com preço, banco de reservas e navegação inferior, sobre fundo azul da marca; atrás, desfocada, a versão antiga roxa.",
-    width: 1600,
-    height: 900,
+    src: `${dir}/capa.webp`,
+    alt: "Capa do case Premium League: a tela de escalação redesenhada em destaque, entre a versão antiga roxa e a tela de abertura, sobre fundo azul da marca com linhas de campo, e o título Redesign + Design System.",
+    width: 1920,
+    height: 1080,
   },
-  og: `${dir}/og.png`,
+  og: `${dir}/og.jpg`,
   draft: true,
   facts: [
     ["Método", "Double Diamond"],
@@ -146,8 +146,7 @@ export const premiumLeague: CaseStudy = {
         "O redesign foi a porta de entrada do novo design system da Tecnologia Única: componentes, regras e documentação compartilhados entre design e desenvolvimento.",
         "O mesmo sistema passou a dar consistência visual e de usabilidade a 10 plataformas digitais e reduziu em 30% o tempo de desenvolvimento de novos recursos.",
       ],
-      art: "design-system",
-      note: "Ilustração do conceito, desenhada para este estudo; não é uma captura do sistema real.",
+      custom: "pl-design-system",
     },
     {
       id: "antes-depois",

@@ -21,12 +21,12 @@ export const podeRegularizar: CaseStudy = {
   platforms: "App mobile",
   metric: { value: "12 → 23", label: "clientes atendidos por mês" },
   cover: {
-    src: `${dir}/capa.svg`,
-    alt: "Ilustração do app Pode Regularizar num celular: painel com o cumprimento da meta do mês em barra laranja, receita, compromissos do dia na agenda e atalhos, sobre fundo azul.",
+    src: "/projetos/capas/pode-regularizar.webp",
+    alt: "Capa do projeto Pode Regularizar publicada pelo Mateus: celular sobre uma mesa com a lista de imóveis cadastrados e o título Atualização do app.",
     width: 1600,
     height: 900,
   },
-  og: `${dir}/og.png`,
+  og: `${dir}/og.jpg`,
   draft: true,
   facts: [
     ["Tipo", "Freelance · plataforma digital"],

@@ -150,103 +150,139 @@ export function PremiumLeaguePrototype() {
 /* ---------- Pormade: fluxo do vendedor em campo ---------- */
 
 const pmSteps: ProtoStep[] = [
-  { label: "Selecionar o cliente", ms: 2000 },
-  { label: "Escolher a porta no catálogo", ms: 2200 },
-  { label: "Ajustar medidas e acabamento", ms: 2400 },
-  { label: "Proposta gerada com o total", ms: 2200 },
-  { label: "Enviar ao cliente", ms: 1800 },
+  { label: "Cadastro do cliente e da obra", ms: 2200 },
+  { label: "Catálogo: escolher a categoria", ms: 2000 },
+  { label: "Configurar tamanho, cor e material", ms: 2400 },
+  { label: "Revisar o carrinho e gerar a proposta", ms: 2200 },
+  { label: "Compartilhar pelo WhatsApp ou e-mail", ms: 1800 },
   { label: "Proposta enviada", ms: 2200 },
 ];
-const pmClock = ["0:20", "1:05", "2:10", "3:00", "3:30", "3:45"];
+const pmClock = ["0:30", "1:10", "2:05", "2:50", "3:10", "3:20"];
+const pmGreen = "#2e5f2e";
+const pmLime = "#8bc34a";
+const pmCategories = ["Kit Porta Pronta", "Folha de Porta", "Porta de Correr", "Rodapé", "Papel de Parede", "Piso Vinílico"];
+
+function DoorIcon({ i }: { i: number }) {
+  // Ícones de linha simples, no estilo das telas reais (traço verde).
+  const paths = [
+    "M6 3h12v18H6z M14 12h1",
+    "M8 3h8v18H8z M13 12h1",
+    "M4 3h10v18H4z M14 3h6v18h-6",
+    "M3 16l18-6 M3 20l18-6",
+    "M7 3h10v14l-5 4H7z",
+    "M3 3h18v18H3z M3 9h18 M3 15h18 M9 3v18 M15 3v18",
+  ];
+  return (
+    <svg viewBox="0 0 24 24" className="mx-auto size-7" fill="none" stroke={pmGreen} strokeWidth="1.6" aria-hidden="true">
+      <path d={paths[i]} />
+    </svg>
+  );
+}
 
 export function PormadePrototype() {
-  const wood = "#c8743a";
   return (
     <PrototypePlayer
-      title="Protótipo do fluxo do vendedor no gerador de propostas"
+      title="Protótipo do fluxo do vendedor no Gerador de Propostas"
       steps={pmSteps}
-      accent={wood}
+      accent={pmGreen}
       render={(s) => (
         <>
-          <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between bg-[#141210] px-4 pb-2 pt-8 text-white">
-            <span className="font-semibold">Nova proposta</span>
-            <span className="tabular rounded-full bg-white/15 px-2 py-0.5 text-[10px]" title="Tempo do fluxo (ilustrativo)">
+          <div className="absolute inset-x-0 top-0 z-10 flex items-end justify-between bg-white px-4 pb-2 pt-8" style={{ borderBottom: `3px solid ${pmLime}` }}>
+            <span className="leading-none">
+              <b className="block text-[15px]" style={{ color: pmGreen }}>
+                Pormade
+              </b>
+              <span className="text-[9px] text-[#6b7280]">Portas</span>
+            </span>
+            <span className="tabular rounded-full px-2 py-0.5 text-[10px] text-white" style={{ background: pmGreen }} title="Tempo do fluxo (ilustrativo)">
               ⏱ {pmClock[s]} min
             </span>
           </div>
-          <div className="absolute inset-0 top-[62px]">
+          <div className="absolute inset-0 top-[66px] bg-[#f6f7f5]">
             <Screen show={s === 0}>
-              <p className="px-4 pt-3 font-semibold">Cliente</p>
-              <ul className="flex flex-col gap-2 p-3">
-                {["Construtora Exemplo", "Loja Modelo", "Residencial Teste"].map((c, i) => (
-                  <li key={c} className={`relative rounded-lg border px-3 py-3 ${i === 0 ? "border-[#c8743a] bg-[#fbf3ec]" : "border-[#e5e7eb]"}`}>
-                    {c}
-                    {i === 0 ? <Tap on /> : null}
-                  </li>
-                ))}
-              </ul>
-            </Screen>
-            <Screen show={s === 1}>
-              <p className="px-4 pt-3 font-semibold">Catálogo de portas</p>
-              <ul className="grid grid-cols-2 gap-2 p-3">
-                {["#b98a5f", "#e9e4dc", "#8a5a33", "#3a3a3a"].map((c, i) => (
-                  <li key={c} className={`rounded-lg border p-2 ${i === 0 ? "border-[#c8743a] ring-2 ring-[#c8743a]" : "border-[#e5e7eb]"}`}>
-                    <span className="mx-auto block h-20 w-12 rounded-sm" style={{ background: c }} />
-                    <span className="mt-1 block text-center text-[10px]">Modelo {i + 1}</span>
-                  </li>
-                ))}
-              </ul>
-            </Screen>
-            <Screen show={s === 2}>
-              <p className="px-4 pt-3 font-semibold">Medidas e acabamento</p>
-              <div className="flex flex-col gap-3 p-3">
+              <p className="px-4 pt-3 font-semibold">Cadastro de cliente</p>
+              <div className="flex flex-col gap-2 p-3">
                 {[
-                  ["Largura", s === 2 ? "80 cm" : "70 cm"],
-                  ["Altura", "210 cm"],
-                ].map(([k, v]) => (
-                  <div key={k} className="flex items-center justify-between rounded-lg border border-[#e5e7eb] px-3 py-2">
-                    <span className="text-[#6b7280]">{k}</span>
-                    <span className="flex items-center gap-2">
-                      <span className="flex size-6 items-center justify-center rounded-full bg-[#f3f4f6]">−</span>
-                      <b>{v}</b>
-                      <span className="flex size-6 items-center justify-center rounded-full bg-[#f3f4f6]">+</span>
+                  ["Nome completo", "Construtora Exemplo"],
+                  ["DDD + Telefone", "(00) 0000-0000"],
+                  ["Obra", "Residencial Exemplo, bloco B"],
+                ].map(([k, v], i) => (
+                  <div key={k} className="rounded-lg border border-[#d9dcd5] bg-white px-3 py-2">
+                    <span className="block text-[9px] text-[#6b7280]">{k}</span>
+                    <span className={ease} style={{ opacity: s === 0 ? 1 : 0, transitionDelay: `${300 + i * 300}ms` }}>
+                      {v}
                     </span>
                   </div>
                 ))}
-                <p className="text-[#6b7280]">Acabamento</p>
-                <div className="flex gap-2">
+                <span className="mt-1 rounded-lg py-2.5 text-center font-semibold text-white" style={{ background: pmGreen }}>
+                  Confirmar cadastro
+                </span>
+              </div>
+            </Screen>
+            <Screen show={s === 1}>
+              <div className="m-3 rounded-xl bg-white p-3">
+                <p className="text-center text-[13px]" style={{ color: pmGreen }}>
+                  Gerador de
+                </p>
+                <p className="text-center text-[15px] font-bold">Propostas</p>
+                <ul className="mt-3 grid grid-cols-3 gap-2">
+                  {pmCategories.map((c, i) => (
+                    <li key={c} className={`rounded-lg border p-2 text-center text-[8px] leading-tight ${i === 0 ? "ring-2" : ""}`} style={{ borderColor: "#d9dcd5", ["--tw-ring-color" as string]: pmGreen }}>
+                      <DoorIcon i={i} />
+                      <span className="mt-1 block">{c}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </Screen>
+            <Screen show={s === 2}>
+              <p className="px-4 pt-3 font-semibold">Kit Porta Pronta</p>
+              <div className="flex flex-col gap-3 p-3">
+                <span className="mx-auto block h-28 w-16 rounded-sm bg-[#b98a5f] ring-4 ring-white" />
+                {[
+                  ["Tamanho", s === 2 ? "80 × 210 cm" : "70 × 210 cm"],
+                  ["Material", "Madeira"],
+                ].map(([k, v]) => (
+                  <div key={k} className="flex items-center justify-between rounded-lg border border-[#d9dcd5] bg-white px-3 py-2">
+                    <span className="text-[#6b7280]">{k}</span>
+                    <b>{v}</b>
+                  </div>
+                ))}
+                <div className="flex items-center gap-2">
+                  <span className="text-[#6b7280]">Cor</span>
                   {["#c8a27a", "#8a5a33", "#e9e4dc", "#3a3a3a"].map((c, i) => (
-                    <span key={c} className={`size-8 rounded-full ${i === 1 ? "ring-2 ring-[#111827] ring-offset-2" : ""}`} style={{ background: c }} />
+                    <span key={c} className={`size-7 rounded-full ${i === 1 ? "ring-2 ring-offset-2" : ""}`} style={{ background: c, ["--tw-ring-color" as string]: pmGreen }} />
                   ))}
                 </div>
               </div>
             </Screen>
             <Screen show={s >= 3}>
-              <p className="px-4 pt-3 font-semibold">Resumo da proposta</p>
+              <p className="px-4 pt-3 font-semibold">Carrinho</p>
               <ul className="flex flex-col p-3 text-[11px]">
-                {[
-                  ["Porta · Modelo 1", "1 un."],
-                  ["80 × 210 cm · madeira", ""],
-                  ["Batente e fechadura", "1 kit"],
-                  ["Instalação", "incluída"],
-                ].map(([a, b]) => (
-                  <li key={a} className="flex justify-between border-b border-[#eee] py-2">
+                {["Kit Porta Pronta · 80 × 210", "Rodapé · 12 m", "Piso Vinílico · 18 m²"].map((a) => (
+                  <li key={a} className="flex justify-between border-b border-[#e4e7e1] py-2">
                     <span>{a}</span>
-                    <span className="text-[#6b7280]">{b}</span>
+                    <span className="text-[#6b7280]">1</span>
                   </li>
                 ))}
               </ul>
-              <div className="flex items-end justify-between px-3">
-                <span className="text-[#6b7280]">Total</span>
-                <b className="text-[18px]">R$ 4.380,00</b>
-              </div>
-              <div className="relative mt-auto p-3">
-                <span className={`flex items-center justify-center rounded-full px-3 py-3 font-semibold text-white ${ease} ${s === 4 ? "scale-95" : ""}`} style={{ background: wood }}>
-                  Enviar ao cliente
+              <div className="relative mt-auto grid grid-cols-2 gap-2 p-3">
+                <span className="rounded-lg bg-[#f2766a] py-2.5 text-center font-semibold text-white">Cancelar</span>
+                <span className={`rounded-lg py-2.5 text-center font-semibold text-white ${ease} ${s === 3 ? "scale-95" : ""}`} style={{ background: pmGreen }}>
+                  Gerar proposta
                 </span>
               </div>
+              <div className={`absolute inset-x-3 bottom-16 rounded-xl bg-white p-3 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.35)] ${ease} ${s === 4 ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}>
+                <p className="mb-2 font-semibold">Compartilhar proposta</p>
+                <div className="grid grid-cols-2 gap-2 text-center text-[11px]">
+                  <span className="rounded-lg bg-[#25d366] py-2 font-semibold text-white">WhatsApp</span>
+                  <span className="rounded-lg border border-[#d9dcd5] py-2">E-mail</span>
+                </div>
+              </div>
               <div className={`absolute inset-0 flex flex-col items-center justify-center gap-2 bg-white/95 ${ease} ${s === 5 ? "opacity-100" : "pointer-events-none opacity-0"}`}>
-                <span className={`flex size-16 items-center justify-center rounded-full bg-[#16a34a] text-[28px] text-white ${ease} ${s === 5 ? "scale-100" : "scale-50"}`}>✓</span>
+                <span className={`flex size-16 items-center justify-center rounded-full text-[28px] text-white ${ease} ${s === 5 ? "scale-100" : "scale-50"}`} style={{ background: pmGreen }}>
+                  ✓
+                </span>
                 <b className="text-[14px]">Proposta enviada</b>
                 <span className="text-[#6b7280]">em minutos, ainda na visita</span>
               </div>

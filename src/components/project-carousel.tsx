@@ -209,7 +209,7 @@ export function ProjectCarousel({ items, labelledBy }: { items: CarouselItem[]; 
 
   const renderItem = (item: CarouselItem, clone: boolean) => {
     const media = (
-      <div aria-hidden="true" className="relative aspect-[4/3] overflow-hidden rounded-xl bg-surface">
+      <div aria-hidden="true" className="relative aspect-video overflow-hidden rounded-xl bg-surface">
         <Image
           src={item.image.src}
           alt={clone ? "" : item.image.alt}

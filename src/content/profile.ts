@@ -205,7 +205,7 @@ export const profile: Profile = {
       place: "São Paulo",
       description:
         "Coordenou o time de designers e a qualidade de todas as entregas de design, perto dos clientes. Antes, como Product Designer Pleno, conduziu pesquisas de usabilidade, interfaces e testes A/B.",
-      result: "App de vendas da Pormade Portas: fechamento de uma venda de dias para minutos.",
+      result: "Gerador de propostas da Pormade: de 2 dias para 3 a 5 minutos por proposta, com 91% de adoção pelos vendedores.",
     },
     {
       company: "Camaleó Creative",

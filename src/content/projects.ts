@@ -2,6 +2,7 @@ import { miniCases } from "./mini-cases";
 import { premiumLeague } from "./premium-league";
 import { podeRegularizar } from "./pode-regularizar";
 import { horaDoLar } from "./hora-do-lar";
+import { pormade } from "./pormade";
 
 /**
  * Projetos.
@@ -63,7 +64,7 @@ export type Chapter = {
   /** Ilustração desenhada em código. */
   art?: "design-system";
   /** Componente especial do capítulo. */
-  custom?: "homepage-anatomy" | "app-screens";
+  custom?: "homepage-anatomy" | "app-screens" | "pl-design-system";
   /** Nota pequena ao fim do capítulo (fonte, ressalva). */
   note?: string;
   /** Protótipo animado ilustrativo exibido no capítulo. */
@@ -127,7 +128,7 @@ export type CaseStudy = {
   learnings?: Learning[];
 };
 
-export type ProjectCategory = "produto" | "branding";
+export type ProjectCategory = "produto" | "branding" | "conceito" | "landing";
 
 /**
  * Case resumido (página leve em /projetos/[slug]).
@@ -156,7 +157,17 @@ export type MoreProject = {
 export const categoryLabels: Record<ProjectCategory, string> = {
   produto: "Produto e UI",
   branding: "Branding",
+  conceito: "Conceito",
+  landing: "Landing page",
 };
+
+/** Capa publicada no Behance, ajustada para 16:9 (public/projetos/capas). */
+const cover = (slug: string, alt: string, width = 1920, height = 1080): ProjectImage => ({
+  src: `/projetos/capas/${slug}.webp`,
+  alt,
+  width,
+  height,
+});
 
 const board = (slug: string, alt: string): ProjectImage => ({
   src: `/projetos/mais/${slug}.jpg`,
@@ -168,124 +179,7 @@ const board = (slug: string, alt: string): ProjectImage => ({
 export const caseStudies: CaseStudy[] = [
   premiumLeague,
   horaDoLar,
-  {
-    slug: "pormade",
-    title: "Pormade: vendas sem papel",
-    summary: "Um gerador de propostas mobile que tirou do papel o fluxo de vendas de uma fabricante de portas.",
-    year: "2020 – 2022", // TODO: ano exato do projeto
-    context: "Digitaly Tech, para Pormade Portas",
-    role: "Product Designer · Líder técnico de UX/UI", // TODO: confirme seu papel neste projeto
-    platforms: "App mobile",
-    metric: { value: "dias → minutos", label: "para fechar uma venda" },
-    cover: {
-      src: "/projetos/pormade/capa.svg",
-      alt: "Ilustração do gerador de propostas num tablet: etapas Cliente, Porta, Medidas, Acabamento e Resumo; a porta configurada com 80 por 210 centímetros e acabamento em madeira; o resumo com o total e o botão Enviar proposta. Ao lado, o texto dias para minutos.",
-      width: 1600,
-      height: 900,
-    },
-    og: "/projetos/pormade/og.png",
-    draft: true,
-    // TODO-revisar: texto reconstruído (problema e processo)
-    problem: {
-      paragraphs: [
-        "A Pormade fabrica portas e vende por meio de vendedores em campo. Todo o fluxo de vendas acontecia em papel: a proposta era preenchida à mão, conferida e repassada, e fechar uma venda levava dias.",
-        "Público: vendedores que montam propostas na frente do cliente, longe do escritório, e precisam de rapidez e de poucos erros.",
-      ],
-    },
-    process: {
-      paragraphs: [
-        "Comecei entendendo com o cliente e com quem vende como a proposta era montada no papel, onde travava e o que mais gerava retrabalho.",
-        "Transformei esse caminho em um fluxo digital, cortando etapas de conferência, e validei a estrutura em wireframes antes da interface.",
-        "Fechei o protótipo de alta fidelidade, testei com os usuários e acompanhei o handoff e a qualidade das entregas como líder técnico de UX/UI.",
-      ],
-    },
-    solution: {
-      paragraphs: [
-        "Um aplicativo mobile de alta usabilidade substituiu o processo manual de ponta a ponta, pensado para quem vende em campo.",
-        "TODO: as telas e decisões de interface mais importantes (montagem da proposta, catálogo, envio ao cliente).",
-      ],
-    },
-    result: {
-      paragraphs: [
-        "O tempo para fechar uma venda caiu de dias para minutos, com mudança direta na operação e na experiência dos vendedores em campo.",
-      ],
-    },
-    gallery: [],
-    links: [],
-    // TODO-revisar: estudo de caso reconstruído. Os artefatos originais não foram
-    // guardados; tudo abaixo é qualitativo e precisa da sua validação.
-    deep: {
-      team: "TODO: quem mais estava no time (desenvolvimento, produto, cliente)",
-      tools: ["Figma", "Adobe Illustrator"], // TODO: confirme as ferramentas
-      objectives: {
-        business: [
-          "Encurtar o tempo entre a visita ao cliente e a venda fechada.",
-          "Reduzir erros e retrabalho na conferência de propostas.",
-          "Dar visibilidade às propostas em andamento.",
-        ],
-        user: [
-          "Montar uma proposta completa na frente do cliente, sem voltar ao escritório.",
-          "Encontrar produtos e opções rapidamente, com o mínimo de digitação.",
-          "Enviar a proposta na hora e saber em que etapa ela está.",
-        ],
-      },
-      discovery: [
-        "Conversas com o cliente e com as áreas envolvidas para entender o processo comercial e as regras de cada proposta.",
-        "Conversas com vendedores sobre a rotina em campo: onde a proposta era preenchida, o que costumava faltar e o que obrigava a refazer.",
-        "Mapeamento do caminho do papel, do preenchimento à aprovação, marcando esperas e pontos de conferência.",
-        "Benchmarking de aplicativos de força de vendas e geradores de propostas.",
-      ],
-      persona: {
-        name: "Vendedor em campo",
-        context: "Visita clientes ao longo do dia, apresenta produtos e precisa sair da conversa com a proposta encaminhada. Usa o celular como principal ferramenta de trabalho fora do escritório.",
-        goals: ["Fechar a venda enquanto o cliente ainda está interessado.", "Não errar medidas, modelos e valores."],
-        pains: ["Formulários em papel longos e fáceis de preencher errado.", "Dias de espera entre a visita e a proposta aprovada."],
-      },
-      journey: {
-        before: [
-          "Visita ao cliente",
-          "Proposta preenchida à mão",
-          "Envio do papel ao escritório",
-          "Conferência e correções",
-          "Aprovação",
-          "Proposta ao cliente: dias depois",
-        ],
-        after: [
-          "Visita ao cliente",
-          "Proposta montada no app",
-          "Validação na hora",
-          "Proposta enviada: minutos depois",
-        ],
-      },
-      flow: [
-        { label: "Entrada", steps: ["Login", "Início com propostas recentes"] },
-        { label: "Proposta", steps: ["Dados do cliente", "Catálogo de produtos", "Opções e medidas", "Resumo com valores"] },
-        { label: "Envio", steps: ["Revisão final", "Envio ao cliente", "Acompanhamento do status"] },
-      ],
-      wireframes: [
-        { title: "Início", note: "Ação principal no topo e propostas recentes logo abaixo.", blocks: ["bar", "button", "list", "list", "list"] },
-        { title: "Catálogo", note: "Busca e cards de produto com o mínimo de digitação.", blocks: ["bar", "field", "card", "card", "card"] },
-        { title: "Resumo", note: "Itens, valores e total antes do envio.", blocks: ["bar", "list", "list", "total", "button"] },
-      ],
-      testing: [
-        "Testes de usabilidade com o protótipo, observando vendedores montarem uma proposta do início ao fim.",
-        "Ajustes de ordem dos passos e de rótulos onde houve hesitação, e nova rodada de validação com o cliente.",
-        "Acompanhamento da implementação para manter a interface fiel ao que foi testado.",
-      ],
-    },
-    impact: {
-      claim: "dias → minutos",
-      caption: "para fechar uma venda, ainda na visita ao cliente.",
-      chips: ["Fluxo 100% digital", "Proposta enviada na hora", "Menos conferência e retrabalho"],
-      paragraphs: ["Transformação direta na operação e na experiência dos vendedores em campo."],
-    },
-    // TODO-revisar: aprendizados reconstruídos
-    learnings: [
-      { title: "Digitalizar não é copiar", text: "O ganho veio de cortar etapas, não de passar o formulário de papel para a tela." },
-      { title: "Desenhar para o campo", text: "Leitura rápida, toque grande e o mínimo de digitação para quem vende em pé, na frente do cliente." },
-      { title: "Qualidade até a entrega", text: "Acompanhar o desenvolvimento como líder técnico de UX/UI protegeu o resultado." },
-    ],
-  },
+  pormade,
   podeRegularizar,
 ];
 
@@ -295,7 +189,7 @@ const moreProjectsBase: Omit<MoreProject, "case">[] = [
     name: "Angel Investor",
     categories: ["produto"],
     description: "App de comunidade de investidores: cadastro por telefone, feed, stories e chat.",
-    image: board("angel-investor", "Telas do app Angel Investor Club: cadastro por número de telefone, feed da comunidade, stories e conversas, em roxo e branco."),
+    image: cover("angel-investor", "Capa do Angel Investor Club: celular com a tela de abertura, fotos de pessoas da comunidade e o botão Iniciar, sobre fundo preto."),
   },
   {
     slug: "akamai",
@@ -316,7 +210,7 @@ const moreProjectsBase: Omit<MoreProject, "case">[] = [
     name: "NuRótulo",
     categories: ["produto", "branding"],
     description: "Rebranding com antes e depois e o app de explorar produtos, com scanner e cartão saúde.",
-    image: board("nurotulo", "Antes e depois da marca NuRótulo e um celular com o app aberto na tela Explorar, com scanner, cartão saúde e categorias."),
+    image: cover("nurotulo", "Capa do app NuRótulo: celular com a tela de login, sobre fundo verde-azulado."),
   },
   {
     slug: "polaris",
@@ -330,7 +224,7 @@ const moreProjectsBase: Omit<MoreProject, "case">[] = [
     name: "Bloco do Urso",
     categories: ["produto"],
     description: "App de bloco de carnaval: notícias do evento, match entre foliões e metaverso.",
-    image: board("bloco-do-urso", "Telas do app Bloco do Urso em roxo e amarelo: notícias do primeiro dia, match entre foliões, área de metaverso e tela de abertura."),
+    image: cover("bloco-do-urso", "Capa do app Bloco do Urso: celular com a tela de abertura rosa e o logotipo do bloco, sobre fundo roxo."),
   },
   {
     slug: "virtualmed-clin",
@@ -380,6 +274,41 @@ const moreProjectsBase: Omit<MoreProject, "case">[] = [
     categories: ["branding"],
     description: "Materiais de marca: display, ecobag e bottons.",
     image: board("grupo-ivy", "Materiais do Grupo Ivy em rosa e preto: display de mesa, ecobag azul com o logotipo e bottons."),
+  },
+  {
+    slug: "banco-digital",
+    name: "Banco digital",
+    categories: ["conceito"],
+    description: "Conceito de app de banco digital: tela de entrada com acesso à conta e abertura de conta.",
+    image: cover("banco-digital", "Celular com a tela de entrada de um app de banco digital, com os botões Entrar na conta e Abrir uma conta, sobre fundo lilás."),
+  },
+  {
+    slug: "ticket-log",
+    name: "Ticket Log",
+    categories: ["conceito"],
+    description: "Conceito de app para a marca Ticket Log.",
+    image: cover("ticket-log", "Logotipo verde da Ticket Log sobre fundo escuro.", 1600, 900),
+  },
+  {
+    slug: "nasp",
+    name: "Nasp Engenharia",
+    categories: ["landing"],
+    description: "Website institucional para uma empresa de engenharia.",
+    image: cover("nasp", "Capa do projeto: logotipo da Nasp Engenharia e o título Website institucional, em UI/UX Design, sobre fundo escuro.", 1280, 720),
+  },
+  {
+    slug: "bugatti",
+    name: "Bugatti Store",
+    categories: ["conceito"],
+    description: "Conceito de loja da Bugatti: tela de abertura com o carro e chamada para explorar.",
+    image: cover("bugatti", "Tela de abertura conceitual da Bugatti com o carro, o título Bugatti e o botão Discover more, sobre fundo escuro com hexágonos.", 1280, 720),
+  },
+  {
+    slug: "mortal-kombat",
+    name: "Mortal Kombat",
+    categories: ["conceito"],
+    description: "Conceito de app com fichas de personagem e atributos de combate.",
+    image: cover("mortal-kombat", "Duas telas conceituais com a ficha do personagem Baraka e barras de dano, vida, combo e especial.", 1280, 720),
   },
 ];
 
