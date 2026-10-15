@@ -30,6 +30,14 @@ export const miniCases: Record<string, MiniCase> = {
       "Navegação inferior com quatro destinos fixos: explorar, conversas, início e ajustes.",
     ],
     delivery: "Protótipo de alta fidelidade com abertura, cadastro, feed, lista de conversas e chat.",
+    flow: [
+      { src: "/projetos/angel-investor/abertura.webp", width: 384, height: 842, title: "Abertura", alt: "Tela de abertura do Angel Investor Club com quatro fotos de pessoas em formas roxas e o botão Iniciar.", callouts: [ { x: 50, y: 40, text: "Fotos de pessoas em formas roxas dão rosto à comunidade logo na entrada." }, { x: 50, y: 88, text: "Uma única ação, Iniciar, em botão largo." } ] },
+      { src: "/projetos/angel-investor/cadastro.webp", width: 531, height: 1146, title: "Cadastro", alt: "Tela de cadastro com campo de telefone com a bandeira do Brasil e o botão Cadastre o seu número.", callouts: [ { x: 55, y: 78, text: "Cadastro só pelo telefone, com o código do país já preenchido." }, { x: 50, y: 88, text: "O botão diz exatamente o que vai acontecer." } ] },
+      { src: "/projetos/angel-investor/feed.webp", width: 528, height: 1155, title: "Feed", alt: "Feed da comunidade com stories no topo, publicações com foto e um botão flutuante de adicionar.", callouts: [ { x: 50, y: 7, text: "Stories no topo, padrão que o público já conhece." }, { x: 50, y: 86, text: "Botão flutuante para publicar." }, { x: 70, y: 95, text: "Navegação inferior com quatro destinos fixos." } ] },
+      { src: "/projetos/angel-investor/conversas.webp", width: 528, height: 1155, title: "Conversas", alt: "Lista de conversas com busca no topo, fotos dos membros e contadores de mensagens não lidas.", callouts: [ { x: 45, y: 6, text: "Busca por mensagem antes da lista." }, { x: 88, y: 32, text: "Contador de não lidas em roxo, sem depender só da cor: o número aparece." } ] },
+      { src: "/projetos/angel-investor/chat.webp", width: 528, height: 1071, title: "Chat", alt: "Conversa com mensagens em balões brancos e roxos e um link com imagem dentro da conversa.", callouts: [ { x: 72, y: 45, text: "Links e imagens aparecem com prévia dentro da conversa." } ] },
+    ],
+    resultsTodo: "TODO: se tiver resultados reais (adesão, uso do chat, publicações), acrescente aqui.",
   },
   // TODO-revisar: texto reconstruído
   akamai: {
@@ -49,6 +57,13 @@ export const miniCases: Record<string, MiniCase> = {
       "Mini design system com tipografia, cores, ícones, botões, formulários, calendários e gráficos.",
     ],
     delivery: "Telas de login, resumo, ataques, tráfego e hostnames, mais o quadro de componentes.",
+    flow: [
+      { src: "/projetos/akamai/login.webp", width: 438, height: 966, title: "Login", alt: "Tela de login do Akamai Mobile Control Center em azul, com seletor de idioma, e-mail, senha e botão Fazer login.", callouts: [ { x: 78, y: 8, text: "Seletor de idioma antes de tudo." }, { x: 50, y: 55, text: "Login direto: dois campos e uma ação." } ] },
+      { src: "/projetos/akamai/waf-resumo.webp", width: 423, height: 1050, title: "Resumo do WAF", alt: "Tela Web Application Firewall com contrato e período no topo, barras de tráfego, gráfico de pizza dos grupos de ataque e percentuais de ações aplicadas.", callouts: [ { x: 50, y: 8, text: "Contrato e período no topo: o filtro vem antes do dado." }, { x: 30, y: 22, text: "Barras para comparar volumes." }, { x: 30, y: 62, text: "Pizza para a proporção entre tipos de ataque." }, { x: 55, y: 92, text: "Percentuais grandes para leitura em segundos." } ] },
+      { src: "/projetos/akamai/trafego.webp", width: 423, height: 900, title: "Tráfego", alt: "Tela Tráfego Geral com barras coloridas por métrica e atalhos para WAF Attack Geral, Hostname e Top URLs.", callouts: [ { x: 50, y: 45, text: "Uma cor por métrica, com o valor escrito ao lado." }, { x: 50, y: 88, text: "Atalhos para as outras áreas no fim da tela." } ] },
+    ],
+    designSystem: { src: "/projetos/akamai/design-system.webp", width: 1329, height: 978, alt: "Mini design system do app: tipografia, cores, ícones e logotipos, botões, top bar, formulários, barra de navegação, calendários, gráficos, imagens, barra de pesquisa, avatares e campos de exibição." },
+    resultsTodo: "TODO: se tiver resultados reais (adoção, tempo de consulta, feedback do cliente), acrescente aqui.",
   },
   // TODO-revisar: texto reconstruído
   "app-de-viagens": {

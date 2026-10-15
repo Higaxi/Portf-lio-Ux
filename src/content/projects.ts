@@ -141,6 +141,22 @@ export type MiniCase = {
   process: string[];
   decisions: string[];
   delivery: string;
+  /** Jornada principal em telas grandes, com decisões numeradas sobre cada tela. */
+  flow?: FlowScreen[];
+  /** Mini design system em destaque (opcional). */
+  designSystem?: ProjectImage;
+  /** Pendência de resultados reais (aparece só em desenvolvimento). */
+  resultsTodo?: string;
+};
+
+export type FlowScreen = {
+  src: string;
+  width: number;
+  height: number;
+  title: string;
+  alt: string;
+  /** Posição em % sobre a tela e o texto da decisão. */
+  callouts: { x: number; y: number; text: string }[];
 };
 
 export type MoreProject = {
@@ -152,6 +168,8 @@ export type MoreProject = {
   image: ProjectImage;
   /** Só projetos de produto têm case resumido. */
   case?: MiniCase;
+  /** Imagem de compartilhamento do case resumido. */
+  og?: string;
 };
 
 export const categoryLabels: Record<ProjectCategory, string> = {
@@ -189,14 +207,16 @@ const moreProjectsBase: Omit<MoreProject, "case">[] = [
     name: "Angel Investor",
     categories: ["produto"],
     description: "App de comunidade de investidores: cadastro por telefone, feed, stories e chat.",
-    image: cover("angel-investor", "Capa do Angel Investor Club: celular com a tela de abertura, fotos de pessoas da comunidade e o botão Iniciar, sobre fundo preto."),
+    image: { src: "/projetos/angel-investor/capa.webp", alt: "Capa do case Angel Investor Club: três telas reais do app (cadastro, abertura e feed) em celulares sobre fundo roxo, com o título Comunidade de investidores.", width: 1920, height: 1080 },
+    og: "/projetos/angel-investor/og.jpg",
   },
   {
     slug: "akamai",
     name: "Akamai",
     categories: ["produto"],
     description: "App de painel de segurança com gráficos de tráfego e ataques, e um mini design system.",
-    image: board("akamai", "App mobile Akamai Mobile Control Center: login, gráficos de pizza e barras de ataques e tráfego, e um quadro de tipografia, cores, botões, formulários e gráficos."),
+    image: { src: "/projetos/akamai/capa.webp", alt: "Capa do case Akamai: telas reais de login, resumo do firewall e tráfego em celulares sobre fundo azul, com o título Segurança no bolso.", width: 1920, height: 1080 },
+    og: "/projetos/akamai/og.jpg",
   },
   {
     slug: "app-de-viagens",
@@ -240,20 +260,8 @@ const moreProjectsBase: Omit<MoreProject, "case">[] = [
     description: "Identidade visual entre ecologia e esporte: logotipo, camiseta e ecobag.",
     image: board("wineen", "Marca Wineen com folhas no logotipo, aplicada em camiseta de atleta, letreiro em fundo verde e ecobag."),
   },
-  {
-    slug: "gamerside",
-    name: "Gamerside",
-    categories: ["branding"],
-    description: "Marca gamer aplicada em mousepad, copo e periféricos.",
-    image: board("gamerside", "Símbolo da Gamerside em mousepad, copo de papel e mesa gamer com controle e fone, em roxo."),
-  },
-  {
-    slug: "startingstar",
-    name: "Startingstar",
-    categories: ["branding"],
-    description: "Marca e site de squads de desenvolvimento, com cartões de visita e mascote astronauta.",
-    image: board("startingstar", "Cartões de visita da Startingstar com mascote astronauta e o site de squads de desenvolvimento aberto num monitor."),
-  },
+
+
   {
     slug: "sixseeds",
     name: "Sixseeds",
@@ -268,13 +276,7 @@ const moreProjectsBase: Omit<MoreProject, "case">[] = [
     description: "Marca de cibersegurança aplicada em moletom e em site responsivo.",
     image: board("eight2s4", "Marca eight2s4 estampada em moletom preto e o site de cibersegurança aberto num celular e num monitor."),
   },
-  {
-    slug: "grupo-ivy",
-    name: "Grupo Ivy",
-    categories: ["branding"],
-    description: "Materiais de marca: display, ecobag e bottons.",
-    image: board("grupo-ivy", "Materiais do Grupo Ivy em rosa e preto: display de mesa, ecobag azul com o logotipo e bottons."),
-  },
+
   {
     slug: "banco-digital",
     name: "Banco digital",

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter_Tight, Space_Grotesk, Space_Mono } from "next/font/google";
 import { profile } from "@/content/profile";
 import { RevealObserver } from "@/components/reveal-observer";
+import { BackToTop } from "@/components/back-to-top";
 import "./globals.css";
 
 const display = Space_Grotesk({ subsets: ["latin"], weight: ["500"], variable: "--font-space-grotesk", display: "swap" });
@@ -52,6 +53,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </a>
         {children}
         <RevealObserver />
+        <BackToTop />
       </body>
     </html>
   );

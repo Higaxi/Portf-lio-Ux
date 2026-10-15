@@ -19,6 +19,9 @@ import { CaseCover, DesignSystemArt } from "@/components/case-art";
 import { FlowDiagram, JourneyDiagram, Wireframes } from "@/components/case-diagrams";
 import { isTodo, published, showTodos } from "@/lib/todo";
 import { CasePrototype } from "@/components/prototypes-extra";
+import { BrandCaseView } from "@/components/brand-case-view";
+import { FlowCallouts } from "@/components/flow-callouts";
+import { brandCases, getBrandCase } from "@/content/brand-cases";
 import { LearningCards, ResultBlock } from "@/components/case-outcome";
 import { HomepageAnatomy } from "@/components/homepage-anatomy";
 import { AppScreens } from "@/components/app-screens";
@@ -29,17 +32,22 @@ type Params = { slug: string };
 const miniProjects = moreProjects.filter((p) => p.case);
 
 export function generateStaticParams(): Params[] {
-  return [...caseStudies.map((c) => ({ slug: c.slug })), ...miniProjects.map((p) => ({ slug: p.slug }))];
+  return [
+    ...caseStudies.map((c) => ({ slug: c.slug })),
+    ...miniProjects.map((p) => ({ slug: p.slug })),
+    ...brandCases.map((b) => ({ slug: b.slug })),
+  ];
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug } = await params;
   const c = getCaseStudy(slug);
   const m = miniProjects.find((p) => p.slug === slug);
-  if (!c && !m) return {};
-  const title = c ? c.title : m!.name;
-  const description = c ? c.summary : m!.description;
-  const image = c ? (c.og ?? c.cover?.src) : m!.image.src;
+  const b = getBrandCase(slug);
+  if (!c && !m && !b) return {};
+  const title = c ? c.title : m ? m.name : b!.name;
+  const description = c ? c.summary : m ? m.description : b!.summary;
+  const image = c ? (c.og ?? c.cover?.src) : m ? (m.og ?? m.image.src) : `/projetos/${b!.dir}/01.webp`;
   return {
     title,
     description,
@@ -76,10 +84,11 @@ async function ProjectContent({ params }: { params: Promise<Params> }) {
   const { slug } = await params;
   const c = getCaseStudy(slug);
   const m = miniProjects.find((p) => p.slug === slug);
-  if (!c && !m) notFound();
+  const b = getBrandCase(slug);
+  if (!c && !m && !b) notFound();
   return (
     <>
-      {c ? <FullCase c={c} /> : <MiniCasePage p={m!} />}
+      {c ? <FullCase c={c} /> : m ? <MiniCasePage p={m} /> : <BrandCaseView b={b!} />}
       <NextProject current={slug} />
     </>
   );
@@ -519,17 +528,52 @@ function MiniCasePage({ p }: { p: MoreProject }) {
         <Section id="processo" title="Processo">
           <Bullets items={mc.process} />
         </Section>
-        <Section id="decisoes" title="Decisões de design">
-          <Bullets items={mc.decisions} />
-        </Section>
+        {mc.flow?.length ? (
+          <section id="entrega" aria-labelledby="entrega-titulo" className="border-t border-line py-14 md:py-20">
+            <div className="grid gap-4 md:grid-cols-12 md:gap-x-6">
+              <h2 id="entrega-titulo" data-reveal="title" className="text-lead md:col-span-4">
+                Entrega: a jornada principal
+              </h2>
+              <p className="max-w-[60ch] text-body md:col-span-8">
+                {mc.delivery} As decisões de design estão numeradas sobre cada tela.
+              </p>
+            </div>
+            <div className="mt-10">
+              <FlowCallouts screens={mc.flow} />
+            </div>
+          </section>
+        ) : (
+          <Section id="decisoes" title="Decisões de design">
+            <Bullets items={mc.decisions} />
+          </Section>
+        )}
+        {mc.designSystem ? (
+          <section id="design-system" aria-labelledby="ds-titulo" className="border-t border-line py-14 md:py-20">
+            <h2 id="ds-titulo" data-reveal="title" className="text-lead">
+              Mini design system
+            </h2>
+            <p className="mt-3 max-w-[60ch] text-body">
+              Tipografia, cores, ícones, botões, top bar, formulários, navegação, calendários, gráficos e campos de exibição documentados para manter as telas consistentes.
+            </p>
+            <div className="mt-8 overflow-hidden rounded-2xl bg-[#e9edf3] p-3 md:p-6">
+              <Image src={mc.designSystem.src} alt={mc.designSystem.alt} width={mc.designSystem.width} height={mc.designSystem.height} sizes="(min-width: 1440px) 1300px, 100vw" loading="eager" className="h-auto w-full rounded-lg" />
+            </div>
+          </section>
+        ) : null}
         {p.slug === "akamai" || p.slug === "angel-investor" ? (
           <Section id="prototipo" title="Protótipo">
             <CasePrototype id={p.slug === "akamai" ? "akamai" : "angel-investor"} />
           </Section>
         ) : null}
-        <Section id="entrega" title="Entrega">
-          <p className="max-w-[64ch] text-body">{mc.delivery}</p>
-        </Section>
+        {mc.flow?.length ? (
+          showTodos && mc.resultsTodo ? (
+            <p className="mb-10 rounded-lg bg-surface p-4 font-mono text-[0.875rem]">{mc.resultsTodo}</p>
+          ) : null
+        ) : (
+          <Section id="entrega" title="Entrega">
+            <p className="max-w-[64ch] text-body">{mc.delivery}</p>
+          </Section>
+        )}
       </div>
     </article>
   );
@@ -538,7 +582,11 @@ function MiniCasePage({ p }: { p: MoreProject }) {
 /* ---------- Próximo projeto ---------- */
 
 function NextProject({ current }: { current: string }) {
-  const order = [...caseStudies.map((c) => ({ slug: c.slug, name: c.title })), ...miniProjects.map((p) => ({ slug: p.slug, name: p.name }))];
+  const order = [
+    ...caseStudies.map((c) => ({ slug: c.slug, name: c.title })),
+    ...miniProjects.map((p) => ({ slug: p.slug, name: p.name })),
+    ...brandCases.map((b) => ({ slug: b.slug, name: b.name })),
+  ];
   const i = order.findIndex((o) => o.slug === current);
   const next = order[(i + 1) % order.length];
   return (

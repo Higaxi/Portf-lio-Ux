@@ -347,6 +347,21 @@ p {
   }
 }
 
+/* Troca de categoria de projetos: o painel que aparece entra com um fade curto. */
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.tab-panel:not([hidden]) {
+  animation: panel-in 380ms var(--ease-out-quart) both;
+}
+
 /* Acordeão: a altura anima por grid-template-rows (0fr → 1fr). Fechado,
    o conteúdo fica invisível e inerte (fora do teclado e do leitor de tela). */
 .accordion-panel {
