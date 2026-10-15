@@ -258,13 +258,14 @@ p {
     opacity: 1;
     transform: none;
   }
-  exit 0% {
+  exit 0%,
+  exit 65% {
     opacity: 1;
     transform: none;
   }
   exit 100% {
     opacity: 0;
-    transform: translateY(-32px);
+    transform: translateY(-16px);
   }
 }
 @keyframes fold-title {
@@ -276,13 +277,16 @@ p {
     clip-path: inset(0 0 0 0);
     transform: none;
   }
-  exit 0% {
+  exit 0%,
+  exit 65% {
     clip-path: inset(0 0 0 0);
+    opacity: 1;
     transform: none;
   }
   exit 100% {
-    clip-path: inset(100% 0 0 0);
-    transform: translateY(-30%);
+    clip-path: inset(0 0 0 0);
+    opacity: 0;
+    transform: translateY(-12px);
   }
 }
 @keyframes fold-card {
@@ -294,7 +298,8 @@ p {
     opacity: 1;
     transform: none;
   }
-  exit 0% {
+  exit 0%,
+  exit 65% {
     opacity: 1;
     transform: none;
   }

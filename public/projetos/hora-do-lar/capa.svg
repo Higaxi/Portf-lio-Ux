@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" font-family="Arial, Helvetica, sans-serif">
+  <rect width="1600" height="900" fill="#fbefe6"/>
+  <rect x="0" y="720" width="1600" height="180" fill="#f6dccb"/>
+  <text x="96" y="230" font-size="24" font-weight="700" letter-spacing="6" fill="#ef6c1a">HORA DO LAR</text>
+  <text x="90" y="310" font-size="60" font-weight="700" letter-spacing="-2" fill="#2a1830">Site novo</text>
+  <text x="90" y="378" font-size="60" font-weight="700" letter-spacing="-2" fill="#2a1830">e dois apps</text>
+  <text x="96" y="430" font-size="22" fill="#5b4a55">Gestão de empregados</text>
+  <text x="96" y="460" font-size="22" fill="#5b4a55">domésticos sem juridiquês</text>
+  
+  <rect x="502" y="152" width="796" height="506" rx="22" fill="#1d1d22"/>
+  <rect x="520" y="170" width="760" height="470" rx="6" fill="#ffffff"/>
+  <rect x="520" y="170" width="760" height="40" fill="#ef6c1a"/>
+  <text x="544" y="196" font-size="15" font-weight="700" fill="#fff">hora do lar</text>
+  <rect x="1130" y="180" width="70" height="22" rx="11" fill="#fff" fill-opacity="0.85"/>
+  <rect x="1208" y="180" width="54" height="22" rx="11" fill="none" stroke="#fff"/>
+  <text x="550" y="280" font-size="30" font-weight="700" fill="#222">Cuida da sua jornada</text>
+  <text x="550" y="318" font-size="30" font-weight="700" fill="#222">com empregados</text>
+  <text x="550" y="356" font-size="30" font-weight="700" fill="#ef6c1a">domésticos</text>
+  <rect x="550" y="378" width="300" height="10" rx="5" fill="#e5e7eb"/>
+  <rect x="550" y="396" width="250" height="10" rx="5" fill="#e5e7eb"/>
+  <rect x="550" y="432" width="220" height="44" rx="10" fill="#ef6c1a"/>
+  <text x="660" y="460" font-size="15" font-weight="700" fill="#fff" text-anchor="middle">Comece agora</text>
+  <rect x="940" y="230" width="310" height="380" rx="12" fill="#7a1f5c"/>
+  <rect x="970" y="280" width="250" height="280" rx="10" fill="#f4d7c3"/>
+  <circle cx="1110" cy="370" r="38" fill="#c98b62"/>
+  <rect x="1060" y="416" width="100" height="120" rx="40" fill="#f2f2f2"/>
+  <rect x="450" y="658" width="900" height="22" rx="11" fill="#2a2a30"/>
+  
+  <defs><clipPath id="hl-screen"><rect x="1170" y="150" width="300" height="640" rx="40"/></clipPath></defs>
+  <rect x="1158" y="138" width="324" height="664" rx="52" fill="#0b0b0f"/>
+  <g clip-path="url(#hl-screen)">
+    <rect x="1170" y="150" width="300" height="640" fill="#ffffff"/>
+    
+    <text x="1320" y="206" font-size="16" font-weight="700" fill="#ef6c1a" text-anchor="middle">hora do lar</text>
+    <text x="1192" y="254" font-size="22" font-weight="700" fill="#111">Oi Funcionário!</text>
+    <text x="1192" y="276" font-size="12" fill="#6b7280">Sexta-feira, 31 de janeiro</text>
+    <rect x="1190" y="300" width="128" height="52" rx="12" fill="#ef6c1a"/>
+    <text x="1254" y="332" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">Marcar o ponto</text>
+    <rect x="1328" y="300" width="122" height="52" rx="12" fill="#fff" stroke="#ef6c1a" stroke-width="2"/>
+    <text x="1389" y="332" font-size="13" fill="#ef6c1a" text-anchor="middle">Resumo do mês</text>
+    <rect x="1190" y="400" width="260" height="48" rx="10" fill="#f3f3f5"/>
+      <rect x="1204" y="414" width="20" height="20" rx="4" fill="none" stroke="#9ca3af" stroke-width="2"/>
+      <text x="1236" y="430" font-size="13" fill="#111">Entrada</text>
+      <text x="1436" y="430" font-size="13" font-weight="700" fill="#ef6c1a" text-anchor="end">08:00</text><rect x="1190" y="464" width="260" height="48" rx="10" fill="#f3f3f5"/>
+      <rect x="1204" y="478" width="20" height="20" rx="4" fill="none" stroke="#9ca3af" stroke-width="2"/>
+      <text x="1236" y="494" font-size="13" fill="#9ca3af">Intervalo</text>
+      <rect x="1190" y="528" width="260" height="48" rx="10" fill="#f3f3f5"/>
+      <rect x="1204" y="542" width="20" height="20" rx="4" fill="none" stroke="#9ca3af" stroke-width="2"/>
+      <text x="1236" y="558" font-size="13" fill="#9ca3af">Retorno intervalo</text>
+      <rect x="1190" y="592" width="260" height="48" rx="10" fill="#f3f3f5"/>
+      <rect x="1204" y="606" width="20" height="20" rx="4" fill="none" stroke="#9ca3af" stroke-width="2"/>
+      <text x="1236" y="622" font-size="13" fill="#9ca3af">Saída</text>
+      
+    <rect x="1210" y="662" width="220" height="40" rx="20" fill="#ef6c1a"/>
+    <text x="1320" y="687" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">Registrar intervalo</text>
+    <rect x="1170" y="726" width="300" height="64" fill="#faf7f5"/>
+    <circle cx="1208" cy="746" r="7" fill="none" stroke="#ef6c1a" stroke-width="2"/><text x="1208" y="770" font-size="10" fill="#ef6c1a" text-anchor="middle">Ponto</text><circle cx="1283" cy="746" r="7" fill="none" stroke="#9ca3af" stroke-width="2"/><text x="1283" y="770" font-size="10" fill="#6b7280" text-anchor="middle">Notificações</text><circle cx="1358" cy="746" r="7" fill="none" stroke="#9ca3af" stroke-width="2"/><text x="1358" y="770" font-size="10" fill="#6b7280" text-anchor="middle">Aprovações</text><circle cx="1433" cy="746" r="7" fill="none" stroke="#9ca3af" stroke-width="2"/><text x="1433" y="770" font-size="10" fill="#6b7280" text-anchor="middle">Menu</text>
+  </g>
+</svg>

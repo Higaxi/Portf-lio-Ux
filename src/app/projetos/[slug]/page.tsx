@@ -17,8 +17,11 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { CaseCover, DesignSystemArt } from "@/components/case-art";
 import { FlowDiagram, JourneyDiagram, Wireframes } from "@/components/case-diagrams";
-import { published, showTodos } from "@/lib/todo";
-import { AkamaiPrototype, AngelInvestorPrototype, PormadePrototype, PremiumLeaguePrototype } from "@/components/prototypes";
+import { isTodo, published, showTodos } from "@/lib/todo";
+import { CasePrototype } from "@/components/prototypes-extra";
+import { LearningCards, ResultBlock } from "@/components/case-outcome";
+import { HomepageAnatomy } from "@/components/homepage-anatomy";
+import { AppScreens } from "@/components/app-screens";
 
 type Params = { slug: string };
 
@@ -161,34 +164,36 @@ function Figure({ img, sizes }: { img: NonNullable<CaseStudy["problem"]["image"]
 
 function FullCase({ c }: { c: CaseStudy }) {
   const d = c.deep;
-  const toc: [string, string][] = c.chapters
+  const chapterToc: [string, string][] = c.chapters
     ? c.chapters.map((ch) => [ch.id, ch.title] as [string, string])
     : d
-    ? [
-        ["contexto", "Contexto e problema"],
-        ["objetivos", "Objetivos"],
-        ["descoberta", "Descoberta"],
-        ["persona", "Proto-persona"],
-        ["jornada", "Jornada atual e futura"],
-        ["fluxo", "Fluxo do app"],
-        ["wireframes", "Wireframes"],
-        ["interface", "Interface"],
-        ["testes", "Testes e iteração"],
-        ["resultado", "Resultado"],
-        ["aprendizados", "Aprendizados"],
-      ]
-    : [
-        ["contexto", "Contexto e problema"],
-        ["processo", "Processo"],
-        ["solucao", "Solução"],
-        ["resultado", "Resultado"],
-      ];
+      ? [
+          ["contexto", "Contexto e problema"],
+          ["objetivos", "Objetivos"],
+          ["descoberta", "Descoberta"],
+          ["persona", "Proto-persona"],
+          ["jornada", "Jornada atual e futura"],
+          ["fluxo", "Fluxo do app"],
+          ["wireframes", "Wireframes"],
+          ["interface", "Interface"],
+          ["testes", "Testes e iteração"],
+        ]
+      : [
+          ["contexto", "Contexto e problema"],
+          ["processo", "Processo"],
+          ["solucao", "Solução"],
+        ];
+  const toc: [string, string][] = [
+    ...chapterToc,
+    ["resultado", "Resultado"],
+    ...(c.learnings?.length ? ([["aprendizados", "Aprendizados"]] as [string, string][]) : []),
+  ];
 
   return (
     <article className="mt-6">
       <header>
         <p className="label">
-          {c.context} · {c.year}
+          {[c.context, c.year].filter((v) => showTodos || !isTodo(v)).join(" · ") || c.platforms}
         </p>
         <ViewTransition name={`titulo-${c.slug}`} share="morph" default="none">
           <h1 className="mt-3 max-w-[16ch] font-display text-[clamp(2.5rem,1.5rem+5vw,6.5rem)] font-medium uppercase leading-[0.9] tracking-[-0.04em]">
@@ -240,112 +245,90 @@ function FullCase({ c }: { c: CaseStudy }) {
         </ol>
       </nav>
 
-      {c.chapters ? (
-        <div className="mt-12">
-          {c.chapters.map((ch) => (
-            <ChapterSection key={ch.id} ch={ch} />
-          ))}
-          <CaseLinks links={c.links} />
-        </div>
-      ) : (
       <div className="mt-12">
-        <Section id="contexto" title="Contexto e problema">
-          <Paragraphs items={c.problem.paragraphs} />
-          {c.problem.image ? <Figure img={c.problem.image} sizes="(min-width: 768px) 60vw, 100vw" /> : null}
-        </Section>
-
-        {d ? (
-          <>
-            <Section id="objetivos" title="Objetivos">
-              <div className="grid gap-8 sm:grid-cols-2">
-                <div>
-                  <h3 className="label">Para o negócio</h3>
-                  <div className="mt-3">
-                    <Bullets items={d.objectives.business} />
-                  </div>
-                </div>
-                <div>
-                  <h3 className="label">Para quem usa</h3>
-                  <div className="mt-3">
-                    <Bullets items={d.objectives.user} />
-                  </div>
-                </div>
-              </div>
-            </Section>
-            <Section id="descoberta" title="Descoberta">
-              <Bullets items={d.discovery} />
-            </Section>
-            <Section id="persona" title="Proto-persona">
-              <div className="rounded-xl bg-surface p-6 md:p-8">
-                <p className="label">Proto-persona: hipótese construída com o time, não resultado de pesquisa quantitativa</p>
-                <h3 className="mt-3 font-display text-head font-medium tracking-tight">{d.persona.name}</h3>
-                <p className="mt-3 max-w-[60ch] text-body">{d.persona.context}</p>
-                <div className="mt-6 grid gap-6 sm:grid-cols-2">
-                  <div>
-                    <h4 className="label">Quer</h4>
-                    <div className="mt-2">
-                      <Bullets items={d.persona.goals} />
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="label">Sofre com</h4>
-                    <div className="mt-2">
-                      <Bullets items={d.persona.pains} />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Section>
-            <Section id="jornada" title="Jornada atual e futura">
-              <JourneyDiagram journey={d.journey} />
-            </Section>
-            <Section id="fluxo" title="Fluxo do app">
-              <FlowDiagram flow={d.flow} />
-            </Section>
-            <Section id="wireframes" title="Wireframes">
-              <Wireframes items={d.wireframes} />
-              <p className="label mt-6">Representação dos wireframes, redesenhada para este estudo.</p>
-            </Section>
-            <Section id="interface" title="Interface de alta fidelidade">
-              <Paragraphs items={c.solution.paragraphs} />
-              <div className="mt-8">
-                <PormadePrototype />
-              </div>
-              {showTodos && c.gallery.length === 0 ? (
-                <p className="label mt-4">TODO: adicione as telas finais em public/projetos/{c.slug}/ e preencha gallery.</p>
-              ) : null}
-            </Section>
-            <Section id="testes" title="Testes e iteração">
-              <Bullets items={d.testing} />
-            </Section>
-          </>
+        {c.chapters ? (
+          c.chapters.map((ch) => <ChapterSection key={ch.id} ch={ch} />)
         ) : (
           <>
-            <Section id="processo" title="Processo">
-              <Paragraphs items={c.process.paragraphs} />
+            <Section id="contexto" title="Contexto e problema">
+              <Paragraphs items={c.problem.paragraphs} />
+              {c.problem.image ? <Figure img={c.problem.image} sizes="(min-width: 768px) 60vw, 100vw" /> : null}
             </Section>
-            <Section id="solucao" title="Solução">
-              <Paragraphs items={c.solution.paragraphs} />
-              {c.solution.image ? <Figure img={c.solution.image} sizes="(min-width: 768px) 60vw, 100vw" /> : null}
-            </Section>
+
+            {d ? (
+              <>
+                <Section id="objetivos" title="Objetivos">
+                  <div className="grid gap-8 sm:grid-cols-2">
+                    <div>
+                      <h3 className="label">Para o negócio</h3>
+                      <div className="mt-3">
+                        <Bullets items={d.objectives.business} />
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="label">Para quem usa</h3>
+                      <div className="mt-3">
+                        <Bullets items={d.objectives.user} />
+                      </div>
+                    </div>
+                  </div>
+                </Section>
+                <Section id="descoberta" title="Descoberta">
+                  <Bullets items={d.discovery} />
+                </Section>
+                <Section id="persona" title="Proto-persona">
+                  <PersonaCard
+                    label="Proto-persona: hipótese construída com o time, não resultado de pesquisa quantitativa"
+                    name={d.persona.name}
+                    context={d.persona.context}
+                    goals={d.persona.goals}
+                    pains={d.persona.pains}
+                  />
+                </Section>
+                <Section id="jornada" title="Jornada atual e futura">
+                  <JourneyDiagram journey={d.journey} />
+                </Section>
+                <Section id="fluxo" title="Fluxo do app">
+                  <FlowDiagram flow={d.flow} />
+                </Section>
+                <Section id="wireframes" title="Wireframes">
+                  <Wireframes items={d.wireframes} />
+                  <p className="label mt-6">Representação dos wireframes, redesenhada para este estudo.</p>
+                </Section>
+                <Section id="interface" title="Interface de alta fidelidade">
+                  <Paragraphs items={c.solution.paragraphs} />
+                  <div className="mt-8">
+                    <CasePrototype id="pormade" />
+                  </div>
+                  {showTodos && c.gallery.length === 0 ? (
+                    <p className="label mt-4">TODO: adicione as telas finais em public/projetos/{c.slug}/ e preencha gallery.</p>
+                  ) : null}
+                </Section>
+                <Section id="testes" title="Testes e iteração">
+                  <Bullets items={d.testing} />
+                </Section>
+              </>
+            ) : (
+              <>
+                <Section id="processo" title="Processo">
+                  <Paragraphs items={c.process.paragraphs} />
+                </Section>
+                <Section id="solucao" title="Solução">
+                  <Paragraphs items={c.solution.paragraphs} />
+                  {c.solution.image ? <Figure img={c.solution.image} sizes="(min-width: 768px) 60vw, 100vw" /> : null}
+                </Section>
+              </>
+            )}
           </>
         )}
 
-        <Section id="resultado" title="Resultado">
-          <p className="font-display text-[clamp(2.5rem,1.5rem+4vw,5.5rem)] font-medium leading-[0.95] tracking-[-0.04em]">
-            {c.metric.value}
-          </p>
-          <p className="label mt-2">{c.metric.label}</p>
-          <div className="mt-8">
-            <Paragraphs items={c.result.paragraphs} />
-          </div>
-        </Section>
+        {c.impact ? (
+          <ResultBlock impact={c.impact} />
+        ) : (
+          <ResultBlock impact={{ claim: c.metric.value, caption: c.metric.label, chips: [], paragraphs: c.result.paragraphs }} />
+        )}
 
-        {d ? (
-          <Section id="aprendizados" title="Aprendizados">
-            <Bullets items={d.learnings} />
-          </Section>
-        ) : null}
+        {c.learnings?.length ? <LearningCards items={c.learnings} /> : null}
 
         {c.gallery.length > 0 ? (
           <section aria-labelledby="galeria-titulo" className="border-t border-line py-14 md:py-20">
@@ -363,18 +346,8 @@ function FullCase({ c }: { c: CaseStudy }) {
           </section>
         ) : null}
 
-        {!d && c.links.length > 0 ? (
-          <div className="flex flex-wrap gap-4 border-t border-line py-10">
-            {c.links.map((l) => (
-              <a key={l.href} href={l.href} target="_blank" rel="noopener noreferrer" className="btn-primary">
-                {l.label}
-                <span className="sr-only"> (abre em nova aba)</span>
-              </a>
-            ))}
-          </div>
-        ) : null}
+        <CaseLinks links={c.links} />
       </div>
-      )}
     </article>
   );
 }
@@ -399,19 +372,67 @@ function CaseLinks({ links }: { links: CaseStudy["links"] }) {
   );
 }
 
+function PersonaCard({
+  label,
+  name,
+  context,
+  goals,
+  pains,
+}: {
+  label: string;
+  name: string;
+  context?: string;
+  goals: string[];
+  pains: string[];
+}) {
+  return (
+    <div className="rounded-xl bg-surface p-6 md:p-8">
+      <p className="label">{label}</p>
+      <h3 className="mt-3 font-display text-head font-medium tracking-tight">{name}</h3>
+      {context ? <p className="mt-3 max-w-[60ch] text-body">{context}</p> : null}
+      <div className="mt-6 grid gap-6 sm:grid-cols-2">
+        <div>
+          <h4 className="label">Objetivos</h4>
+          <div className="mt-2">
+            <Bullets items={goals} />
+          </div>
+        </div>
+        <div>
+          <h4 className="label">Frustrações</h4>
+          <div className="mt-2">
+            <Bullets items={pains} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ChapterSection({ ch }: { ch: Chapter }) {
+  const stats = ch.columnsStyle !== "list";
   return (
     <Section id={ch.id} title={ch.title}>
       <div className="flex flex-col gap-8">
         {ch.paragraphs ? <Paragraphs items={ch.paragraphs} /> : null}
+        {ch.stages ? (
+          <ol className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+            {ch.stages.map((st, i) => (
+              <li key={st.title} className="flex flex-col rounded-xl bg-surface p-4">
+                <span className="label">Etapa {i + 1}</span>
+                <span className="mt-2 text-body font-medium">{st.title}</span>
+                {st.text ? <span className="mt-1 text-[0.9375rem] text-muted">{st.text}</span> : null}
+              </li>
+            ))}
+          </ol>
+        ) : null}
         {ch.columns ? (
-          <div className="grid gap-6 sm:grid-cols-2">
+          <div className={`grid gap-4 ${ch.columns.length >= 3 ? "md:grid-cols-3" : "sm:grid-cols-2"}`}>
             {ch.columns.map((col) => (
               <div key={col.title} className="rounded-xl bg-surface p-6">
                 <h3 className="label">{col.title}</h3>
-                <ul className="mt-3 flex flex-col gap-1">
+                <ul className={`mt-3 flex flex-col ${stats ? "gap-1" : "gap-2"}`}>
                   {col.items.map((it) => (
-                    <li key={it} className="font-display text-lead font-medium">
+                    <li key={it} className={stats ? "font-display text-lead font-medium" : "text-[0.9375rem] leading-snug"}>
                       {it}
                     </li>
                   ))}
@@ -420,9 +441,18 @@ function ChapterSection({ ch }: { ch: Chapter }) {
             ))}
           </div>
         ) : null}
+        {ch.persona ? (
+          <PersonaCard
+            label={ch.persona.label ?? "Persona"}
+            name={ch.persona.name}
+            context={ch.persona.context}
+            goals={ch.persona.goals}
+            pains={ch.persona.pains}
+          />
+        ) : null}
         {ch.bullets ? <Bullets items={ch.bullets} /> : null}
         {ch.quotes ? (
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className={`grid gap-4 ${ch.quotes.length >= 3 ? "lg:grid-cols-3" : "md:grid-cols-2"}`}>
             {ch.quotes.map((q) => (
               <figure key={q.text} className="rounded-xl bg-surface p-6">
                 <blockquote className="text-lead">“{q.text}”</blockquote>
@@ -440,14 +470,17 @@ function ChapterSection({ ch }: { ch: Chapter }) {
             ))}
           </ul>
         ) : null}
-        {ch.prototype ? <PremiumLeaguePrototype /> : null}
+        {ch.custom === "homepage-anatomy" ? <HomepageAnatomy /> : null}
+        {ch.custom === "app-screens" ? <AppScreens /> : null}
+        {ch.prototype ? <CasePrototype id={ch.prototype} /> : null}
         {ch.art === "design-system" ? (
           <div className="relative aspect-video overflow-hidden rounded-xl">
             <DesignSystemArt />
           </div>
         ) : null}
         {ch.image ? <Figure img={ch.image} sizes="(min-width: 768px) 60vw, 100vw" /> : null}
-        {ch.note ? <p className="label">{ch.note}</p> : null}
+        {ch.images?.map((img) => <Figure key={img.src} img={img} sizes="(min-width: 768px) 60vw, 100vw" />)}
+        {ch.note && (!isTodo(ch.note) || showTodos) ? <p className="label">{ch.note}</p> : null}
       </div>
     </Section>
   );
@@ -489,7 +522,7 @@ function MiniCasePage({ p }: { p: MoreProject }) {
         </Section>
         {p.slug === "akamai" || p.slug === "angel-investor" ? (
           <Section id="prototipo" title="Protótipo">
-            {p.slug === "akamai" ? <AkamaiPrototype /> : <AngelInvestorPrototype />}
+            <CasePrototype id={p.slug === "akamai" ? "akamai" : "angel-investor"} />
           </Section>
         ) : null}
         <Section id="entrega" title="Entrega">

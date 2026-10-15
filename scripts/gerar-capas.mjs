@@ -9,6 +9,7 @@
  */
 import { mkdirSync, writeFileSync } from "node:fs";
 import sharp from "sharp";
+import { horaDoLar, podeRegularizar } from "./capas-extra.mjs";
 
 const FONT = "Arial, Helvetica, sans-serif";
 
@@ -223,6 +224,8 @@ function pormade() {
 const out = [
   ["premium-league", premiumLeague()],
   ["pormade", pormade()],
+  ["pode-regularizar", podeRegularizar()],
+  ["hora-do-lar", horaDoLar()],
 ];
 
 for (const [slug, svg] of out) {

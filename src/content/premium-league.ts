@@ -130,7 +130,7 @@ export const premiumLeague: CaseStudy = {
     {
       id: "ideacao",
       title: "Ideação e testes",
-      prototype: true,
+      prototype: "premium-league",
       bullets: [
         "Interfaces mobile e desktop",
         "Testes de usabilidade com usuários reais",
@@ -166,23 +166,28 @@ export const premiumLeague: CaseStudy = {
         "Ações da escalação agrupadas e navegação inferior com Campeonatos, Notificações e Minha conta",
       ],
     },
-    {
-      id: "resultado",
-      title: "Resultado",
-      paragraphs: [
-        "Oportunidades mapeadas nas entrevistas hoje fazem parte do plano PRO do produto: sem propagandas, escalação automática, mínimo para valorizar, novos dados e estatísticas e todas as notificações do time. A pesquisa virou funcionalidade, e a funcionalidade virou parte da oferta paga, numa decisão de produto tomada com o time e o negócio.",
-        "No design system, o resultado foi 30% menos tempo para desenvolver novos recursos, com consistência em 10 plataformas.",
-      ],
-    },
-    {
-      id: "aprendizados",
-      title: "Aprendizados",
-      // TODO-revisar: aprendizados escritos a partir da narrativa da palestra
-      bullets: [
-        "Ouvir antes de redesenhar: o diagnóstico pedia reformulação total; as entrevistas mostraram o que preservar.",
-        "Pesquisa bem registrada vira roadmap: as oportunidades das entrevistas chegaram ao produto.",
-        "Um design system implantado num produto real é o melhor argumento para levá-lo aos outros.",
-      ],
-    },
+  ],
+  impact: {
+    claim: "Pesquisa → produto",
+    caption: "Oportunidades mapeadas nas entrevistas hoje fazem parte do plano PRO.",
+    chips: [
+      "Sem propagandas",
+      "Escalação automática",
+      "Mínimo para valorizar",
+      "Novos dados e estatísticas",
+      "Todas as notificações do time",
+      "Design system: −30% no tempo de desenvolvimento",
+      "10 plataformas consistentes",
+    ],
+    paragraphs: [
+      "A pesquisa virou funcionalidade, e a funcionalidade virou parte da oferta paga, numa decisão de produto tomada com o time e o negócio.",
+    ],
+    note: "Plano PRO conferido no site público do produto. O resultado do design system é do sistema como um todo.",
+  },
+  // TODO-revisar: aprendizados escritos a partir da narrativa da palestra
+  learnings: [
+    { title: "Ouvir antes de redesenhar", text: "O diagnóstico pedia reformulação total; as entrevistas mostraram o que preservar." },
+    { title: "Pesquisa vira roadmap", text: "Oportunidades bem registradas nas entrevistas chegaram ao produto e à oferta paga." },
+    { title: "Sistema provado em produto real", text: "Implantar o design system num produto em uso é o melhor argumento para levá-lo aos outros." },
   ],
 };

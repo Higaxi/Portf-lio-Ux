@@ -1,5 +1,7 @@
 import { miniCases } from "./mini-cases";
 import { premiumLeague } from "./premium-league";
+import { podeRegularizar } from "./pode-regularizar";
+import { horaDoLar } from "./hora-do-lar";
 
 /**
  * Projetos.
@@ -40,7 +42,6 @@ export type DeepCase = {
   flow: { label: string; steps: string[] }[];
   wireframes: { title: string; note: string; blocks: ("bar" | "field" | "list" | "card" | "button" | "total")[] }[];
   testing: string[];
-  learnings: string[];
 };
 
 /** Capítulo livre de um estudo de caso (usado no Premium League). */
@@ -49,17 +50,48 @@ export type Chapter = {
   title: string;
   paragraphs?: string[];
   bullets?: string[];
+  /** Colunas: "stats" mostra os itens grandes (números); "list", em lista. */
   columns?: { title: string; items: string[] }[];
+  columnsStyle?: "stats" | "list";
+  /** Etapas em sequência (jornada, passos). */
+  stages?: { title: string; text?: string }[];
+  persona?: { name: string; context?: string; goals: string[]; pains: string[]; label?: string };
   quotes?: { text: string; who: string }[];
   chips?: string[];
   image?: ProjectImage;
+  images?: ProjectImage[];
   /** Ilustração desenhada em código. */
   art?: "design-system";
+  /** Componente especial do capítulo. */
+  custom?: "homepage-anatomy" | "app-screens";
   /** Nota pequena ao fim do capítulo (fonte, ressalva). */
   note?: string;
   /** Protótipo animado ilustrativo exibido no capítulo. */
-  prototype?: boolean;
+  prototype?: PrototypeId;
 };
+
+export type PrototypeId =
+  | "premium-league"
+  | "pormade"
+  | "pode-regularizar"
+  | "hora-do-lar-funcionario"
+  | "hora-do-lar-empregador"
+  | "akamai"
+  | "angel-investor";
+
+/** Bloco de impacto (Resultado) com destaque em largura total. */
+export type Impact = {
+  /** A frase ou número principal, em tamanho de cartaz. */
+  claim: string;
+  caption: string;
+  chips: string[];
+  paragraphs?: string[];
+  /** Fonte ou ressalva. Começando com "TODO", só aparece em desenvolvimento. */
+  note?: string;
+};
+
+/** Aprendizado em card numerado. */
+export type Learning = { title: string; text: string };
 
 export type CaseStudy = {
   slug: string;
@@ -89,6 +121,10 @@ export type CaseStudy = {
   chapters?: Chapter[];
   /** Fatos extras do resumo (rótulo, valor). */
   facts?: [string, string][];
+  /** Resultado em destaque (todos os cases completos). */
+  impact?: Impact;
+  /** Aprendizados em cards numerados (todos os cases completos). */
+  learnings?: Learning[];
 };
 
 export type ProjectCategory = "produto" | "branding";
@@ -131,6 +167,7 @@ const board = (slug: string, alt: string): ProjectImage => ({
 
 export const caseStudies: CaseStudy[] = [
   premiumLeague,
+  horaDoLar,
   {
     slug: "pormade",
     title: "Pormade: vendas sem papel",
@@ -235,13 +272,21 @@ export const caseStudies: CaseStudy[] = [
         "Ajustes de ordem dos passos e de rótulos onde houve hesitação, e nova rodada de validação com o cliente.",
         "Acompanhamento da implementação para manter a interface fiel ao que foi testado.",
       ],
-      learnings: [
-        "Digitalizar não é copiar o formulário: o ganho veio de cortar etapas, não de passar o papel para a tela.",
-        "Desenhar para quem trabalha em campo pede leitura rápida, toque grande e o mínimo de digitação.",
-        "Liderar a qualidade das entregas até o fim do desenvolvimento protege o resultado do projeto.",
-      ],
     },
+    impact: {
+      claim: "dias → minutos",
+      caption: "para fechar uma venda, ainda na visita ao cliente.",
+      chips: ["Fluxo 100% digital", "Proposta enviada na hora", "Menos conferência e retrabalho"],
+      paragraphs: ["Transformação direta na operação e na experiência dos vendedores em campo."],
+    },
+    // TODO-revisar: aprendizados reconstruídos
+    learnings: [
+      { title: "Digitalizar não é copiar", text: "O ganho veio de cortar etapas, não de passar o formulário de papel para a tela." },
+      { title: "Desenhar para o campo", text: "Leitura rápida, toque grande e o mínimo de digitação para quem vende em pé, na frente do cliente." },
+      { title: "Qualidade até a entrega", text: "Acompanhar o desenvolvimento como líder técnico de UX/UI protegeu o resultado." },
+    ],
   },
+  podeRegularizar,
 ];
 
 const moreProjectsBase: Omit<MoreProject, "case">[] = [

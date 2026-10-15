@@ -3,11 +3,12 @@ import Link from "next/link";
 import { ViewTransition, type ReactNode } from "react";
 import { caseStudies, categoryLabels, moreProjects } from "@/content/projects";
 import { CaseCover } from "./case-art";
+import { isTodo, showTodos } from "@/lib/todo";
 import { RollText } from "./roll-text";
 import { ProjectCarousel } from "./project-carousel";
 
-/** Os 4 projetos de maior impacto, nesta ordem. */
-const FEATURED = ["premium-league", "pormade", "akamai", "angel-investor"];
+/** Os 6 projetos de maior impacto, nesta ordem. */
+const FEATURED = ["premium-league", "hora-do-lar", "pormade", "pode-regularizar", "akamai", "angel-investor"];
 
 type Card = { slug: string; name: string; meta: string; cta: string; media: ReactNode };
 
@@ -17,7 +18,8 @@ function buildFeatured(): Card[] {
   return FEATURED.flatMap<Card>((slug) => {
     const c = caseStudies.find((x) => x.slug === slug);
     if (c) {
-      return [{ slug, name: c.title, meta: `${c.context} · ${c.year}`, cta: "Estudo de caso", media: <CaseCover project={c} sizes={sizes} /> }];
+      const meta = [c.context, c.year].filter((v) => showTodos || !isTodo(v)).join(" · ") || c.platforms;
+      return [{ slug, name: c.title, meta, cta: "Estudo de caso", media: <CaseCover project={c} sizes={sizes} /> }];
     }
     const p = moreProjects.find((x) => x.slug === slug && x.case);
     if (p) {
