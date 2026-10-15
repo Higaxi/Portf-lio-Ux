@@ -28,6 +28,11 @@ Procure por `TODO` nesses arquivos. Textos que começam com "TODO" aparecem em `
 
 Os 4 projetos em destaque são definidos em `FEATURED`, no topo de `src/components/project-grid.tsx`. Imagens ficam em `public/projetos/<projeto>/`. As cores e tamanhos de texto ficam em `src/app/globals.css` (tokens no topo do arquivo).
 
+## Capas e protótipos
+
+- As capas de Premium League e Pormade são ilustrações em SVG geradas por `scripts/gerar-capas.mjs`, que também gera as imagens de compartilhamento (`og.png`). Depois de editar o script, rode `node scripts/gerar-capas.mjs`.
+- Os protótipos animados dos cases ficam em `src/components/prototypes.tsx`. São recriações ilustrativas (o site avisa isso), não as telas originais.
+
 ## Variáveis de ambiente
 
 Copie `.env.example` para `.env.local` (que nunca vai para o Git).

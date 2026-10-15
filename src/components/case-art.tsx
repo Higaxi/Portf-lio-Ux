@@ -64,6 +64,7 @@ export function CaseCover({
         fill
         sizes={sizes}
         preload={priority}
+        unoptimized={project.cover.src.endsWith(".svg")}
         loading={priority ? undefined : "eager"}
         className={`object-cover ${className}`}
       />

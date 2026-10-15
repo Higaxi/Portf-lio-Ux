@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" font-family="Arial, Helvetica, sans-serif">
+  <rect width="1600" height="900" fill="#141210"/>
+  <rect x="0" y="640" width="1600" height="260" fill="#1d1916"/>
+
+  <text x="100" y="250" font-size="26" font-weight="700" letter-spacing="6" fill="#d9b48f">PORMADE</text>
+  <text x="96" y="330" font-size="56" font-weight="700" letter-spacing="-2" fill="#f5f0ea">Gerador de</text>
+  <text x="96" y="392" font-size="56" font-weight="700" letter-spacing="-2" fill="#f5f0ea">propostas</text>
+  <text x="96" y="530" font-size="70" font-weight="700" letter-spacing="-2" fill="#ffffff">dias → minutos</text>
+  <text x="100" y="578" font-size="26" fill="#cfc6bc">para fechar uma venda em campo</text>
+
+  <rect x="698" y="128" width="834" height="644" rx="40" fill="#050505"/>
+  <rect x="720" y="150" width="790" height="600" rx="20" fill="#ffffff"/>
+  <rect x="720" y="150" width="790" height="64" rx="20" fill="#f4f1ed"/>
+  <rect x="720" y="194" width="790" height="20" fill="#f4f1ed"/>
+  <text x="752" y="190" font-size="18" font-weight="700" fill="#111111">Nova proposta</text>
+  <text x="1478" y="190" font-size="14" fill="#6b6b6b" text-anchor="end">Cliente: Construtora Exemplo</text>
+
+  <rect x="720" y="214" width="200" height="536" fill="#faf8f6"/>
+  <circle cx="764" cy="270" r="13" fill="#111111" stroke="#111111" stroke-width="2"/>
+      <path d="M758 270 l4 4 l8 -8" stroke="#fff" stroke-width="2.5" fill="none"/>
+      <text x="788" y="275" font-size="15" fill="#111111" font-weight="400">Cliente</text><circle cx="764" cy="332" r="13" fill="#111111" stroke="#111111" stroke-width="2"/>
+      <path d="M758 332 l4 4 l8 -8" stroke="#fff" stroke-width="2.5" fill="none"/>
+      <text x="788" y="337" font-size="15" fill="#111111" font-weight="400">Porta</text><circle cx="764" cy="394" r="13" fill="#111111" stroke="#111111" stroke-width="2"/>
+      <path d="M758 394 l4 4 l8 -8" stroke="#fff" stroke-width="2.5" fill="none"/>
+      <text x="788" y="399" font-size="15" fill="#111111" font-weight="400">Medidas</text><circle cx="764" cy="456" r="13" fill="#111111" stroke="#111111" stroke-width="2"/>
+      <path d="M758 456 l4 4 l8 -8" stroke="#fff" stroke-width="2.5" fill="none"/>
+      <text x="788" y="461" font-size="15" fill="#111111" font-weight="400">Acabamento</text><circle cx="764" cy="518" r="13" fill="#fff" stroke="#111111" stroke-width="2"/>
+      <circle cx="764" cy="518" r="5" fill="#111111"/>
+      <text x="788" y="523" font-size="15" fill="#111111" font-weight="700">Resumo</text>
+
+  <rect x="956" y="246" width="150" height="300" rx="6" fill="#b98a5f"/>
+  <rect x="974" y="266" width="114" height="120" rx="3" fill="none" stroke="#8a5a33" stroke-width="3"/>
+  <rect x="974" y="402" width="114" height="124" rx="3" fill="none" stroke="#8a5a33" stroke-width="3"/>
+  <rect x="1080" y="386" width="8" height="36" rx="4" fill="#2b2b2b"/>
+  <text x="956" y="578" font-size="13" fill="#6b6b6b">Largura</text>
+  <text x="956" y="600" font-size="18" font-weight="700" fill="#111111">80 cm</text>
+  <text x="1056" y="578" font-size="13" fill="#6b6b6b">Altura</text>
+  <text x="1056" y="600" font-size="18" font-weight="700" fill="#111111">210 cm</text>
+  <text x="956" y="646" font-size="13" fill="#6b6b6b">Acabamento</text>
+  <circle cx="1060" cy="642" r="16" fill="#c8a27a" stroke="#d4d4d4" stroke-width="1.5"/><circle cx="1100" cy="642" r="16" fill="#8a5a33" stroke="#111111" stroke-width="3"/><circle cx="1140" cy="642" r="16" fill="#e9e4dc" stroke="#d4d4d4" stroke-width="1.5"/><circle cx="1180" cy="642" r="16" fill="#3a3a3a" stroke="#d4d4d4" stroke-width="1.5"/>
+
+  <text x="1210" y="260" font-size="16" font-weight="700" fill="#111111">Resumo da proposta</text>
+  <text x="1210" y="300" font-size="14" fill="#111111">Porta lisa · Freijó</text><text x="1474" y="300" font-size="14" fill="#6b6b6b" text-anchor="end">1 un.</text><line x1="1210" y1="316" x2="1474" y2="316" stroke="#e5e5e5"/><text x="1210" y="346" font-size="14" fill="#111111">Batente e guarnição</text><text x="1474" y="346" font-size="14" fill="#6b6b6b" text-anchor="end">1 jogo</text><line x1="1210" y1="362" x2="1474" y2="362" stroke="#e5e5e5"/><text x="1210" y="392" font-size="14" fill="#111111">Fechadura e dobradiças</text><text x="1474" y="392" font-size="14" fill="#6b6b6b" text-anchor="end">1 kit</text><line x1="1210" y1="408" x2="1474" y2="408" stroke="#e5e5e5"/><text x="1210" y="438" font-size="14" fill="#111111">Instalação</text><text x="1474" y="438" font-size="14" fill="#6b6b6b" text-anchor="end">incluída</text><line x1="1210" y1="454" x2="1474" y2="454" stroke="#e5e5e5"/>
+  <text x="1210" y="530" font-size="14" fill="#6b6b6b">Total</text>
+  <text x="1474" y="534" font-size="28" font-weight="700" fill="#111111" text-anchor="end">R$ 4.380,00</text>
+  <rect x="1210" y="620" width="264" height="56" rx="28" fill="#c8743a"/>
+  <text x="1342" y="654" font-size="17" font-weight="700" fill="#ffffff" text-anchor="middle">Enviar proposta</text>
+  <text x="1342" y="706" font-size="12" fill="#8a8a8a" text-anchor="middle">Valores ilustrativos</text>
+</svg>

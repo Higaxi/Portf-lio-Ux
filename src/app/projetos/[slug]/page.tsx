@@ -18,6 +18,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { CaseCover, DesignSystemArt } from "@/components/case-art";
 import { FlowDiagram, JourneyDiagram, Wireframes } from "@/components/case-diagrams";
 import { published, showTodos } from "@/lib/todo";
+import { AkamaiPrototype, AngelInvestorPrototype, PormadePrototype, PremiumLeaguePrototype } from "@/components/prototypes";
 
 type Params = { slug: string };
 
@@ -34,7 +35,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   if (!c && !m) return {};
   const title = c ? c.title : m!.name;
   const description = c ? c.summary : m!.description;
-  const image = c ? c.cover?.src : m!.image.src;
+  const image = c ? (c.og ?? c.cover?.src) : m!.image.src;
   return {
     title,
     description,
@@ -95,7 +96,7 @@ function DraftNotice({ show }: { show: boolean }) {
 function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return (
     <section id={id} aria-labelledby={`${id}-titulo`} className="grid gap-6 border-t border-line py-14 md:grid-cols-12 md:gap-x-6 md:py-20">
-      <h2 id={`${id}-titulo`} className="text-lead md:col-span-4">
+      <h2 id={`${id}-titulo`} data-reveal="title" className="text-lead md:col-span-4">
         {title}
       </h2>
       <div className="md:col-span-8">{children}</div>
@@ -307,11 +308,11 @@ function FullCase({ c }: { c: CaseStudy }) {
             </Section>
             <Section id="interface" title="Interface de alta fidelidade">
               <Paragraphs items={c.solution.paragraphs} />
-              {c.gallery.length === 0 ? (
-                <div className="mt-8 flex aspect-video flex-col items-center justify-center gap-2 rounded-xl bg-surface p-6 text-center">
-                  <p className="max-w-[40ch] text-body">Telas finais em preparação para esta página.</p>
-                  {showTodos ? <p className="label">TODO: adicione as imagens em public/projetos/{c.slug}/ e preencha gallery.</p> : null}
-                </div>
+              <div className="mt-8">
+                <PormadePrototype />
+              </div>
+              {showTodos && c.gallery.length === 0 ? (
+                <p className="label mt-4">TODO: adicione as telas finais em public/projetos/{c.slug}/ e preencha gallery.</p>
               ) : null}
             </Section>
             <Section id="testes" title="Testes e iteração">
@@ -439,6 +440,7 @@ function ChapterSection({ ch }: { ch: Chapter }) {
             ))}
           </ul>
         ) : null}
+        {ch.prototype ? <PremiumLeaguePrototype /> : null}
         {ch.art === "design-system" ? (
           <div className="relative aspect-video overflow-hidden rounded-xl">
             <DesignSystemArt />
@@ -485,6 +487,11 @@ function MiniCasePage({ p }: { p: MoreProject }) {
         <Section id="decisoes" title="Decisões de design">
           <Bullets items={mc.decisions} />
         </Section>
+        {p.slug === "akamai" || p.slug === "angel-investor" ? (
+          <Section id="prototipo" title="Protótipo">
+            {p.slug === "akamai" ? <AkamaiPrototype /> : <AngelInvestorPrototype />}
+          </Section>
+        ) : null}
         <Section id="entrega" title="Entrega">
           <p className="max-w-[64ch] text-body">{mc.delivery}</p>
         </Section>

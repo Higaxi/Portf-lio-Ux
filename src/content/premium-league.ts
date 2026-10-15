@@ -27,11 +27,12 @@ export const premiumLeague: CaseStudy = {
   // mínimo para valorizar, estatísticas e notificações).
   metric: { value: "5 de 8", label: "oportunidades das entrevistas hoje fazem parte do plano PRO" },
   cover: {
-    src: `${dir}/antes-depois.webp`,
-    alt: "Antes e depois da tela de escalação do Premium League: à esquerda a versão antiga, roxa, com marcadores de mais sobre o campo; à direita a nova, azul, com cards de jogadores com preço, banco de reservas e navegação inferior.",
-    width: 1400,
-    height: 788,
+    src: `${dir}/capa.svg`,
+    alt: "Ilustração da nova tela de escalação do Premium League num celular: campo verde com a formação 4-3-3, cards de jogadores com preço, banco de reservas e navegação inferior, sobre fundo azul da marca; atrás, desfocada, a versão antiga roxa.",
+    width: 1600,
+    height: 900,
   },
+  og: `${dir}/og.png`,
   draft: true,
   facts: [
     ["Método", "Double Diamond"],
@@ -129,6 +130,7 @@ export const premiumLeague: CaseStudy = {
     {
       id: "ideacao",
       title: "Ideação e testes",
+      prototype: true,
       bullets: [
         "Interfaces mobile e desktop",
         "Testes de usabilidade com usuários reais",

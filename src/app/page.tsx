@@ -6,10 +6,12 @@ import { Skills } from "@/components/skills";
 import { About } from "@/components/about";
 import { Contact } from "@/components/contact";
 import { SiteFooter } from "@/components/site-footer";
+import { PersonJsonLd } from "@/components/person-jsonld";
 
 export default function Home() {
   return (
     <>
+      <PersonJsonLd />
       <SiteHeader />
       <main id="conteudo">
         <Hero />

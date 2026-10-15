@@ -4,37 +4,41 @@ import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 
 /**
- * Animação de entrada de [data-reveal], como melhoria progressiva: o conteúdo
- * já está visível; só os elementos que ainda estão ABAIXO da tela ganham a
- * animação, disparada um pouco antes de entrarem na viewport. Nada fica
- * escondido sem JS, para buscadores, na impressão ou com movimento reduzido.
+ * Fallback das animações por dobra para navegadores SEM scroll-driven
+ * animations (animation-timeline). Onde há suporte, o CSS faz tudo sozinho.
+ *
+ * Alterna .is-in quando o elemento entra e quando sai da tela, nos dois
+ * sentidos. Sem JS ou com movimento reduzido, nada é escondido.
  */
 export function RevealObserver() {
   const pathname = usePathname();
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (typeof CSS !== "undefined" && CSS.supports("animation-timeline: view()")) return;
     if (!("IntersectionObserver" in window)) return;
 
+    const root = document.documentElement;
+    const els = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]"));
+    // O que já está na tela começa visível (sem piscar).
     const vh = window.innerHeight;
-    const els = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]")).filter(
-      (el) => el.getBoundingClientRect().top > vh,
-    );
+    els.forEach((el) => {
+      const r = el.getBoundingClientRect();
+      if (r.top < vh && r.bottom > 0) el.classList.add("is-in");
+    });
+    root.classList.add("reveal-io");
 
     const io = new IntersectionObserver(
       (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-playing");
-            io.unobserve(entry.target);
-          }
-        }
+        for (const entry of entries) entry.target.classList.toggle("is-in", entry.isIntersecting);
       },
-      // Dispara quando o elemento está a 12% da altura da tela de aparecer.
-      { rootMargin: "0px 0px 12% 0px" },
+      { rootMargin: "0px 0px -6% 0px", threshold: 0.01 },
     );
     els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
+    return () => {
+      io.disconnect();
+      root.classList.remove("reveal-io");
+    };
   }, [pathname]);
 
   return null;

@@ -237,23 +237,109 @@ p {
 }
 
 /*
- * Entradas por seção. O conteúdo é SEMPRE visível por padrão (sem JS, para
- * buscadores, impressão e capturas de página inteira). A animação só toca
- * quando o elemento está chegando à tela durante a rolagem.
+ * Animação por dobra, nos dois sentidos: cada elemento [data-reveal] entra
+ * quando chega à tela e sai quando a deixa (rolando para baixo ou para cima).
+ *
+ * 1) Navegadores com scroll-driven animations: CSS puro (animation-timeline:
+ *    view()), sem JS, ligado à rolagem e reversível por natureza.
+ * 2) Sem suporte: o RevealObserver adiciona .reveal-io ao <html> e alterna
+ *    .is-in conforme o elemento entra e sai.
+ * Sem JS e com prefers-reduced-motion, tudo fica visível e parado.
+ * Só transform, opacity e clip-path.
+ * Variantes: padrão (sobe e aparece), "title" (revela por máscara),
+ * "card" (sobe com leve escala; --i desloca cada card para dar escalonamento).
  */
-@keyframes rise {
-  from {
+@keyframes fold {
+  entry 0% {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(48px);
   }
-  to {
+  entry 100% {
     opacity: 1;
     transform: none;
   }
+  exit 0% {
+    opacity: 1;
+    transform: none;
+  }
+  exit 100% {
+    opacity: 0;
+    transform: translateY(-32px);
+  }
 }
-[data-reveal].is-playing {
-  animation: rise 450ms var(--ease-out-quart) both;
-  animation-delay: calc(var(--i, 0) * 80ms);
+@keyframes fold-title {
+  entry 0% {
+    clip-path: inset(0 0 100% 0);
+    transform: translateY(40%);
+  }
+  entry 100% {
+    clip-path: inset(0 0 0 0);
+    transform: none;
+  }
+  exit 0% {
+    clip-path: inset(0 0 0 0);
+    transform: none;
+  }
+  exit 100% {
+    clip-path: inset(100% 0 0 0);
+    transform: translateY(-30%);
+  }
+}
+@keyframes fold-card {
+  entry 0% {
+    opacity: 0;
+    transform: translateY(calc(56px + var(--i, 0) * 28px)) scale(0.94);
+  }
+  entry 100% {
+    opacity: 1;
+    transform: none;
+  }
+  exit 0% {
+    opacity: 1;
+    transform: none;
+  }
+  exit 100% {
+    opacity: 0;
+    transform: translateY(-40px) scale(0.96);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    [data-reveal] {
+      animation: fold linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+    }
+    [data-reveal="title"] {
+      animation-name: fold-title;
+    }
+    [data-reveal="card"] {
+      animation-name: fold-card;
+    }
+  }
+
+  .reveal-io [data-reveal] {
+    opacity: 0;
+    transform: translateY(40px);
+    transition:
+      opacity 500ms var(--ease-out-quart),
+      transform 500ms var(--ease-out-quart),
+      clip-path 500ms var(--ease-out-quart);
+    transition-delay: calc(var(--i, 0) * 70ms);
+  }
+  .reveal-io [data-reveal="title"] {
+    opacity: 1;
+    clip-path: inset(0 0 100% 0);
+  }
+  .reveal-io [data-reveal="card"] {
+    transform: translateY(56px) scale(0.95);
+  }
+  .reveal-io [data-reveal].is-in {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(0 0 0 0);
+  }
 }
 
 /* Acordeão: a altura anima por grid-template-rows (0fr → 1fr). Fechado,

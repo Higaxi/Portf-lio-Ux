@@ -57,6 +57,8 @@ export type Chapter = {
   art?: "design-system";
   /** Nota pequena ao fim do capítulo (fonte, ressalva). */
   note?: string;
+  /** Protótipo animado ilustrativo exibido no capítulo. */
+  prototype?: boolean;
 };
 
 export type CaseStudy = {
@@ -72,6 +74,8 @@ export type CaseStudy = {
   metric: { value: string; label: string };
   /** Sem imagem, a métrica aparece em tipo grande no lugar da foto. */
   cover: ProjectImage | null;
+  /** Imagem de compartilhamento (1200×630). */
+  og?: string;
   draft: boolean;
   problem: CaseSection;
   process: CaseSection;
@@ -136,7 +140,13 @@ export const caseStudies: CaseStudy[] = [
     role: "Product Designer · Líder técnico de UX/UI", // TODO: confirme seu papel neste projeto
     platforms: "App mobile",
     metric: { value: "dias → minutos", label: "para fechar uma venda" },
-    cover: null, // TODO: exporte as telas finais para public/projetos/pormade/ e preencha cover e gallery
+    cover: {
+      src: "/projetos/pormade/capa.svg",
+      alt: "Ilustração do gerador de propostas num tablet: etapas Cliente, Porta, Medidas, Acabamento e Resumo; a porta configurada com 80 por 210 centímetros e acabamento em madeira; o resumo com o total e o botão Enviar proposta. Ao lado, o texto dias para minutos.",
+      width: 1600,
+      height: 900,
+    },
+    og: "/projetos/pormade/og.png",
     draft: true,
     // TODO-revisar: texto reconstruído (problema e processo)
     problem: {

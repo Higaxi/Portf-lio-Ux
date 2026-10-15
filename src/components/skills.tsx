@@ -8,7 +8,7 @@ export function Skills() {
       aria-labelledby="habilidades-titulo"
       className="mx-auto max-w-[90rem] px-4 pt-28 md:px-10 md:pt-40"
     >
-      <h2 id="habilidades-titulo" className="border-b border-line pb-6 font-display text-head font-medium uppercase tracking-tight">
+      <h2 id="habilidades-titulo" data-reveal="title" className="border-b border-line pb-6 font-display text-head font-medium uppercase tracking-tight">
         Competências
       </h2>
       <div className="mt-10 grid gap-12 md:grid-cols-3 md:gap-x-6">

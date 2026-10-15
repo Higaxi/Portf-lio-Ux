@@ -5,7 +5,8 @@
  * confirmação ou de conteúdo real (inclusive e-mail e links públicos).
  */
 
-export type Link = { label: string; href: string };
+/** `display` é o texto exibido ao lado do rótulo (sem ele, usa a URL). */
+export type Link = { label: string; href: string; display?: string };
 
 export type SkillGroup = {
   name: string;
@@ -103,6 +104,7 @@ export const profile: Profile = {
       : "http://localhost:3000"),
   socials: [
     { label: "LinkedIn", href: "https://www.linkedin.com/in/mateushigashie" },
+    { label: "WhatsApp", href: "https://wa.me/5561984276250", display: "(61) 98427-6250" },
   ],
   about: {
     personal: "TODO: uma ou duas frases suas, fora do trabalho (o que gosta de fazer, o que te move). Não publique nada que não seja seu.",
@@ -232,8 +234,8 @@ export const profile: Profile = {
     },
   ],
   education: [
-    { kind: "Graduação tecnológica", school: "Universidade Anhembi Morumbi", course: "CST em Análise e Desenvolvimento de Sistemas", period: "2021 – 2024" },
-    { kind: "Graduação tecnológica", school: "Universidade Anhembi Morumbi", course: "CST em Design Gráfico", period: "2016 – 2018" },
+    { kind: "Tecnólogo", school: "Universidade Anhembi Morumbi", course: "Análise e Desenvolvimento de Sistemas", period: "2021 – 2024" },
+    { kind: "Tecnólogo", school: "Universidade Anhembi Morumbi", course: "Design Gráfico", period: "2016 – 2018" },
     { kind: "Curso", school: "Leon Consultoria", course: "Liderança Organizacional", period: "2025" },
     { kind: "Certificação", school: "AgileIT Academy", course: "Scrum Fundamentals", period: "2022" },
     { kind: "Certificação", school: "FM2S", course: "Lean Six Sigma White e Yellow Belt", period: "2022" },

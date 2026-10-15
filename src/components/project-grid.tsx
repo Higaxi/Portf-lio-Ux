@@ -42,13 +42,13 @@ export function ProjectGrid() {
   return (
     <section id="projetos" aria-labelledby="projetos-titulo" className="pt-28 md:pt-40">
       <div className="mx-auto max-w-[90rem] px-4 md:px-10">
-        <h2 id="projetos-titulo" className="border-b border-line pb-6 font-display text-head font-medium uppercase tracking-tight">
+        <h2 id="projetos-titulo" data-reveal="title" className="border-b border-line pb-6 font-display text-head font-medium uppercase tracking-tight">
           Projetos
         </h2>
 
         <ul className="mt-10 grid grid-cols-1 gap-x-6 gap-y-12 md:grid-cols-2 md:gap-y-16">
-          {featured.map((c) => (
-            <li key={c.slug}>
+          {featured.map((c, i) => (
+            <li key={c.slug} data-reveal="card" style={{ "--i": i % 2 } as React.CSSProperties}>
               <Link href={`/projetos/${c.slug}`} className="zoom-on-hover block rounded-xl">
                 <ViewTransition name={`capa-${c.slug}`} share="morph" default="none">
                   <div aria-hidden="true" className="relative aspect-video overflow-hidden rounded-xl bg-surface">{c.media}</div>
@@ -70,10 +70,10 @@ export function ProjectGrid() {
 
       <div className="mt-24 md:mt-32">
         <div className="mx-auto max-w-[90rem] px-4 md:px-10">
-          <h3 id="mais-titulo" className="font-display text-[clamp(1.5rem,1.2rem+1.2vw,2.25rem)] font-medium uppercase tracking-tight">
+          <h3 id="mais-titulo" data-reveal="title" className="font-display text-[clamp(1.5rem,1.2rem+1.2vw,2.25rem)] font-medium uppercase tracking-tight">
             Mais projetos
           </h3>
-          <p className="mt-2 max-w-[56ch] text-body text-muted">
+          <p data-reveal className="mt-2 max-w-[56ch] text-body text-muted">
             Aplicativos, dashboards e marcas. Os de produto abrem um case resumido; os de marca abrem a imagem ampliada.
           </p>
         </div>

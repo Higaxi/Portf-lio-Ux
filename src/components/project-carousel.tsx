@@ -262,6 +262,7 @@ export function ProjectCarousel({ items, labelledBy }: { items: CarouselItem[]; 
       aria-roledescription="carrossel"
       aria-labelledby={labelledBy}
       className="mt-8"
+      data-reveal
       onPointerEnter={(e) => e.pointerType === "mouse" && (hover.current = true)}
       onPointerLeave={() => (hover.current = false)}
       onFocus={onFocusIn}

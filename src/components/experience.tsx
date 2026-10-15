@@ -18,7 +18,7 @@ export function Experience() {
       aria-labelledby="experiencia-titulo"
       className="mx-auto max-w-[90rem] px-4 pt-28 md:px-10 md:pt-40"
     >
-      <h2 id="experiencia-titulo" className="border-b border-line pb-6 font-display text-head font-medium uppercase tracking-tight">
+      <h2 id="experiencia-titulo" data-reveal="title" className="border-b border-line pb-6 font-display text-head font-medium uppercase tracking-tight">
         Experiência
       </h2>
       <ul>
@@ -27,7 +27,7 @@ export function Experience() {
           const panelId = `${baseId}-painel-${i}`;
           const buttonId = `${baseId}-botao-${i}`;
           return (
-            <li key={`${e.company}-${e.period}`} className="border-b border-line">
+            <li key={`${e.company}-${e.period}`} data-reveal className="border-b border-line">
               <h3>
                 <button
                   id={buttonId}
@@ -93,13 +93,14 @@ export function Experience() {
         })}
       </ul>
 
-      <h2 className="mt-24 border-b border-line pb-6 font-display text-head font-medium uppercase tracking-tight">
+      <h2 data-reveal="title" className="mt-24 border-b border-line pb-6 font-display text-head font-medium uppercase tracking-tight">
         Formação
       </h2>
       <ul>
         {profile.education.map((c) => (
           <li
             key={`${c.school}-${c.course}`}
+            data-reveal
             className="grid gap-x-6 gap-y-1 border-b border-line py-5 md:grid-cols-[2fr_5fr_4fr_1fr]"
           >
             <span className="label">{c.kind}</span>
