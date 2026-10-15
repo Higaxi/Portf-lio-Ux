@@ -9,11 +9,15 @@ import type { FlowScreen } from "@/content/projects";
 export function FlowCallouts({ screens }: { screens: FlowScreen[] }) {
   const starts = screens.map((_, i) => screens.slice(0, i).reduce((sum, x) => sum + x.callouts.length, 0));
   return (
-    <ol className="-mx-4 flex snap-x snap-mandatory gap-6 overflow-x-auto px-4 pb-4 md:mx-0 md:px-0">
+    // No celular rola de lado; em telas grandes todas as telas cabem na linha.
+    <ol
+      className="-mx-4 flex snap-x snap-mandatory gap-6 overflow-x-auto px-4 pb-4 md:mx-0 md:px-0 lg:grid lg:[grid-template-columns:repeat(var(--screens),minmax(0,1fr))] lg:overflow-visible"
+      style={{ "--screens": screens.length } as React.CSSProperties}
+    >
       {screens.map((s, si) => {
         const start = starts[si];
         return (
-          <li key={s.src} className="w-[min(78vw,17rem)] shrink-0 snap-start">
+          <li key={s.src} className="w-[min(78vw,17rem)] shrink-0 snap-start lg:w-auto">
             <p className="label mb-3">
               {si + 1}. {s.title}
             </p>
