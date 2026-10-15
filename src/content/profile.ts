@@ -95,7 +95,12 @@ export const profile: Profile = {
   availability: "Disponível para freelance e tempo integral.",
   goal: "Meu próximo passo é evoluir para Senior Product Designer ou UX Lead, com foco em gestão de produto e IA no design, num time que valorize inovação e impacto real.",
   email: "higadesign19@gmail.com",
-  siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? "https://TODO-seu-dominio.vercel.app",
+  // Domínio próprio via NEXT_PUBLIC_SITE_URL; sem ele, usa o domínio de produção que a Vercel injeta no build.
+  siteUrl:
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : "http://localhost:3000"),
   socials: [
     { label: "LinkedIn", href: "https://www.linkedin.com/in/mateushigashie" },
   ],
