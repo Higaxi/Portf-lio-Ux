@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import type { PrototypeId } from "@/content/projects";
 import { PrototypePlayer, type ProtoStep } from "./prototype-player";
+import { RecreatedScreen, type ScreenId } from "./recreated-screens";
 import {
   AkamaiPrototype,
   AngelInvestorPrototype,
@@ -155,32 +156,17 @@ export function PodeRegularizarPrototype() {
   );
 }
 
-/* ---------- Hora do Lar ---------- */
+/* ---------- Hora do Lar (telas redesenhadas) ---------- */
 
-const hlOrange = "#ef6c1a";
-
-function HlHeader() {
+function Steps({ ids, step }: { ids: ScreenId[]; step: number }) {
   return (
-    <div className="px-4 pb-2 pt-9">
-      <p className="text-center text-[12px] font-semibold" style={{ color: hlOrange }}>
-        hora do lar
-      </p>
-      <p className="mt-2 text-[16px] font-bold">Oi, Funcionário!</p>
-      <p className="text-[10px] text-[#6b7280]">Sexta-feira, 31 de janeiro</p>
-    </div>
-  );
-}
-
-function HlNav({ active }: { active: string }) {
-  return (
-    <div className="mt-auto grid grid-cols-4 border-t border-[#eee] py-2 text-center text-[9px]">
-      {["Ponto", "Notificações", "Aprovações", "Menu"].map((t) => (
-        <span key={t} style={{ color: t === active ? hlOrange : "#6b7280" }}>
-          <span aria-hidden="true">●</span>
-          <span className="block">{t}</span>
-        </span>
+    <>
+      {ids.map((id, i) => (
+        <Screen key={id} show={i === step}>
+          <RecreatedScreen id={id} />
+        </Screen>
       ))}
-    </div>
+    </>
   );
 }
 
@@ -191,76 +177,10 @@ const fnSteps: ProtoStep[] = [
   { label: "Marcar a saída", ms: 1800 },
   { label: "Resumo do mês", ms: 2600 },
 ];
-const marks = [
-  ["Entrada", "08:00"],
-  ["Intervalo", "12:00"],
-  ["Retorno do intervalo", "13:00"],
-  ["Saída", "17:00"],
-];
+const fnIds: ScreenId[] = ["hl-ponto-1", "hl-ponto-2", "hl-ponto-3", "hl-ponto-4", "hl-resumo"];
 
 export function HoraDoLarFuncionarioPrototype() {
-  return (
-    <PrototypePlayer
-      title="Protótipo do app do funcionário do Hora do Lar"
-      steps={fnSteps}
-      accent={hlOrange}
-      render={(s) => (
-        <>
-          <Screen show={s <= 3}>
-            <HlHeader />
-            <div className="flex gap-2 px-3">
-              <span className="flex-1 rounded-lg py-2 text-center font-semibold text-white" style={{ background: hlOrange }}>
-                Marcar o ponto
-              </span>
-              <span className="flex-1 rounded-lg border py-2 text-center" style={{ borderColor: hlOrange, color: hlOrange }}>
-                Resumo do mês
-              </span>
-            </div>
-            <ul className="flex flex-col gap-2 p-3">
-              {marks.map(([t, h], i) => {
-                const done = i <= s;
-                return (
-                  <li key={t} className="flex items-center justify-between rounded-lg bg-[#f6f6f8] px-3 py-2.5">
-                    <span className={done ? "font-semibold" : "text-[#9ca3af]"}>{t}</span>
-                    <span className={`tabular ${ease} ${done ? "opacity-100" : "opacity-0"}`} style={{ color: hlOrange }}>
-                      {h}
-                    </span>
-                  </li>
-                );
-              })}
-            </ul>
-            <div className="px-3">
-              <span className="block rounded-full py-2.5 text-center font-semibold text-white" style={{ background: hlOrange }}>
-                Registrar {marks[Math.min(s, 3)][0].toLowerCase()}
-              </span>
-            </div>
-            <HlNav active="Ponto" />
-          </Screen>
-          <Screen show={s === 4}>
-            <HlHeader />
-            <div className="mx-3 flex items-center gap-3 rounded-lg bg-[#f6f6f8] p-3">
-              <span className="size-12 rounded-full border-4" style={{ borderColor: hlOrange, borderRightColor: "#e5e7eb" }} />
-              <span>
-                <span className="block text-[11px] text-[#6b7280]">Horas trabalhadas</span>
-                <b className="tabular text-[15px]">128/168 horas</b>
-              </span>
-            </div>
-            <ul className="flex flex-col gap-2 p-3 text-[11px]">
-              <li>
-                <span className="text-[#16a34a]">● </span>Extrato de horas extras
-              </li>
-              <li>
-                <span className="text-[#dc2626]">● </span>Resumo de descontos
-              </li>
-              <li className="tabular">Saldo: 02:00 horas</li>
-              <li className="tabular">Atrasos: 00:00 · Faltas: 0 dias</li>
-            </ul>
-            <HlNav active="Ponto" />
-          </Screen>
-        </>
-      )}
-    />
-  );
+  return <PrototypePlayer title="Protótipo do app do funcionário do Hora do Lar" steps={fnSteps} accent="#f26b1d" render={(st) => <Steps ids={fnIds} step={st} />} />;
 }
 
 const emSteps: ProtoStep[] = [
@@ -270,85 +190,10 @@ const emSteps: ProtoStep[] = [
   { label: "Emitir o recibo", ms: 2200 },
   { label: "Notificação de documento pronto", ms: 2200 },
 ];
+const emIds: ScreenId[] = ["hl-emp-aprovar", "hl-emp-aprovado", "hl-emp-resumo", "hl-emp-documentos", "hl-emp-notificacao"];
 
 export function HoraDoLarEmpregadorPrototype() {
-  return (
-    <PrototypePlayer
-      title="Protótipo do app do empregador do Hora do Lar"
-      steps={emSteps}
-      accent={hlOrange}
-      render={(s) => (
-        <>
-          <Screen show={s <= 1}>
-            <div className="px-4 pb-2 pt-9">
-              <p className="text-[16px] font-bold">Aprovações</p>
-              <p className="text-[10px] text-[#6b7280]">1 pedido aguardando você</p>
-            </div>
-            <div className="mx-3 rounded-lg border border-[#e5e7eb] p-3">
-              <b>Ajuste de ponto</b>
-              <p className="mt-1 text-[11px] text-[#6b7280]">Quinta-feira · saída registrada às 17:00</p>
-              <p className="text-[11px]">Pedido: saída às 18:00</p>
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                <span className="rounded-full border border-[#d1d5db] py-2 text-center">Recusar</span>
-                <span className={`rounded-full py-2 text-center font-semibold text-white ${ease} ${s === 1 ? "scale-95" : ""}`} style={{ background: hlOrange }}>
-                  Aprovar
-                </span>
-              </div>
-            </div>
-            <div className={`mx-3 mt-3 rounded-lg bg-[#ecfdf5] p-3 text-[#047857] ${ease} ${s === 1 ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}>
-              ✓ Ajuste aprovado. As horas foram atualizadas.
-            </div>
-          </Screen>
-          <Screen show={s === 2}>
-            <div className="px-4 pb-2 pt-9">
-              <p className="text-[16px] font-bold">Resumo do mês</p>
-              <p className="text-[10px] text-[#6b7280]">Funcionária exemplo</p>
-            </div>
-            <div className="grid grid-cols-2 gap-2 px-3">
-              {[
-                ["Horas trabalhadas", "129h"],
-                ["Horas extras", "3h"],
-                ["Atrasos", "0h"],
-                ["Faltas", "0"],
-              ].map(([k, v]) => (
-                <span key={k} className="rounded-lg bg-[#f6f6f8] p-3">
-                  <span className="block text-[10px] text-[#6b7280]">{k}</span>
-                  <b className="tabular text-[16px]">{v}</b>
-                </span>
-              ))}
-            </div>
-          </Screen>
-          <Screen show={s >= 3}>
-            <div className="px-4 pb-2 pt-9">
-              <p className="text-[16px] font-bold">Documentos</p>
-            </div>
-            <ul className="flex flex-col gap-2 px-3">
-              {["Recibo de pagamento", "Folha de ponto", "Guia DAE"].map((d, i) => (
-                <li key={d} className="flex items-center justify-between rounded-lg border border-[#e5e7eb] px-3 py-2.5">
-                  <span>{d}</span>
-                  {i === 0 ? (
-                    <span className={`rounded-full px-2 py-1 text-[10px] font-semibold text-white ${ease} ${s === 3 ? "scale-95" : ""}`} style={{ background: hlOrange }}>
-                      {s >= 4 ? "Emitido" : "Emitir"}
-                    </span>
-                  ) : (
-                    <span className="text-[10px] text-[#6b7280]">Disponível</span>
-                  )}
-                </li>
-              ))}
-            </ul>
-            <div
-              className={`absolute inset-x-3 top-10 rounded-xl bg-white p-3 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.35)] ${ease} ${s === 4 ? "translate-y-0 opacity-100" : "-translate-y-4 opacity-0"}`}
-            >
-              <b className="text-[11px]" style={{ color: hlOrange }}>
-                hora do lar
-              </b>
-              <p className="text-[11px]">O recibo de janeiro está pronto para baixar e enviar.</p>
-            </div>
-          </Screen>
-        </>
-      )}
-    />
-  );
+  return <PrototypePlayer title="Protótipo do app do empregador do Hora do Lar" steps={emSteps} accent="#f26b1d" render={(st) => <Steps ids={emIds} step={st} />} />;
 }
 
 /** Seleciona o protótipo pelo id usado nos dados dos cases. */

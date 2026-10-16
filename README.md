@@ -31,9 +31,8 @@ Os 4 projetos em destaque são definidos em `FEATURED`, no topo de `src/componen
 ## Capas e protótipos
 
 - Capas dos cards: as capas publicadas no Behance, ajustadas para 16:9 por `scripts/capas-behance.mjs`, ficam em `public/projetos/capas/`.
-- Regra de imagens: nenhuma imagem bitmap é exibida acima da sua resolução nativa. Telas que só existiam em tamanho pequeno (Akamai e Angel Investor) foram redesenhadas em código em `src/components/recreated-screens.tsx`.
-- As capas de Akamai e Angel Investor usam essas telas: rode `npm run dev`, abra `/capas-render/akamai` ou `/capas-render/angel-investor` (rota só de desenvolvimento) e capture o elemento `#capa` em 3200×1800.
-- As capas de Premium League e Hora do Lar são composições em HTML (`design/capas/pl.html` e `hl.html`) com telas reais, renderizadas em 2x para `public/projetos/<case>/capa.webp`. A imagem de compartilhamento de cada case é `og.jpg`, na mesma pasta.
+- Regra de imagens: nenhuma imagem bitmap é exibida acima da sua resolução nativa. Telas que só existiam em tamanho pequeno (Akamai, Angel Investor, Premium League e Hora do Lar) foram redesenhadas em código em `src/components/recreated-screens.tsx` e `recreated-screens-pl-hl.tsx`.
+- As capas desses quatro cases usam essas telas: rode `npm run dev`, abra `/capas-render/<slug>` (rota só de desenvolvimento; `/capas-render/telas` mostra todas as telas) e capture o elemento `#capa` em 3200×1800.
 - Os protótipos animados dos cases ficam em `src/components/prototypes.tsx` e `prototypes-extra.tsx`. São recriações ilustrativas (o site avisa isso), não as telas originais.
 
 ## Web Design

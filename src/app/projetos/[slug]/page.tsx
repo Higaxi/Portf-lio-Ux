@@ -26,6 +26,7 @@ import { LearningCards, ResultBlock } from "@/components/case-outcome";
 import { HomepageAnatomy } from "@/components/homepage-anatomy";
 import { AppScreens } from "@/components/app-screens";
 import { PlDesignSystem } from "@/components/pl-design-system";
+import { HlAppFuncionario, PlAntesDepois } from "@/components/recreated-sections";
 
 type Params = { slug: string };
 
@@ -108,7 +109,7 @@ function DraftNotice({ show }: { show: boolean }) {
 
 function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return (
-    <section id={id} aria-labelledby={`${id}-titulo`} className="grid gap-6 border-t border-line py-14 md:grid-cols-12 md:gap-x-6 md:py-20">
+    <section id={id} aria-labelledby={`${id}-titulo`} className="grid grid-cols-1 gap-6 border-t border-line py-14 md:grid-cols-12 md:gap-x-6 md:py-20">
       <h2 id={`${id}-titulo`} data-reveal="title" className="text-lead md:col-span-4">
         {title}
       </h2>
@@ -483,6 +484,8 @@ function ChapterSection({ ch }: { ch: Chapter }) {
         {ch.custom === "homepage-anatomy" ? <HomepageAnatomy /> : null}
         {ch.custom === "app-screens" ? <AppScreens /> : null}
         {ch.custom === "pl-design-system" ? <PlDesignSystem /> : null}
+        {ch.custom === "pl-antes-depois" ? <PlAntesDepois /> : null}
+        {ch.custom === "hl-app-funcionario" ? <HlAppFuncionario /> : null}
         {ch.prototype ? <CasePrototype id={ch.prototype} /> : null}
         {ch.art === "design-system" ? (
           <div className="relative aspect-video overflow-hidden rounded-xl">

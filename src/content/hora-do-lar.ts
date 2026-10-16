@@ -94,13 +94,7 @@ export const horaDoLar: CaseStudy = {
     {
       id: "app-funcionario",
       title: "App do funcionário",
-      custom: "app-screens",
-      bullets: [
-        "Marcar o ponto é a ação principal: botão laranja no topo, com entrada, intervalo, retorno e saída em sequência.",
-        "Resumo do mês a um toque, com horas trabalhadas contra a meta mensal.",
-        "Saldo, extrato de horas extras, descontos, atrasos e faltas visíveis, sem precisar pedir ao empregador.",
-        "Navegação inferior fixa: Ponto, Notificações, Aprovações e Menu (ajuste de ponto, documentos, desligamento e configuração).",
-      ],
+      custom: "hl-app-funcionario",
       prototype: "hora-do-lar-funcionario",
     },
     {

@@ -18,7 +18,7 @@ const screens = [
   },
 ];
 
-/** Capturas reais (pequenas) do app do funcionário, em molduras de celular. */
+/** Capturas originais (pequenas) do app do funcionário, em tamanho real. */
 export function AppScreens() {
   return (
     <figure>
@@ -32,7 +32,7 @@ export function AppScreens() {
           </li>
         ))}
       </ul>
-      <figcaption className="label mt-3">Telas atuais do app do funcionário (capturas do app publicado, em tamanho original).</figcaption>
+      <figcaption className="label mt-3">Capturas originais do app publicado, em tamanho real (base das telas redesenhadas acima).</figcaption>
     </figure>
   );
 }

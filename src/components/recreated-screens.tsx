@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
+import { PlHlScreen, isPlHlScreen, type PlHlScreenId } from "./recreated-screens-pl-hl";
 
 /*
  * Telas redesenhadas em código (HTML/CSS + SVG) a partir dos protótipos
@@ -9,9 +10,10 @@ import type { CSSProperties, ReactNode } from "react";
  */
 
 /** px na base de 300px → unidade proporcional à largura da tela. */
-const u = (n: number) => `calc(${n} * 100cqw / 300)`;
+export const u = (n: number) => `calc(${n} * 100cqw / 300)`;
 
 export type ScreenId =
+  | PlHlScreenId
   | "akamai-login"
   | "akamai-waf"
   | "akamai-trafego"
@@ -23,7 +25,7 @@ export type ScreenId =
 
 /* ---------- Peças comuns ---------- */
 
-function Root({ children, bg, color = "#111827" }: { children: ReactNode; bg: string; color?: string }) {
+export function Root({ children, bg, color = "#111827" }: { children: ReactNode; bg: string; color?: string }) {
   return (
     <div
       className="relative flex h-full w-full flex-col overflow-hidden"
@@ -45,7 +47,7 @@ export function ScreenBox({ id }: { id: ScreenId }) {
   );
 }
 
-function StatusBar({ time, light }: { time: string; light?: boolean }) {
+export function StatusBar({ time, light }: { time: string; light?: boolean }) {
   const c = light ? "#ffffff" : "#111827";
   return (
     <div className="flex shrink-0 items-center justify-between" style={{ height: u(30), padding: `0 ${u(18)}`, fontSize: u(11), fontWeight: 600, color: c }}>
@@ -686,6 +688,7 @@ function AngelChat() {
 
 /** Seleciona a tela pelo id. Preenche o container (use com ScreenBox). */
 export function RecreatedScreen({ id }: { id: ScreenId }) {
+  if (isPlHlScreen(id)) return <PlHlScreen id={id} />;
   switch (id) {
     case "akamai-login":
       return <AkamaiLogin />;

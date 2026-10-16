@@ -65,7 +65,7 @@ export type Chapter = {
   /** Ilustração desenhada em código. */
   art?: "design-system";
   /** Componente especial do capítulo. */
-  custom?: "homepage-anatomy" | "app-screens" | "pl-design-system";
+  custom?: "homepage-anatomy" | "app-screens" | "pl-design-system" | "pl-antes-depois" | "hl-app-funcionario";
   /** Nota pequena ao fim do capítulo (fonte, ressalva). */
   note?: string;
   /** Protótipo animado ilustrativo exibido no capítulo. */

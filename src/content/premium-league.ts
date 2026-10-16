@@ -156,14 +156,9 @@ export const premiumLeague: CaseStudy = {
         alt: "Tela de escalação antes e depois. Antes: fundo roxo, campo com marcadores de mais e pouca hierarquia. Depois: topo azul com preço do time, fechamento do mercado e patrimônio; campo com cards de jogadores com preço e escudo; banco de reservas; ações e navegação inferior.",
         width: 1400,
         height: 788,
-        caption: "Tela de escalação, antes e depois.",
+        caption: "Prancha original (slide da palestra), em tamanho real.",
       },
-      bullets: [
-        "Preço do time, fechamento do mercado e patrimônio lado a lado no topo",
-        "Cada posição mostra o jogador, o escudo e o preço, em vez de um marcador vazio",
-        "Banco de reservas visível na mesma tela",
-        "Ações da escalação agrupadas e navegação inferior com Campeonatos, Notificações e Minha conta",
-      ],
+      custom: "pl-antes-depois",
     },
   ],
   impact: {
