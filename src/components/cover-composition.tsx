@@ -4,7 +4,7 @@ import { RecreatedScreen, type ScreenId } from "./recreated-screens";
 
 export const coverSlugs = ["akamai", "angel-investor", "premium-league", "hora-do-lar", "telas"];
 
-type PhoneSpec = { id: ScreenId; style: CSSProperties; w?: number; label?: string; labelStyle?: CSSProperties };
+type PhoneSpec = { id?: ScreenId; img?: string; style: CSSProperties; w?: number; label?: string; labelStyle?: CSSProperties };
 
 type Cover = {
   bg: string;
@@ -48,9 +48,9 @@ const covers: Record<string, Cover> = {
     sub: "App mobile para investidores-anjo conversarem, acompanharem novidades e entrarem sem atrito.",
     chips: ["Cadastro pelo telefone", "Feed", "Chat"],
     phones: [
-      { id: "angel-cadastro", style: { left: 860, top: 200, transform: "rotate(-7deg) scale(.88)" } },
-      { id: "angel-abertura", style: { left: 1080, top: 110, zIndex: 2 } },
-      { id: "angel-feed", style: { left: 1300, top: 210, transform: "rotate(7deg) scale(.88)" } },
+      { img: "/projetos/angel-investor/cadastro.webp", style: { left: 860, top: 200, transform: "rotate(-7deg) scale(.88)" } },
+      { img: "/projetos/angel-investor/abertura.webp", style: { left: 1080, top: 110, zIndex: 2 } },
+      { img: "/projetos/angel-investor/feed.webp", style: { left: 1300, top: 210, transform: "rotate(7deg) scale(.88)" } },
     ],
   },
   "premium-league": {
@@ -83,13 +83,13 @@ const covers: Record<string, Cover> = {
   },
 };
 
-function Phone({ id, style, w = 270 }: { id: ScreenId; style: CSSProperties; w?: number }) {
+function Phone({ id, img, style, w = 270 }: { id?: ScreenId; img?: string; style: CSSProperties; w?: number }) {
   const h = Math.round((w * 19.5) / 9);
   const big = w > 230;
   return (
     <div style={{ position: "absolute", padding: big ? 9 : 7, borderRadius: big ? 46 : 36, background: "#0b0b10", boxShadow: "0 50px 90px -30px rgba(10,5,50,.8)", ...style }}>
       <div style={{ width: w, height: h, borderRadius: big ? 37 : 29, overflow: "hidden", background: "#fff", containerType: "inline-size" }}>
-        <RecreatedScreen id={id} />
+        {img ? <img src={img} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }} /> : id ? <RecreatedScreen id={id} /> : null}
       </div>
     </div>
   );
@@ -145,7 +145,7 @@ export function CoverComposition({ slug }: { slug: string }) {
         </div>
       ) : null}
       {c.phones.map((p) => (
-        <Phone key={p.id} id={p.id} style={p.style} w={p.w} />
+        <Phone key={p.id ?? p.img} id={p.id} img={p.img} style={p.style} w={p.w} />
       ))}
       {c.phones
         .filter((p) => p.label)

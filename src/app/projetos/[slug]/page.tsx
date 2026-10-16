@@ -21,6 +21,7 @@ import { isTodo, published, showTodos } from "@/lib/todo";
 import { CasePrototype } from "@/components/prototypes-extra";
 import { BrandCaseView } from "@/components/brand-case-view";
 import { FlowCallouts } from "@/components/flow-callouts";
+import { AkamaiDesignSystem } from "@/components/akamai-design-system";
 import { brandCases, getBrandCase } from "@/content/brand-cases";
 import { LearningCards, ResultBlock } from "@/components/case-outcome";
 import { HomepageAnatomy } from "@/components/homepage-anatomy";
@@ -541,7 +542,7 @@ function MiniCasePage({ p }: { p: MoreProject }) {
                 {mc.delivery} As decisões de design estão numeradas sobre cada tela.
               </p>
             </div>
-            <p className="label mt-8">Telas redesenhadas em alta resolução a partir do protótipo original.</p>
+            {mc.recreated ? <p className="label mt-8">Telas redesenhadas em alta resolução a partir do protótipo original.</p> : null}
             <div className="mt-4">
               <FlowCallouts screens={mc.flow} accent={mc.accent} />
             </div>
@@ -559,10 +560,18 @@ function MiniCasePage({ p }: { p: MoreProject }) {
             <p className="mt-3 max-w-[60ch] text-body">
               Tipografia, cores, ícones, botões, top bar, formulários, navegação, calendários, gráficos e campos de exibição documentados para manter as telas consistentes.
             </p>
-            <div className="mt-8 inline-block max-w-full overflow-hidden rounded-2xl bg-[#e9edf3] p-3 md:p-5">
-              <Image src={mc.designSystem.src} alt={mc.designSystem.alt} width={mc.designSystem.width} height={mc.designSystem.height} sizes={`${mc.designSystem.width}px`} loading="eager" className="h-auto w-full rounded-lg" style={{ maxWidth: mc.designSystem.width }} />
-            </div>
-            <p className="label mt-3">Quadro original, em tamanho real.</p>
+            {p.slug === "akamai" ? (
+              <div className="mt-8">
+                <AkamaiDesignSystem original={mc.designSystem} />
+              </div>
+            ) : (
+              <>
+                <div className="mt-8 inline-block max-w-full overflow-hidden rounded-2xl bg-[#e9edf3] p-3 md:p-5">
+                  <Image src={mc.designSystem.src} alt={mc.designSystem.alt} width={mc.designSystem.width} height={mc.designSystem.height} sizes={`${mc.designSystem.width}px`} loading="eager" className="h-auto w-full rounded-lg" style={{ maxWidth: mc.designSystem.width }} />
+                </div>
+                <p className="label mt-3">Quadro original, em tamanho real.</p>
+              </>
+            )}
           </section>
         ) : null}
         {p.slug === "akamai" || p.slug === "angel-investor" ? (

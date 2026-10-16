@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 import type { ReactNode } from "react";
 import { PrototypePlayer, type ProtoStep } from "./prototype-player";
 import { RecreatedScreen, type ScreenId } from "./recreated-screens";
@@ -218,10 +220,18 @@ const aiSteps: ProtoStep[] = [
   { label: "Lista de conversas", ms: 2200 },
   { label: "Conversa com outro membro", ms: 2600 },
 ];
-const aiIds: ScreenId[] = ["angel-abertura", "angel-cadastro", "angel-feed", "angel-conversas", "angel-chat"];
+const aiImgs = ["abertura", "cadastro", "feed", "conversas", "chat"].map((n) => `/projetos/angel-investor/${n}.webp`);
 
 export function AngelInvestorPrototype() {
   return (
-    <PrototypePlayer title="Protótipo do app da comunidade de investidores" steps={aiSteps} accent="#6c4cf1" render={(s) => <ScreenSteps ids={aiIds} step={s} />} />
+    <PrototypePlayer title="Protótipo do app da comunidade de investidores" steps={aiSteps} accent="#6c4cf1" render={(s) => (
+        <>
+          {aiImgs.map((src, i) => (
+            <Screen key={src} show={i === s}>
+              <Image src={src} alt="" fill sizes="280px" className="object-cover object-top" />
+            </Screen>
+          ))}
+        </>
+      )} />
   );
 }

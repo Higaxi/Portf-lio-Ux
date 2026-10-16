@@ -148,6 +148,8 @@ export type MiniCase = {
   designSystem?: ProjectImage;
   /** Cor da marca do case (callouts numerados). */
   accent?: string;
+  /** Telas da jornada redesenhadas em código (mostra o rótulo). */
+  recreated?: boolean;
   /** Prancha original, exibida em tamanho nativo ou menor. */
   original?: ProjectImage;
   /** Pendência de resultados reais (aparece só em desenvolvimento). */
