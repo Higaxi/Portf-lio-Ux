@@ -59,6 +59,8 @@ export type Profile = {
   /** URL de produção, usada no sitemap, robots e Open Graph. */
   siteUrl: string;
   socials: Link[];
+  /** Currículo em PDF servido de public/. `size` é lido por leitores de tela. */
+  resume: { href: string; fileName: string; size: string };
   about: { statement: string; blocks: { title: string; text: string }[]; /** Frase pessoal, humana (fora do trabalho). */ personal: string };
   skills: SkillGroup[];
   tools: string[];
@@ -106,6 +108,11 @@ export const profile: Profile = {
     { label: "LinkedIn", href: "https://www.linkedin.com/in/mateushigashie" },
     { label: "WhatsApp", href: "https://wa.me/5561984276250", display: "(61) 98427-6250" },
   ],
+  resume: {
+    href: "/curriculo/Mateus-Higashie-Curriculo.pdf",
+    fileName: "Mateus-Higashie-Curriculo.pdf",
+    size: "510 KB",
+  },
   about: {
     personal: "TODO: uma ou duas frases suas, fora do trabalho (o que gosta de fazer, o que te move). Não publique nada que não seja seu.",
     statement: "Do operacional ao estratégico, sem perder o usuário de vista.",

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 import { navLinks } from "@/content/nav";
 import { ThemeToggle } from "./theme-toggle";
+import { ResumeButton } from "./resume-button";
 
 /** Menu do celular: um botão que abre a lista de âncoras. Esc fecha. */
 export function MobileMenu() {
@@ -51,6 +52,7 @@ export function MobileMenu() {
             ))}
           </ul>
         </nav>
+        <ResumeButton className="mt-8 w-full" />
         <ThemeToggle className="mt-6" />
       </div>
     </div>

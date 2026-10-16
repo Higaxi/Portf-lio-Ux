@@ -1,6 +1,7 @@
 import { profile } from "@/content/profile";
 import { ContactForm } from "./contact-form";
 import { RollText } from "./roll-text";
+import { ResumeButton } from "./resume-button";
 
 /** Contato: links grandes (o caminho mais curto) e o formulário ao lado. */
 export function Contact() {
@@ -15,8 +16,9 @@ export function Contact() {
         Vamos conversar!
       </h2>
       <p className="mt-6 max-w-[48ch] text-lead">
-        {profile.availability} Também aceito projetos freelance.
+        {profile.availability}
       </p>
+      <ResumeButton className="mt-8" />
 
       <div className="mt-14 grid gap-16 md:grid-cols-12 md:gap-x-6">
         <ul className="md:col-span-7">
