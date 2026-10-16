@@ -23,8 +23,8 @@ export const podeRegularizar: CaseStudy = {
   cover: {
     src: "/projetos/capas/pode-regularizar.webp",
     alt: "Capa do projeto Pode Regularizar publicada pelo Mateus: celular sobre uma mesa com a lista de imóveis cadastrados e o título Atualização do app.",
-    width: 1600,
-    height: 900,
+    width: 1400,
+    height: 788,
   },
   og: `${dir}/og.jpg`,
   draft: true,

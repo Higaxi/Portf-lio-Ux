@@ -338,8 +338,17 @@ export function ProjectCarousel({ items, labelledBy }: { items: CarouselItem[]; 
                 Fechar
               </button>
             </div>
-            <div className="relative mt-5 aspect-video overflow-hidden rounded-xl bg-surface">
-              <Image src={open.image.src} alt={open.image.alt} fill sizes="(min-width: 1200px) 72rem, 92vw" className="object-contain" />
+            <div className="mt-5 flex justify-center overflow-hidden rounded-xl bg-surface">
+              {/* Nunca passa da resolução nativa da imagem. */}
+              <Image
+                src={open.image.src}
+                alt={open.image.alt}
+                width={open.image.width}
+                height={open.image.height}
+                sizes={`(min-width: 1200px) ${Math.min(open.image.width, 1152)}px, 92vw`}
+                className="h-auto max-h-[70vh] w-auto max-w-full object-contain"
+                style={{ maxWidth: Math.min(open.image.width, 1152) }}
+              />
             </div>
             <p className="mt-4 max-w-[60ch] text-body">{open.description}</p>
           </div>

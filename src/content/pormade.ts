@@ -23,8 +23,8 @@ export const pormade: CaseStudy = {
   cover: {
     src: "/projetos/capas/pormade.webp",
     alt: "Capa do projeto Pormade publicada pelo Mateus: celular com a tela Gerador de Propostas e as categorias de produtos, sobre fundo verde escuro com hexágonos.",
-    width: 1920,
-    height: 1080,
+    width: 1672,
+    height: 941,
   },
   og: `${dir}/og.jpg`,
   draft: false,

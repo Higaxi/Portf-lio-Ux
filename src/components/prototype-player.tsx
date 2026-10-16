@@ -61,7 +61,7 @@ export function PrototypePlayer({
   return (
     <figure ref={rootRef} className="flex flex-col items-center gap-5 rounded-2xl bg-surface px-4 py-8 md:py-10">
       <div className="relative w-[min(78vw,300px)]">
-        <div className="relative aspect-[9/19] overflow-hidden rounded-[2.4rem] border-[10px] border-[#0b0b0f] bg-white text-[#111827] shadow-[0_24px_60px_-28px_rgba(0,0,0,0.55)]">
+        <div className="relative aspect-[9/19.5] overflow-hidden rounded-[2.4rem] border-[10px] border-[#0b0b0f] bg-white text-[#111827] shadow-[0_24px_60px_-28px_rgba(0,0,0,0.55)]">
           <div className="absolute inset-0 font-sans text-[12px] leading-tight">{render(step)}</div>
           <div aria-hidden="true" className="absolute left-1/2 top-2 h-4 w-20 -translate-x-1/2 rounded-full bg-[#0b0b0f]" />
         </div>

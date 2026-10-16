@@ -110,11 +110,24 @@ export function Lightbox({
                 alt={img.alt}
                 width={img.width}
                 height={img.height}
-                sizes="100vw"
-                className="mx-auto h-auto w-full max-w-[1800px]"
+                sizes={`(min-width: ${img.width}px) ${img.width}px, 100vw`}
+                className="mx-auto h-auto w-full"
+                style={{ maxWidth: img.width }}
               />
             ) : (
-              <Image key={img.src} src={img.src} alt={img.alt} fill sizes="100vw" className="object-contain p-2 md:p-6" />
+              // Ajusta à tela sem nunca passar da resolução nativa da imagem.
+              <div className="flex h-full w-full items-center justify-center p-2 md:p-6">
+                <Image
+                  key={img.src}
+                  src={img.src}
+                  alt={img.alt}
+                  width={img.width}
+                  height={img.height}
+                  sizes={`(min-width: ${img.width}px) ${img.width}px, 100vw`}
+                  className="h-auto max-h-full w-auto max-w-full object-contain"
+                  style={{ maxWidth: `min(100%, ${img.width}px)` }}
+                />
+              </div>
             )}
           </div>
 

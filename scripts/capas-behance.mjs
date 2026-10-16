@@ -11,7 +11,6 @@ const [covers, pormade, podereg] = process.argv.slice(2);
 const jobs = [
   ["pormade", `${pormade}/01.png`, 1920],
   ["pode-regularizar", `${podereg}/01.png`, 1600],
-  ["angel-investor", `${covers}/angel-investor.png`, 1920],
   ["bloco-do-urso", `${covers}/bloco-do-urso.png`, 1920],
   ["nurotulo", `${covers}/nurotulo.png`, 1920],
   ["banco-digital", `${covers}/banco-digital.png`, 1920],
@@ -21,7 +20,9 @@ const jobs = [
   ["mortal-kombat", `${covers}/mortal-kombat.jpg`, 1280],
 ];
 
-for (const [slug, src, W] of jobs) {
+for (const [slug, src, maxW] of jobs) {
+  // Nunca amplia: a largura final é no máximo a largura original.
+  const W = Math.min(maxW, (await sharp(src).metadata()).width);
   const H = Math.round((W * 9) / 16);
   const img = sharp(src).removeAlpha();
   const { data } = await img.clone().extract({ left: 2, top: 2, width: 1, height: 1 }).raw().toBuffer({ resolveWithObject: true });

@@ -16,33 +16,35 @@ const palette = [
   { hex: "#FFFFFF", role: "Superfícies e cards" },
 ];
 
+/** Componentes visíveis na tela, numerados de cima para baixo. */
 const components = [
-  { src: "cabecalho.webp", w: 639, h: 215, name: "Cabeçalho com métricas", note: "Preço do time, fechamento do mercado e patrimônio." },
-  { src: "formacao.webp", w: 610, h: 75, name: "Seletor de formação e visualização", note: "Formação em lista suspensa; campo ou lista." },
-  { src: "card-jogador.webp", w: 110, h: 145, name: "Card de jogador", note: "Preço, camisa com escudo, confirmação e nome." },
-  { src: "banco.webp", w: 639, h: 200, name: "Banco de reservas", note: "Os mesmos cards, em linha." },
-  { src: "acoes.webp", w: 615, h: 90, name: "Ações da escalação", note: "Atalhos da escalação (como limpar e compartilhar) e o capitão escolhido." },
-  { src: "navegacao.webp", w: 639, h: 100, name: "Navegação inferior", note: "Campeonatos, Notificações e Minha conta." },
+  { name: "Cabeçalho com métricas", note: "Preço do time, fechamento do mercado e patrimônio." },
+  { name: "Seletor de formação e visualização", note: "Formação em lista suspensa; campo ou lista." },
+  { name: "Card de jogador", note: "Preço, camisa com escudo, confirmação e nome." },
+  { name: "Banco de reservas", note: "Os mesmos cards, em linha." },
+  { name: "Ações da escalação", note: "Atalhos (como limpar e compartilhar) e o capitão escolhido." },
+  { name: "Navegação inferior", note: "Campeonatos, Notificações e Minha conta." },
 ];
 
 /**
  * Design system do Premium League mostrado a partir das telas reais:
- * a tela de escalação redesenhada, a paleta extraída dela e os componentes
- * recortados da própria tela. Nada inventado.
+ * a tela de escalação redesenhada (em tamanho real), a paleta extraída dela e
+ * a lista dos componentes visíveis. Nada inventado.
  */
 export function PlDesignSystem() {
   return (
     <figure className="flex flex-col gap-8">
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,15rem)_1fr]">
-        <div className="mx-auto w-full max-w-[15rem] overflow-hidden rounded-[2rem] border-[8px] border-[#0b0b10] bg-white">
+      <div className="grid gap-8 lg:grid-cols-[229px_1fr]">
+        {/* Captura original em tamanho real (213px): não é ampliada. */}
+        <div className="mx-auto w-[229px] overflow-hidden rounded-[1.6rem] border-[8px] border-[#0b0b10] bg-white">
           <Image
             src={`${dir}/tela-depois.webp`}
             alt="Tela de escalação redesenhada do Premium League: cabeçalho azul com métricas, seletor de formação, campo verde com cards de jogadores, banco de reservas, ações e navegação inferior."
-            width={639}
-            height={1464}
+            width={213}
+            height={488}
             loading="eager"
-            sizes="240px"
-            className="h-auto w-full"
+            unoptimized
+            className="block h-[488px] w-[213px]"
           />
         </div>
         <div>
@@ -63,29 +65,19 @@ export function PlDesignSystem() {
 
       <div>
         <h3 className="label">Componentes</h3>
-        <ul className="mt-3 grid gap-4 sm:grid-cols-2">
-          {components.map((c) => (
-            <li key={c.src} className="flex flex-col gap-3 rounded-xl bg-surface p-4">
-              <div className="flex min-h-24 items-center justify-center rounded-lg bg-white p-3">
-                <Image
-                  src={`${dir}/${c.src}`}
-                  alt={`${c.name}, recortado da tela do app.`}
-                  width={c.w}
-                  height={c.h}
-                  loading="eager"
-                  sizes="(min-width: 640px) 30vw, 90vw"
-                  className="h-auto max-h-36 w-auto max-w-full"
-                />
-              </div>
+        <ol className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {components.map((c, i) => (
+            <li key={c.name} className="grid grid-cols-[2rem_1fr] rounded-xl bg-surface p-4">
+              <span className="tabular font-mono text-[0.875rem] text-muted">{String(i + 1).padStart(2, "0")}</span>
               <span>
                 <span className="block text-[0.9375rem] font-medium">{c.name}</span>
                 <span className="block text-[0.875rem] text-muted">{c.note}</span>
               </span>
             </li>
           ))}
-        </ul>
+        </ol>
       </div>
-      <figcaption className="label">Paleta e componentes extraídos das telas do app (tela de escalação redesenhada).</figcaption>
+      <figcaption className="label">Paleta e componentes extraídos das telas do app. A tela aparece em tamanho real, como foi entregue na apresentação.</figcaption>
     </figure>
   );
 }

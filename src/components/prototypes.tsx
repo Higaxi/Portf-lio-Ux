@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { PrototypePlayer, type ProtoStep } from "./prototype-player";
+import { RecreatedScreen, type ScreenId } from "./recreated-screens";
 
 /*
  * Protótipos ilustrativos recriados a partir do que sabemos de cada projeto
@@ -294,156 +295,42 @@ export function PormadePrototype() {
   );
 }
 
-/* ---------- Akamai / Exbiz: painel de segurança ---------- */
+/* ---------- Akamai e Angel Investor: telas redesenhadas em código ---------- */
+
+function ScreenSteps({ ids, step }: { ids: ScreenId[]; step: number }) {
+  return (
+    <>
+      {ids.map((id, i) => (
+        <Screen key={id} show={i === step}>
+          <RecreatedScreen id={id} />
+        </Screen>
+      ))}
+    </>
+  );
+}
 
 const akSteps: ProtoStep[] = [
-  { label: "Entrar no painel", ms: 1800 },
-  { label: "Resumo de tráfego com barras", ms: 2400 },
-  { label: "Tipos de ataque no gráfico de pizza", ms: 2400 },
-  { label: "Ações aplicadas aos ataques", ms: 2200 },
+  { label: "Entrar no painel", ms: 2000 },
+  { label: "Resumo do firewall: tráfego e ataques", ms: 3000 },
+  { label: "Tráfego geral por métrica", ms: 2800 },
 ];
+const akIds: ScreenId[] = ["akamai-login", "akamai-waf", "akamai-trafego"];
 
 export function AkamaiPrototype() {
-  const blue = "#0b3a75";
-  return (
-    <PrototypePlayer
-      title="Protótipo do painel de segurança"
-      steps={akSteps}
-      accent={blue}
-      render={(s) => (
-        <>
-          <Screen show={s === 0}>
-            <div className="flex flex-1 flex-col items-center justify-center gap-3 p-5" style={{ background: blue }}>
-              <span className="text-[18px] font-bold text-white">Mobile Control Center</span>
-              <span className="h-9 w-full rounded bg-white/90" />
-              <span className="h-9 w-full rounded bg-white/90" />
-              <span className="h-9 w-full rounded bg-[#5b9bd5] text-center font-semibold leading-9 text-white">Entrar</span>
-            </div>
-          </Screen>
-          <Screen show={s >= 1}>
-            <Bar title="Web Application Firewall" color={blue} />
-            <div className="flex items-center justify-between px-3 py-2 text-[10px] text-[#6b7280]">
-              <span>Contrato 0000-00</span>
-              <span>01/07 a 30/07</span>
-            </div>
-            <div className={`flex flex-col gap-2 px-3 ${ease} ${s === 1 ? "opacity-100" : "opacity-40"}`}>
-              {[
-                ["Edge hits", 0.86, "#2563eb"],
-                ["Page requests", 0.64, "#f97316"],
-                ["Bandwidth", 0.74, "#8b5cf6"],
-              ].map(([k, v, c]) => (
-                <div key={k as string}>
-                  <span className="text-[10px]">{k as string}</span>
-                  <span className="mt-0.5 block h-3 overflow-hidden rounded bg-[#e5e7eb]">
-                    <span
-                      className="block h-full origin-left rounded transition-transform duration-1000 ease-out"
-                      style={{ background: c as string, transform: `scaleX(${s >= 1 ? (v as number) : 0})` }}
-                    />
-                  </span>
-                </div>
-              ))}
-            </div>
-            <div className={`mx-auto mt-4 ${ease} ${s >= 2 ? "scale-100 opacity-100" : "scale-75 opacity-0"}`}>
-              <svg viewBox="0 0 42 42" className="size-28 -rotate-90" aria-hidden="true">
-                {[
-                  [56, "#2563eb", 0],
-                  [24, "#f97316", 56],
-                  [12, "#8b5cf6", 80],
-                  [8, "#22c55e", 92],
-                ].map(([p, c, off]) => (
-                  <circle key={c as string} cx="21" cy="21" r="15.9" fill="none" stroke={c as string} strokeWidth="8" strokeDasharray={`${p} ${100 - (p as number)}`} strokeDashoffset={-(off as number)} />
-                ))}
-              </svg>
-            </div>
-            <div className={`mt-3 grid grid-cols-2 gap-2 px-3 ${ease} ${s === 3 ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"}`}>
-              <span className="rounded-lg bg-[#f3f4f6] p-2"><b className="block text-[16px]">65%</b>Deny</span>
-              <span className="rounded-lg bg-[#f3f4f6] p-2"><b className="block text-[16px]">35%</b>Alert</span>
-            </div>
-          </Screen>
-        </>
-      )}
-    />
-  );
+  return <PrototypePlayer title="Protótipo do painel de segurança" steps={akSteps} accent="#0f3a6b" render={(s) => <ScreenSteps ids={akIds} step={s} />} />;
 }
-
-/* ---------- Angel Investor: onboarding, feed e conversa ---------- */
 
 const aiSteps: ProtoStep[] = [
-  { label: "Abertura com a comunidade", ms: 1800 },
+  { label: "Abertura com a comunidade", ms: 2000 },
   { label: "Cadastro pelo número de telefone", ms: 2200 },
   { label: "Feed com stories e publicações", ms: 2600 },
+  { label: "Lista de conversas", ms: 2200 },
   { label: "Conversa com outro membro", ms: 2600 },
 ];
+const aiIds: ScreenId[] = ["angel-abertura", "angel-cadastro", "angel-feed", "angel-conversas", "angel-chat"];
 
 export function AngelInvestorPrototype() {
-  const purple = "#6d3cf5";
   return (
-    <PrototypePlayer
-      title="Protótipo do app da comunidade de investidores"
-      steps={aiSteps}
-      accent={purple}
-      render={(s) => (
-        <>
-          <Screen show={s <= 1}>
-            <div className="flex flex-1 flex-col items-center gap-3 p-4 pt-10">
-              <span className="text-[16px] font-bold" style={{ color: purple }}>Angel Investor Club</span>
-              <div className="grid grid-cols-2 gap-2">
-                {[0, 1, 2, 3].map((i) => (
-                  <span key={i} className="size-16 rounded-full" style={{ background: i % 2 ? "#c4b5fd" : purple }} />
-                ))}
-              </div>
-              <p className="text-center text-[11px] font-semibold">Investimos em pessoas, transformamos vidas.</p>
-              <div className={`w-full ${ease} ${s === 1 ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"}`}>
-                <span className="block rounded-lg border border-[#d1d5db] px-3 py-2 text-[#6b7280]">+55 (11) 9 ____-____</span>
-              </div>
-              <span className={`mt-auto w-full rounded-full py-2.5 text-center font-semibold text-white ${ease} ${s === 1 ? "scale-95" : ""}`} style={{ background: purple }}>
-                {s === 1 ? "Cadastre o seu número" : "Iniciar"}
-              </span>
-            </div>
-          </Screen>
-          <Screen show={s === 2}>
-            <div className="flex gap-2 overflow-hidden px-3 pb-2 pt-9">
-              {[0, 1, 2, 3, 4].map((i) => (
-                <span key={i} className="size-10 shrink-0 rounded-full ring-2" style={{ background: "#ddd6fe", ["--tw-ring-color" as string]: purple }} />
-              ))}
-            </div>
-            <div className="flex flex-col gap-2 px-3">
-              {[0, 1].map((i) => (
-                <div key={i} className={`rounded-lg bg-[#f9fafb] p-2 ${ease}`} style={{ transitionDelay: `${i * 150}ms`, transform: s === 2 ? "none" : "translateY(12px)" }}>
-                  <span className="flex items-center gap-2 text-[10px] font-semibold">
-                    <span className="size-6 rounded-full bg-[#c4b5fd]" /> Angel Investor Club
-                  </span>
-                  <span className="mt-2 block h-20 rounded bg-[#e5e7eb]" />
-                  <span className="mt-1 block text-[9px] text-[#6b7280]">♥ curtidas · comentários</span>
-                </div>
-              ))}
-            </div>
-            <span className="absolute bottom-14 right-4 flex size-10 items-center justify-center rounded-full text-[20px] text-white" style={{ background: purple }}>+</span>
-          </Screen>
-          <Screen show={s === 3}>
-            <div className="flex items-center gap-2 border-b border-[#eee] px-3 pb-2 pt-9">
-              <span className="size-7 rounded-full bg-[#c4b5fd]" />
-              <span className="font-semibold">Membro da comunidade</span>
-            </div>
-            <div className="flex flex-1 flex-col gap-2 p-3">
-              {[
-                ["Oi! Alguma novidade hoje?", false],
-                ["Sim, temos uma atualização no projeto.", true],
-                ["Ótimo, vou dar uma olhada!", false],
-              ].map(([t, me], i) => (
-                <span
-                  key={t as string}
-                  className={`max-w-[80%] rounded-2xl px-3 py-2 ${ease} ${me ? "self-end text-white" : "self-start bg-[#f3f4f6]"}`}
-                  style={{ background: me ? purple : undefined, transitionDelay: `${i * 400}ms`, opacity: s === 3 ? 1 : 0, transform: s === 3 ? "none" : "translateY(8px)" }}
-                >
-                  {t as string}
-                </span>
-              ))}
-            </div>
-          </Screen>
-        </>
-      )}
-    />
+    <PrototypePlayer title="Protótipo do app da comunidade de investidores" steps={aiSteps} accent="#6c4cf1" render={(s) => <ScreenSteps ids={aiIds} step={s} />} />
   );
 }
-

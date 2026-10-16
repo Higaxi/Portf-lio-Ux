@@ -161,7 +161,7 @@ function Facts({ rows }: { rows: [string, string][] }) {
 
 function Figure({ img, sizes }: { img: NonNullable<CaseStudy["problem"]["image"]>; sizes: string }) {
   return (
-    <figure className="mt-10">
+    <figure className="mt-10" style={{ maxWidth: img.width }}>
       <div className="relative overflow-hidden rounded-xl bg-surface" style={{ aspectRatio: `${img.width} / ${img.height}` }}>
         <Image src={img.src} alt={img.alt} fill sizes={sizes} loading="eager" className="object-cover" />
       </div>
@@ -538,8 +538,9 @@ function MiniCasePage({ p }: { p: MoreProject }) {
                 {mc.delivery} As decisões de design estão numeradas sobre cada tela.
               </p>
             </div>
-            <div className="mt-10">
-              <FlowCallouts screens={mc.flow} />
+            <p className="label mt-8">Telas redesenhadas em alta resolução a partir do protótipo original.</p>
+            <div className="mt-4">
+              <FlowCallouts screens={mc.flow} accent={mc.accent} />
             </div>
           </section>
         ) : (
@@ -555,15 +556,27 @@ function MiniCasePage({ p }: { p: MoreProject }) {
             <p className="mt-3 max-w-[60ch] text-body">
               Tipografia, cores, ícones, botões, top bar, formulários, navegação, calendários, gráficos e campos de exibição documentados para manter as telas consistentes.
             </p>
-            <div className="mt-8 overflow-hidden rounded-2xl bg-[#e9edf3] p-3 md:p-6">
-              <Image src={mc.designSystem.src} alt={mc.designSystem.alt} width={mc.designSystem.width} height={mc.designSystem.height} sizes="(min-width: 1440px) 1300px, 100vw" loading="eager" className="h-auto w-full rounded-lg" />
+            <div className="mt-8 inline-block max-w-full overflow-hidden rounded-2xl bg-[#e9edf3] p-3 md:p-5">
+              <Image src={mc.designSystem.src} alt={mc.designSystem.alt} width={mc.designSystem.width} height={mc.designSystem.height} sizes={`${mc.designSystem.width}px`} loading="eager" className="h-auto w-full rounded-lg" style={{ maxWidth: mc.designSystem.width }} />
             </div>
+            <p className="label mt-3">Quadro original, em tamanho real.</p>
           </section>
         ) : null}
         {p.slug === "akamai" || p.slug === "angel-investor" ? (
           <Section id="prototipo" title="Protótipo">
             <CasePrototype id={p.slug === "akamai" ? "akamai" : "angel-investor"} />
           </Section>
+        ) : null}
+        {mc.original ? (
+          <section id="prancha-original" aria-labelledby="original-titulo" className="border-t border-line py-14 md:py-20">
+            <h2 id="original-titulo" className="text-lead">
+              Prancha original
+            </h2>
+            <p className="mt-3 max-w-[60ch] text-body text-muted">A apresentação do projeto como foi entregue, em tamanho real.</p>
+            <div className="mt-8">
+              <Image src={mc.original.src} alt={mc.original.alt} width={mc.original.width} height={mc.original.height} sizes={`(min-width: 1440px) ${mc.original.width}px, 100vw`} loading="eager" className="h-auto w-full rounded-xl" style={{ maxWidth: mc.original.width }} />
+            </div>
+          </section>
         ) : null}
         {mc.flow?.length ? (
           showTodos && mc.resultsTodo ? (

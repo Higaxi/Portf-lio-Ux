@@ -1,3 +1,4 @@
+import type { ScreenId } from "@/components/recreated-screens";
 import { miniCases } from "./mini-cases";
 import { premiumLeague } from "./premium-league";
 import { podeRegularizar } from "./pode-regularizar";
@@ -143,16 +144,23 @@ export type MiniCase = {
   delivery: string;
   /** Jornada principal em telas grandes, com decisões numeradas sobre cada tela. */
   flow?: FlowScreen[];
-  /** Mini design system em destaque (opcional). */
+  /** Mini design system em destaque (opcional), em tamanho nativo. */
   designSystem?: ProjectImage;
+  /** Cor da marca do case (callouts numerados). */
+  accent?: string;
+  /** Prancha original, exibida em tamanho nativo ou menor. */
+  original?: ProjectImage;
   /** Pendência de resultados reais (aparece só em desenvolvimento). */
   resultsTodo?: string;
 };
 
 export type FlowScreen = {
-  src: string;
-  width: number;
-  height: number;
+  /** Tela redesenhada em código (preferível: nítida em qualquer tamanho). */
+  screen?: ScreenId;
+  /** Ou uma imagem, exibida no máximo na resolução nativa. */
+  src?: string;
+  width?: number;
+  height?: number;
   title: string;
   alt: string;
   /** Posição em % sobre a tela e o texto da decisão. */
@@ -230,7 +238,7 @@ const moreProjectsBase: Omit<MoreProject, "case">[] = [
     name: "NuRótulo",
     categories: ["produto", "branding"],
     description: "Rebranding com antes e depois e o app de explorar produtos, com scanner e cartão saúde.",
-    image: cover("nurotulo", "Capa do app NuRótulo: celular com a tela de login, sobre fundo verde-azulado."),
+    image: cover("nurotulo", "Capa do app NuRótulo: celular com a tela de login, sobre fundo verde-azulado.", 1782, 1002),
   },
   {
     slug: "polaris",
@@ -244,7 +252,7 @@ const moreProjectsBase: Omit<MoreProject, "case">[] = [
     name: "Bloco do Urso",
     categories: ["produto"],
     description: "App de bloco de carnaval: notícias do evento, match entre foliões e metaverso.",
-    image: cover("bloco-do-urso", "Capa do app Bloco do Urso: celular com a tela de abertura rosa e o logotipo do bloco, sobre fundo roxo."),
+    image: cover("bloco-do-urso", "Capa do app Bloco do Urso: celular com a tela de abertura rosa e o logotipo do bloco, sobre fundo roxo.", 1849, 1040),
   },
   {
     slug: "virtualmed-clin",
@@ -282,35 +290,35 @@ const moreProjectsBase: Omit<MoreProject, "case">[] = [
     name: "Banco digital",
     categories: ["conceito"],
     description: "Conceito de app de banco digital: tela de entrada com acesso à conta e abertura de conta.",
-    image: cover("banco-digital", "Celular com a tela de entrada de um app de banco digital, com os botões Entrar na conta e Abrir uma conta, sobre fundo lilás."),
+    image: cover("banco-digital", "Celular com a tela de entrada de um app de banco digital, com os botões Entrar na conta e Abrir uma conta, sobre fundo lilás.", 1483, 834),
   },
   {
     slug: "ticket-log",
     name: "Ticket Log",
     categories: ["conceito"],
     description: "Conceito de app para a marca Ticket Log.",
-    image: cover("ticket-log", "Logotipo verde da Ticket Log sobre fundo escuro.", 1600, 900),
+    image: cover("ticket-log", "Logotipo verde da Ticket Log sobre fundo escuro.", 1440, 810),
   },
   {
     slug: "nasp",
     name: "Nasp Engenharia",
     categories: ["landing"],
     description: "Website institucional para uma empresa de engenharia.",
-    image: cover("nasp", "Capa do projeto: logotipo da Nasp Engenharia e o título Website institucional, em UI/UX Design, sobre fundo escuro.", 1280, 720),
+    image: cover("nasp", "Capa do projeto: logotipo da Nasp Engenharia e o título Website institucional, em UI/UX Design, sobre fundo escuro.", 808, 455),
   },
   {
     slug: "bugatti",
     name: "Bugatti Store",
     categories: ["conceito"],
     description: "Conceito de loja da Bugatti: tela de abertura com o carro e chamada para explorar.",
-    image: cover("bugatti", "Tela de abertura conceitual da Bugatti com o carro, o título Bugatti e o botão Discover more, sobre fundo escuro com hexágonos.", 1280, 720),
+    image: cover("bugatti", "Tela de abertura conceitual da Bugatti com o carro, o título Bugatti e o botão Discover more, sobre fundo escuro com hexágonos.", 808, 455),
   },
   {
     slug: "mortal-kombat",
     name: "Mortal Kombat",
     categories: ["conceito"],
     description: "Conceito de app com fichas de personagem e atributos de combate.",
-    image: cover("mortal-kombat", "Duas telas conceituais com a ficha do personagem Baraka e barras de dano, vida, combo e especial.", 1280, 720),
+    image: cover("mortal-kombat", "Duas telas conceituais com a ficha do personagem Baraka e barras de dano, vida, combo e especial.", 808, 455),
   },
 ];
 
