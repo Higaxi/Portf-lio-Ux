@@ -18,7 +18,10 @@ export function Contact() {
       <p className="mt-6 max-w-[48ch] text-lead">
         {profile.availability}
       </p>
-      <ResumeButton className="mt-8" />
+      <div className="mt-8 flex flex-wrap items-center gap-3">
+        <ResumeButton />
+        <ResumeButton lang="en" variant="quiet" className="min-h-12 px-5" />
+      </div>
 
       <div className="mt-14 grid gap-16 md:grid-cols-12 md:gap-x-6">
         <ul className="md:col-span-7">

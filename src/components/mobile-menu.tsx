@@ -53,6 +53,7 @@ export function MobileMenu() {
           </ul>
         </nav>
         <ResumeButton className="mt-8 w-full" />
+        <ResumeButton lang="en" variant="quiet" className="mt-3 min-h-12 w-full justify-center" />
         <ThemeToggle className="mt-6" />
       </div>
     </div>

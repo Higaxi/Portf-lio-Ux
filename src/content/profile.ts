@@ -59,8 +59,9 @@ export type Profile = {
   /** URL de produção, usada no sitemap, robots e Open Graph. */
   siteUrl: string;
   socials: Link[];
-  /** Currículo em PDF servido de public/. `size` é lido por leitores de tela. */
+  /** Currículos em PDF servidos de public/. `size` é lido por leitores de tela. */
   resume: { href: string; fileName: string; size: string };
+  resumeEn: { href: string; fileName: string; size: string };
   about: { statement: string; blocks: { title: string; text: string }[]; /** Frase pessoal, humana (fora do trabalho). */ personal: string };
   skills: SkillGroup[];
   tools: string[];
@@ -112,6 +113,11 @@ export const profile: Profile = {
     href: "/curriculo/Mateus-Higashie-Curriculo.pdf",
     fileName: "Mateus-Higashie-Curriculo.pdf",
     size: "510 KB",
+  },
+  resumeEn: {
+    href: "/curriculo/Mateus-Higashie-Resume-EN.pdf",
+    fileName: "Mateus-Higashie-Resume-EN.pdf",
+    size: "455 KB",
   },
   about: {
     personal: "TODO: uma ou duas frases suas, fora do trabalho (o que gosta de fazer, o que te move). Não publique nada que não seja seu.",
