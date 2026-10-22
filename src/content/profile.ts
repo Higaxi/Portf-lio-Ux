@@ -87,10 +87,10 @@ export const profile: Profile = {
   handle: "higaxi",
   name: "Mateus Higashie",
   title: ROLE,
-  tagline: "Dez anos desenhando produtos digitais, da pesquisa ao front-end, com IA no processo.",
+  tagline: "Mais de 8 anos desenhando produtos digitais, da pesquisa ao front-end, com IA no processo.",
   intro:
     "Desenho produtos digitais da pesquisa ao front-end. Liderei times de UX/UI, criei design systems e uso IA para entregar mais rápido e refazer menos.",
-  highlight: { value: "10 anos", label: "criando produtos digitais" },
+  highlight: { value: "8+ anos", label: "criando produtos digitais" },
   keywords: ["UX", "UI", "IA", "Design System", "Research", "Liderança", "Produto", "Protótipos"],
   seoDescription:
     `Mateus Higashie, ${ROLE}. Liderança de UX/UI, design systems, pesquisa, protótipos de alta fidelidade e IA aplicada ao design.`,
@@ -119,11 +119,11 @@ export const profile: Profile = {
     blocks: [
       {
         title: "O que eu faço",
-        text: "Há dez anos crio produtos digitais de alta usabilidade, design systems escaláveis e soluções centradas no usuário. O objetivo é sempre o mesmo: entregar mais rápido e refazer menos.",
+        text: "Há mais de oito anos crio produtos digitais de alta usabilidade, design systems escaláveis e soluções centradas no usuário. O objetivo é sempre o mesmo: entregar mais rápido e refazer menos.",
       },
       {
         title: "Como eu lidero",
-        text: "Liderei times de design, criei fluxos e processos de design do zero, treinei designers e conduzi workshops e entrevistas de UX em português e inglês, alinhando produto, negócio e quem usa.",
+        text: "Liderei times de design, criei fluxos e processos de design do zero, treinei designers e conduzi workshops e entrevistas de UX, alinhando produto, negócio e quem usa.",
       },
     ],
   },
