@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Canastrium · A canastra virou roguelike</title>
+<meta name="description" content="Canastrium é um roguelike de canastra em pixel art num boteco brasileiro: monte trincas e canastras, junte Trunfos, vença os Chefões do bar. Em breve na Steam e na Google Play.">
+<meta property="og:title" content="Canastrium · A canastra virou roguelike">
+<meta property="og:description" content="Roguelike de canastra em pixel art, com 171 Trunfos, 36 Chefões, Jogo do Bicho e bebedeira.">
+<meta property="og:image" content="img/fundos/boteco-noite.webp">
+<meta name="theme-color" content="#0c0806">
+<link rel="icon" href="img/ui/favicon.png">
+<link rel="preload" href="fonts/m6x11plus.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="stylesheet" href="css/site.css">
+<link rel="stylesheet" href="css/secoes.css">
+</head>
+<body>
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+<div class="progresso" aria-hidden="true"><span data-progresso></span></div>
+
+<header class="topo" data-topo>
+  <a class="topo-marca" href="#inicio"><img src="img/ui/logo.webp" alt="Canastrium" width="1867" height="499"></a>
+  <nav class="topo-nav" aria-label="Seções">
+    <a href="#jogo">Jogabilidade</a>
+    <a href="#boteco">O boteco</a>
+    <a href="#trunfos">Trunfos</a>
+    <a href="#chefoes">Chefões</a>
+    <a href="#bar">O bar</a>
+  </nav>
+  <a class="btn btn-ouro btn-p" href="#baixar">Em breve</a>
+</header>
+
+<main id="conteudo">
+
+<!-- ============ HERÓI ============ -->
+<section class="heroi" id="inicio">
+  <div class="heroi-fundo" data-par="0.35" data-zoom>
+    <img src="img/fundos/boteco-noite.webp" alt="" width="1784" height="882" fetchpriority="high">
+  </div>
+  <div class="heroi-veu"></div>
+  <div class="vagalumes" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
+  <div class="heroi-conteudo" data-par="-0.12">
+    <img class="heroi-logo entra" src="img/ui/logo.webp" alt="Canastrium" width="1867" height="499">
+    <h1 class="heroi-titulo entra">A canastra virou roguelike.<br><span>E o bar está aberto.</span></h1>
+    <p class="heroi-texto entra">Monte trincas e canastras, junte Trunfos do boteco e derrube os Chefões do bar numa partida que nunca sai igual.</p>
+    <div class="heroi-acoes entra">
+      <a class="btn btn-ouro" href="#baixar"><img src="img/ui/moeda.webp" alt="" width="24" height="24">Em breve</a>
+      <a class="btn btn-linha" href="#jogo">Como se joga</a>
+    </div>
+    <p class="heroi-plataformas entra">Chegando na Steam e na Google Play</p>
+    <ul class="selos entra">
+      <li><b data-conta="171">171</b><span>Trunfos</span></li>
+      <li><b data-conta="36">36</b><span>Chefões</span></li>
+      <li><b data-conta="12">12</b><span>Baralhos</span></li>
+    </ul>
+  </div>
+
+  <figure class="heroi-video" data-par="-0.12">
+    <div class="moldura entra">
+      <video data-trailer src="video/trailer.mp4" poster="video/trailer-capa.jpg" width="1280" height="720" autoplay muted loop playsinline preload="auto" aria-label="Trailer do Canastrium"></video>
+    </div>
+    <figcaption><span>Trailer · versão 1.17</span><button class="som" type="button" data-som aria-pressed="false">Ligar som</button></figcaption>
+  </figure>
+
+  <span class="sprite garcom" aria-hidden="true"></span>
+  <a class="rolar" href="#jogo" aria-label="Rolar para a jogabilidade"><span></span></a>
+</section>
+
+<!-- ============ JOGABILIDADE ============ -->
+<section class="jogo secao" id="jogo">
+  <div class="jogo-texto">
+    <p class="rotulo revela">Jogabilidade</p>
+    <h2 class="titulo revela">Monte a mão.<br><em>Bata a meta.</em></h2>
+    <p class="lead revela">Cada mesa pede uma meta de pontos. Você tem cinco Jogadas e três Descartes para chegar lá com as nove cartas da mão.</p>
+    <ul class="passos">
+      <li class="revela"><img src="img/cards/cardback.webp" alt=""><div><b>16 mãos de canastra</b><span>Da Carta Solta à Sequência de 9 Naipada, a Suprema. E mais 3 mãos secretas que só aparecem depois de feitas.</span></div></li>
+      <li class="revela"><img src="img/ui/chip-cascalho.png" alt="" class="px"><div><b>Cascalho</b><span>As fichas azuis: vêm da mão e de cada carta que pontua.</span></div></li>
+      <li class="revela"><img src="img/ui/chip-brasa.png" alt="" class="px"><div><b>Brasa</b><span>O multiplicador vermelho. Cascalho vezes Brasa dá os pontos.</span></div></li>
+      <li class="revela"><img src="img/bar/tampinha.webp" alt=""><div><b>24 mesas, 8 rodadas</b><span>Mesa Pequena, Mesa Grande e um Chefão que troca as regras.</span></div></li>
+    </ul>
+  </div>
+
+  <div class="jogo-mesa" data-mesa>
+    <div class="cena"><img src="img/fundos/boteco-noite.webp" alt="" width="1784" height="882" loading="lazy"></div>
+    <div class="placar" data-placar>
+      <p class="placar-mao">Canastra Limpa <span>nv. 1</span></p>
+      <div class="placar-conta">
+        <span class="ficha f-cas"><img src="img/ui/chip-cascalho.png" alt="" class="px"><b data-conta="144">144</b></span>
+        <span class="vezes">×</span>
+        <span class="ficha f-bra"><img src="img/ui/chip-brasa.png" alt="" class="px"><b data-conta="6">6</b></span>
+      </div>
+      <p class="placar-total"><span>Pontos</span><b data-conta="864">864</b></p>
+      <div class="placar-meta"><span>Meta da Mesa Pequena: 300</span><i><s data-barra></s></i></div>
+    </div>
+    <div class="madeira">
+      <img class="madeira-img" src="img/bar/mesa-nova.webp" alt="" width="2000" height="742" loading="lazy">
+      <div class="tampo">
+        <div class="mesa-cartas" aria-label="Canastra Limpa de 7 a Rei de Copas">
+          <img src="img/cards/a-7-1.webp" alt="" style="--i:0"><img src="img/cards/a-8-1.webp" alt="" style="--i:1"><img src="img/cards/a-9-1.webp" alt="" style="--i:2"><img src="img/cards/a-10-1.webp" alt="" style="--i:3"><img src="img/cards/a-11-1.webp" alt="" style="--i:4"><img src="img/cards/a-12-1.webp" alt="" style="--i:5"><img src="img/cards/a-13-1.webp" alt="" style="--i:6">
+        </div>
+        <span class="item tabua"><img class="px" src="img/bar/tabua.webp" alt=""><img class="px pic" src="img/bar/picanha.webp" alt=""></span>
+        <img class="item px caneca" src="img/bar/caneca-cheia.webp" alt="">
+        <img class="item px garrafa" src="img/bar/garrafa.webp" alt="">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ O BOTECO: panorama que corre com o scroll ============ -->
+<section class="boteco" id="boteco" data-pino>
+  <div class="boteco-palco">
+    <div class="boteco-pano" data-pano>
+      <img src="img/menu/pano.webp" alt="Panorama do boteco do Canastrium, com mesas, jukebox e balcão" width="1768" height="660">
+      <div class="pessoas" data-pessoas aria-hidden="true"></div>
+    </div>
+    <div class="boteco-veu"></div>
+    <div class="boteco-texto">
+      <p class="rotulo">O boteco</p>
+      <h2 class="titulo">Bem-vindo<br><em>ao boteco</em></h2>
+      <ul class="locais">
+        <li data-local="0"><b>O salão</b><span>Onde a partida começa, com o Nick e o Felix por perto.</span></li>
+        <li data-local="1"><b>A loja</b><span>Entre uma mesa e outra: Trunfos, pacotes e a Conta do Bar.</span></li>
+        <li data-local="2"><b>A mesa do Bicho</b><span>Aposta, escolhe o bicho e vira a carta.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TRUNFOS ============ -->
+<section class="trunfos secao" id="trunfos">
+  <div class="cabeca centro">
+    <p class="rotulo revela">Trunfos</p>
+    <h2 class="titulo revela">Conheça <em>quem joga junto</em></h2>
+    <p class="lead revela">São 171 Trunfos, e cada um muda a conta de um jeito. Eles se combinam entre si, e é aí que a partida fica boa.</p>
+  </div>
+  <div class="destaque">
+    <div class="destaque-carta revela" data-destaque-carta>
+      <span class="aura" data-aura></span>
+      <span class="jk tier-jei"><img src="img/trunfos/bar.webp" alt="Seu Zé do Bar"></span>
+      <span class="destaque-tempo" data-d-tempo aria-hidden="true"></span>
+    </div>
+    <div class="destaque-info revela" aria-live="polite">
+      <p class="destaque-tier" data-d-tier>Normal</p>
+      <h3 class="destaque-nome" data-d-nome>Seu Zé do Bar</h3>
+      <p class="destaque-efeito" data-d-efeito>+100 cascalhos em toda jogada</p>
+      <dl class="barras">
+        <div><dt>Raridade</dt><dd><i data-d-rar style="--v:.25"></i></dd></div>
+        <div><dt>Preço na loja</dt><dd><i data-d-preco style="--v:.4"></i><span data-d-preco-t>R$5</span></dd></div>
+      </dl>
+      <div class="destaque-escolha" data-destaque-lista role="tablist" aria-label="Escolha um Trunfo"></div>
+      <button class="btn btn-linha" type="button" data-pacote><img src="img/pacotes/trunfo.webp" alt="" width="20" height="30">Abrir um pacote</button>
+    </div>
+  </div>
+  <div class="desfile" aria-hidden="true"><div class="desfile-trilho" data-desfile></div></div>
+</section>
+
+<!-- ============ CHEFÕES: corredor horizontal ============ -->
+<section class="chefoes" id="chefoes" data-pino>
+  <div class="chefoes-palco">
+    <div class="chefoes-cabeca">
+      <p class="rotulo">Chefões</p>
+      <h2 class="titulo">Nem todo freguês<br><em>é amigo</em></h2>
+      <p class="lead">A terceira mesa de cada rodada é um Chefão com regra própria. São 36, e os piores só aparecem lá pelo fim da noite.</p>
+    </div>
+    <div class="chefoes-trilho" data-chefoes></div>
+  </div>
+</section>
+
+<!-- ============ O BAR ============ -->
+<section class="bar secao" id="bar">
+  <div class="cabeca linha-cabeca">
+    <div>
+      <p class="rotulo revela">O bar</p>
+      <h2 class="titulo revela">Puxe uma cadeira <em>e fique</em></h2>
+    </div>
+    <div class="setas">
+      <button type="button" class="seta" data-trilho="-1" aria-label="Anterior">‹</button>
+      <button type="button" class="seta" data-trilho="1" aria-label="Próximo">›</button>
+    </div>
+  </div>
+  <ul class="cartazes" data-cartazes>
+    <li class="cartaz revela">
+      <div class="cartaz-arte c-bebedeira"><img class="px" src="img/bebedeira/bebado-1.png" alt=""><img class="px b2" src="img/bebedeira/bebado-8.png" alt=""></div>
+      <div class="cartaz-texto"><b>Bebedeira</b><span>Cada copo deixa o bêbado mais corajoso e mais atrapalhado. E são 8 fases, do Sóbrio ao Cachaceiro lendário.</span></div>
+    </li>
+    <li class="cartaz revela">
+      <div class="cartaz-arte"><img src="img/bar/bicho-fundo.webp" alt=""><img class="px sobre" src="img/bicho/16.png" alt=""></div>
+      <div class="cartaz-texto"><b>Jogo do Bicho</b><span>23 bichos no talão. Acertou, dobra. O bicho premiado paga quatro vezes.</span></div>
+    </li>
+    <li class="cartaz revela">
+      <div class="cartaz-arte"><img src="img/fundos/loja-bar.webp" alt=""><img class="sobre pac" src="img/pacotes/saco.webp" alt=""></div>
+      <div class="cartaz-texto"><b>A loja</b><span>Pacotes de Trunfos, cartas, aprimoramentos e bebidas. Às vezes, o Saco do Saci.</span></div>
+    </li>
+    <li class="cartaz revela">
+      <div class="cartaz-arte c-baralhos" data-versos></div>
+      <div class="cartaz-texto"><b>12 baralhos</b><span>Cada um com um poder e um verso próprio, do Seu Zé ao Saci.</span></div>
+    </li>
+    <li class="cartaz revela">
+      <div class="cartaz-arte c-medalhas">
+        <img class="px" src="img/conquistas/freguesa.png" alt=""><img class="px" src="img/conquistas/milagre.png" alt=""><img class="px" src="img/conquistas/bicheiro.png" alt=""><img class="px" src="img/conquistas/malandragem.png" alt=""><img class="px" src="img/conquistas/bebum.png" alt=""><img class="px" src="img/conquistas/brasa.png" alt=""><img class="px" src="img/conquistas/cascalho.png" alt=""><img class="px" src="img/conquistas/boto.png" alt=""><img class="px" src="img/conquistas/saci.png" alt="">
+      </div>
+      <div class="cartaz-texto"><b>84 conquistas</b><span>Cada uma com medalha. 53 delas liberam Trunfos novos.</span></div>
+    </li>
+    <li class="cartaz revela">
+      <div class="cartaz-arte"><img src="img/fundos/lago-noite.webp" alt=""><img class="sobre caneca" src="img/bar/caneca-cheia.webp" alt=""></div>
+      <div class="cartaz-texto"><b>Beber até cair</b><span>Venceu a Rodada 8? O modo infinito continua com metas cada vez maiores.</span></div>
+    </li>
+  </ul>
+</section>
+
+<!-- ============ CHAMADA FINAL ============ -->
+<section class="baixar" id="baixar">
+  <div class="baixar-fundo" data-par="0.2"><img src="img/fundos/fazenda-dia.webp" alt="" width="1672" height="941" loading="lazy"></div>
+  <div class="baixar-veu"></div>
+  <div class="baixar-caixa revela">
+    <img class="baixar-logo" src="img/ui/logo.webp" alt="Canastrium" width="1867" height="499" loading="lazy">
+    <h2 class="titulo">A primeira mesa <em>vai ser posta</em></h2>
+    <p class="lead">O Canastrium está chegando na Steam, para computador, e na Google Play, para celular Android.</p>
+    <div class="plataformas">
+      <div class="plat" aria-disabled="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16a2 2 0 012 2v9a2 2 0 01-2 2h-6v2h3v2H7v-2h3v-2H4a2 2 0 01-2-2V6a2 2 0 012-2zm0 2v9h16V6z"/></svg>
+        <span><small>Para computador</small>Steam</span>
+        <em class="plat-breve">Em breve</em>
+      </div>
+      <div class="plat" aria-disabled="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2h10a2 2 0 012 2v16a2 2 0 01-2 2H7a2 2 0 01-2-2V4a2 2 0 012-2zm0 3v13h10V5zm4 14.5a1 1 0 102 0 1 1 0 00-2 0z"/></svg>
+        <span><small>Para celular Android</small>Google Play</span>
+        <em class="plat-breve">Em breve</em>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="rodape">
+  <div class="rodape-linha">
+    <img class="rodape-logo" src="img/ui/logo.webp" alt="Canastrium" width="1867" height="499" loading="lazy">
+    <nav aria-label="Rodapé">
+      <a href="#jogo">Jogabilidade</a><a href="#trunfos">Trunfos</a><a href="#chefoes">Chefões</a><a href="#bar">O bar</a><a href="#baixar">Em breve</a>
+    </nav>
+  </div>
+  <div class="rodape-pe">
+    <p>Feito em JavaScript puro por <img src="img/ui/higaxi-games.webp" alt="Higaxi Games" loading="lazy"></p>
+    <p>Em breve na Steam e na Google Play</p>
+  </div>
+  <span class="sprite nick" aria-hidden="true"></span>
+  <span class="sprite felix" aria-hidden="true"></span>
+</footer>
+
+<script src="js/dados.js"></script>
+<script src="js/site.js"></script>
+</body>
+</html>

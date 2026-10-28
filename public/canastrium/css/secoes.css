@@ -1,0 +1,44 @@
+/* Canastrium · landing page: Trunfo-objeto, o pessoal do boteco no panorama, a troca da vitrine e o "em breve".
+   Carrega depois do site.css (mesmas variáveis). */
+
+/* Trunfo que vira objeto (JK_ITEM do jogo): sem carta nem moldura, o desenho em pé */
+.jk.item{background:none}
+.jk.item::after{display:none}
+.jk.item>img{inset:auto;clip-path:none;left:-5%;top:-5%;width:110%;height:110%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 6px 0 rgba(0,0,0,.45))}
+
+/* vitrine: a barrinha mostra quando passa para o próximo */
+.destaque-tempo{position:absolute;left:12%;right:12%;bottom:-22px;height:4px;background:rgba(255,255,255,.12);border-radius:2px;overflow:hidden}
+.destaque-tempo::after{content:"";position:absolute;inset:0;background:var(--ouro);transform-origin:left;transform:scaleX(0)}
+.destaque-tempo.corre::after{animation:tempo 3.8s linear forwards}
+@keyframes tempo{to{transform:scaleX(1)}}
+
+/* o pessoal do menu no panorama: sentados bebericando e a turma dançando */
+.pessoas{position:absolute;inset:0;pointer-events:none}
+.pessoas i{position:absolute;background-repeat:no-repeat;background-size:1600% 100%;image-rendering:pixelated;transform-origin:50% 100%;
+  filter:saturate(.72) sepia(.18) brightness(.88) contrast(1.05) drop-shadow(0 4px 2px rgba(0,0,0,.35))}
+.pessoas .dancando{animation:danca .55s ease-in-out infinite alternate}
+.pessoas .dancando.vira{animation-name:dancaVira}
+.pessoas .sentado{animation:bebe 4s ease-in-out infinite}
+.pessoas .vira{scale:-1 1}
+@keyframes danca{0%{transform:translateY(0) scale(1.03,.97) rotate(-3deg)}100%{transform:translateY(-2%) scale(.97,1.03) rotate(3deg)}}
+@keyframes dancaVira{0%{transform:translateY(0) scale(1.03,.97) rotate(3deg)}100%{transform:translateY(-2%) scale(.97,1.03) rotate(-3deg)}}
+@keyframes bebe{0%,80%,100%{transform:none}88%{transform:translateY(-1%) scaleY(1.02)}}
+
+/* vitrine: a carta gira de lado para trocar e o texto some e volta junto */
+.destaque-carta .jk{transition:transform .26s cubic-bezier(.5,0,.75,0),opacity .26s}
+.destaque-carta:not(.sai) .jk{transition:transform .42s var(--sai),opacity .3s}
+.destaque-carta.sai .jk{transform:rotateY(90deg) scale(.94);opacity:.3}
+.destaque-info [data-d-tier],.destaque-info [data-d-nome],.destaque-info [data-d-efeito]{transition:opacity .25s,translate .35s var(--sai)}
+.destaque-info.sai [data-d-tier],.destaque-info.sai [data-d-nome],.destaque-info.sai [data-d-efeito]{opacity:0;translate:0 8px}
+
+/* ---------- em breve ---------- */
+.plat{position:relative;cursor:default}
+.plat:hover{transform:none;box-shadow:none;border-color:var(--borda)}
+.plat-breve{position:absolute;top:-12px;right:-10px;padding:5px 10px;border-radius:3px;background:var(--brasa);color:#fff;font:400 15px/1 var(--pixel);font-style:normal;rotate:6deg;
+  animation:breve 2.4s ease-in-out infinite}
+@keyframes breve{50%{transform:scale(1.08)}}
+
+@media (prefers-reduced-motion:reduce){
+  .pessoas i{animation:none!important}
+  .destaque-tempo{display:none}
+}

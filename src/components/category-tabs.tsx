@@ -18,7 +18,7 @@ function subscribe(cb: () => void) {
  * tabindex móvel. A aba ativa fica na URL (?cat=marca) para compartilhar.
  * Os painéis são renderizados no servidor; só o visível aparece.
  */
-export function CategoryTabs({ heading, tabs }: { heading: ReactNode; tabs: Tab[] }) {
+export function CategoryTabs({ heading, tabs, extra }: { heading: ReactNode; tabs: Tab[]; extra?: ReactNode }) {
   const ids = tabs.map((t) => t.id);
   const active = useSyncExternalStore(
     subscribe,
@@ -55,7 +55,8 @@ export function CategoryTabs({ heading, tabs }: { heading: ReactNode; tabs: Tab[
     <>
       <div className="flex flex-col gap-6 border-b border-line pb-6 lg:flex-row lg:items-end lg:justify-between">
         {heading}
-        <div role="tablist" aria-label="Categorias de projetos" className="-mx-1 flex flex-wrap gap-2 px-1">
+        <div className="-mx-1 flex flex-wrap items-center gap-2 px-1">
+        <div role="tablist" aria-label="Categorias de projetos" className="flex flex-wrap gap-2">
           {tabs.map((t, i) => {
             const selected = t.id === active;
             return (
@@ -80,6 +81,8 @@ export function CategoryTabs({ heading, tabs }: { heading: ReactNode; tabs: Tab[
               </button>
             );
           })}
+        </div>
+        {extra}
         </div>
       </div>
       {tabs.map((t) => (
