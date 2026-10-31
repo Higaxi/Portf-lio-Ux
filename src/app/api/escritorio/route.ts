@@ -1,4 +1,4 @@
-import { podeEnviar, podeVer, redis, redisPronto, SEM_INDICE } from "@/lib/escritorio";
+import { nomesDeBanco, podeEnviar, podeVer, redis, redisPronto, SEM_INDICE } from "@/lib/escritorio";
 
 const TRINTA_DIAS = 60 * 60 * 24 * 30;
 
@@ -15,7 +15,7 @@ export async function GET(req: Request) {
 // POST: o computador do Higaxi manda { estado, acoes: { id: {nome, input, resultado} } }
 export async function POST(req: Request) {
   if (!podeEnviar(req)) return new Response("não autorizado", { status: 401 });
-  if (!redisPronto()) return Response.json({ erro: "Redis não configurado" }, { status: 500 });
+  if (!redisPronto()) return Response.json({ erro: "Redis não configurado", variaveis: nomesDeBanco() }, { status: 500 });
   const corpo = (await req.json()) as { estado?: unknown; acoes?: Record<string, unknown> };
   const comandos: (string | number)[][] = [];
   if (corpo.estado) comandos.push(["SET", "escritorio:estado", JSON.stringify({ ...(corpo.estado as object), enviadoEm: Date.now() })]);

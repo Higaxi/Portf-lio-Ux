@@ -14,7 +14,11 @@ const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_
 export const COOKIE = "escritorio_chave";
 
 // o banco "Redis" da Vercel entrega só uma REDIS_URL (conexão TCP); o Upstash entrega a API REST acima
-const REDIS_TCP = process.env.REDIS_URL || variavel(/(^|_)REDIS_URL$/);
+// com prefixo próprio o nome muda (ex.: OBARDOSEUZE_URL); por isso vale também qualquer variável cujo valor seja redis://
+const REDIS_TCP = process.env.REDIS_URL || variavel(/(^|_)REDIS_URL$/) || Object.values(process.env).find((v) => /^rediss?:\/\//.test(v || "")) || "";
+
+// para quem tem o token: os NOMES (nunca os valores) das variáveis que parecem de banco, para achar o que faltou
+export const nomesDeBanco = () => Object.keys(process.env).filter((k) => /REDIS|KV_|UPSTASH|STORAGE|DATABASE|OBARDO/i.test(k));
 export const redisPronto = () => Boolean((REDIS_URL && REDIS_TOKEN) || REDIS_TCP);
 
 // uma conexão por instância da função, reaproveitada entre pedidos
