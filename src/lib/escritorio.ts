@@ -3,8 +3,13 @@
 // Variáveis na Vercel: UPSTASH_REDIS_REST_URL/TOKEN (ou KV_REST_API_URL/TOKEN, da integração), ESCRITORIO_TOKEN (quem envia)
 // e ESCRITORIO_CHAVE (opcional: com ela a página só abre com ?chave=...).
 
-const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL || "";
-const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN || "";
+// a integração pode pôr um prefixo nos nomes (o do banco, ex.: OBARDOSEUZE_KV_REST_API_URL): aceita qualquer prefixo
+function variavel(fim: RegExp) {
+  const nome = Object.keys(process.env).find((k) => fim.test(k) && !/READ_ONLY/.test(k));
+  return nome ? process.env[nome] || "" : "";
+}
+const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL || variavel(/(REST_API_URL|REDIS_REST_URL)$/);
+const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN || variavel(/(REST_API_TOKEN|REDIS_REST_TOKEN)$/);
 export const COOKIE = "escritorio_chave";
 
 export const redisPronto = () => Boolean(REDIS_URL && REDIS_TOKEN);
