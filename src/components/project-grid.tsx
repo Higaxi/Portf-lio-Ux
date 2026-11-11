@@ -152,14 +152,16 @@ export function ProjectGrid() {
             { id: "web", label: "Web Design", panel: web },
           ]}
           extra={
-            // a landing do jogo é um site estático em public/canastrium (abre fora do app, por isso <a> e não <Link>)
+            // a landing do jogo tem domínio próprio (canastrium.com.br): abre em outra aba
             <a
-              href="/canastrium/index.html"
+              href="https://canastrium.com.br"
+              target="_blank"
+              rel="noopener"
               aria-label="Canastrium: página do jogo"
               className="inline-flex min-h-11 items-center rounded-full bg-[#160e09] px-4 transition-colors hover:bg-[#2a1a10]"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/canastrium/img/ui/logo.webp" alt="" width={1867} height={499} className="h-6 w-auto" />
+              <img src="/img/canastrium-logo.webp" alt="" width={1867} height={499} className="h-6 w-auto" />
             </a>
           }
         />

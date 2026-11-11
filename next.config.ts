@@ -6,7 +6,9 @@ const nextConfig: NextConfig = {
   // landings estáticas em public/: o endereço curto abre a página de cada uma
   redirects() {
     return [
-      { source: "/canastrium", destination: "/canastrium/index.html", permanent: false },
+      // o site do Canastrium saiu daqui e tem domínio próprio
+      { source: "/canastrium", destination: "https://canastrium.com.br", permanent: true },
+      { source: "/canastrium/:path*", destination: "https://canastrium.com.br/:path*", permanent: true },
       { source: "/redline-test", destination: "/redline-test/index.html", permanent: false },
     ];
   },
