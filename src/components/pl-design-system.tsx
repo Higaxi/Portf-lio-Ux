@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { ScreenBox } from "./recreated-screens";
 import { ComponentZoom, PlActions, PlBench, PlFormation, PlHeader, PlNav, PlPlayerCard } from "./recreated-screens-pl-hl";
 import { recreatedLabel } from "./recreated-sections";
 
@@ -44,34 +43,27 @@ const components: { name: string; note: string; base: number; stretch?: number; 
 ];
 
 /**
- * Design system do Premium League a partir das telas do app: a tela de
- * escalação redesenhada em código, a paleta extraída dela e os componentes
- * visíveis, ampliados. Nada inventado.
+ * Design system do Premium League a partir das telas do app: a paleta extraída
+ * da escalação redesenhada e os componentes visíveis, ampliados. Nada inventado.
  */
 export function PlDesignSystem() {
   return (
     <figure className="flex flex-col gap-8">
       <p className="label">{recreatedLabel}</p>
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[17rem_1fr]">
-        <div className="mx-auto w-full max-w-[17rem] overflow-hidden rounded-[2rem] border-[7px] border-[#0b0b10] bg-white shadow-[0_24px_50px_-28px_rgba(0,0,0,0.55)]">
-          <div role="img" aria-label="Tela de escalação redesenhada do Premium League: cabeçalho azul com métricas, seletor de formação, campo verde com cards de jogadores, banco de reservas, ações e navegação inferior.">
-            <ScreenBox id="pl-escalacao" />
-          </div>
-        </div>
-        <div>
-          <h3 className="label">Paleta</h3>
-          <ul className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-5">
-            {palette.map((c) => (
-              <li key={c.hex} className="overflow-hidden rounded-lg border border-line bg-bg">
-                <span aria-hidden="true" className="block h-12" style={{ background: c.hex }} />
-                <span className="block px-2 pb-2 pt-1.5">
-                  <span className="tabular block font-mono text-[0.75rem]">{c.hex}</span>
-                  <span className="block text-[0.75rem] leading-snug text-muted">{c.role}</span>
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
+      {/* A tela inteira já aparece no protótipo navegável; aqui ficam só as peças do sistema. */}
+      <div>
+        <h3 className="label">Paleta</h3>
+        <ul className="mt-3 grid auto-rows-fr grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          {palette.map((c) => (
+            <li key={c.hex} className="flex flex-col overflow-hidden rounded-xl border border-line bg-bg">
+              <span aria-hidden="true" className="block h-16 shrink-0 border-b border-line" style={{ background: c.hex }} />
+              <span className="flex flex-1 flex-col gap-1 px-3 pb-3 pt-2">
+                <span className="tabular block font-mono text-[0.8125rem]">{c.hex}</span>
+                <span className="block text-[0.8125rem] leading-snug text-muted">{c.role}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
       </div>
 
       <div>
