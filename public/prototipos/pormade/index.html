@@ -1,0 +1,706 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pormade · Gerador de Propostas (protótipo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet">
+<style>
+  /* Layout das telas finais do case; branding do e-commerce pormade.com.br:
+     logo oficial, DM Sans, preto, verde #00A03C e cinza #F3F3F3. */
+  :root{
+    --verde:#00a03c; --verde-esc:#00802f; --verde-claro:#e6f6ec;
+    --preto:#000; --grafite:#212121; --texto:#495057; --suave:#9a9a9a;
+    --c1:#f8f8f8; --c2:#e3e3e3; --cinza:#f3f3f3; --branco:#fff; --erro:#e5484d; --zap:#25d366;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"DM Sans",system-ui,sans-serif;background:#141414;color:var(--grafite);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:28px 16px}
+  button{font:inherit;border:0;background:none;cursor:pointer;color:inherit;text-align:inherit}
+  input{font:inherit}
+
+  .topo{color:#ddd;text-align:center;margin-bottom:18px}
+  .topo h1{font-size:18px;font-weight:700}
+  .topo p{font-size:13px;color:#999;margin-top:4px}
+  .topo a{color:#5cd68a;font-weight:600}
+  .celular{width:390px;height:844px;border-radius:50px;background:#0b0b0b;padding:11px;box-shadow:0 30px 80px -20px rgba(0,0,0,.8),inset 0 0 0 2px #2a2a2a}
+  .visor{width:100%;height:100%;border-radius:40px;overflow:clip;position:relative;background:var(--c1)}
+
+  /* ---------- tela ---------- */
+  .tela{position:absolute;inset:0;display:flex;flex-direction:column;overflow:clip;background:var(--c1);opacity:0;pointer-events:none;transform:translateX(20px);transition:opacity .3s ease,transform .3s ease}
+  .tela.ativa{opacity:1;pointer-events:auto;transform:none}
+  .status{height:44px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:14px;font-weight:700}
+  .status i{font-style:normal;letter-spacing:1px}
+  .conteudo{flex:1;overflow-y:auto;padding:0 18px 18px}
+  .conteudo::-webkit-scrollbar{width:0}
+
+  /* logo oficial */
+  .logo{display:block;height:34px}
+  .logo img{height:100%;display:block}
+  .logo.centro{margin:0 auto;width:max-content}
+  .pdf td:last-child{white-space:nowrap}
+  .logo.grande{height:86px}
+
+  /* cabeçalho escuro com a curva verde (layout do case) */
+  .cab-wrap{position:relative;flex:none;margin-bottom:12px;z-index:2}
+  .cab{background:linear-gradient(180deg,#2a2a2a,#111);color:#fff;padding-bottom:14px;position:relative}
+  .cab .status{color:#fff}
+  .cab-linha{display:flex;align-items:center;justify-content:space-between;padding:2px 22px 0}
+  .cab-wrap::after{content:"";position:absolute;left:0;right:0;bottom:-8px;height:16px;background:var(--verde);border-radius:0 0 50% 50%/0 0 100% 100%;z-index:-1}
+  .menu-ic{width:28px;height:22px;display:flex;flex-direction:column;justify-content:space-between}
+  .menu-ic i{display:block;height:3px;border-radius:2px;background:#fff}
+
+  /* cabeçalho claro (formulários e carrinho) */
+  .cab-claro{background:#fff;flex:none;padding-bottom:12px;box-shadow:0 2px 0 var(--c2)}
+
+  /* barra inferior escura com a folha no centro */
+  .nav{flex:none;height:84px;background:linear-gradient(180deg,#2a2a2a,#111);display:flex;align-items:center;justify-content:space-around;padding:0 10px 16px}
+  .nav button{width:46px;height:46px;display:grid;place-items:center;border-radius:12px;color:#d9d9d9;position:relative}
+  .nav button.on{color:#fff}
+  .nav button.on::after{content:"";position:absolute;bottom:2px;width:18px;height:3px;border-radius:2px;background:var(--verde)}
+  .nav button svg{width:24px;height:24px}
+  .nav .folha{width:60px;height:60px;border-radius:50%;background:#fff;margin-top:-34px;box-shadow:0 6px 16px rgba(0,0,0,.35);border:3px solid #1c1c1c}
+  .nav .folha svg{width:30px;height:30px}
+  .nav .folha::after{display:none}
+  .badge{position:absolute;top:2px;right:2px;min-width:18px;height:18px;border-radius:9px;background:var(--verde);color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center;padding:0 4px}
+
+  /* botões (pílula como no e-commerce) */
+  .btn{height:46px;border-radius:999px;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;transition:transform .12s ease}
+  .btn:active{transform:scale(.97)}
+  .btn svg{width:19px;height:19px}
+  .btn-verde{background:var(--verde);color:#fff}
+  .btn-preto{background:var(--preto);color:#fff}
+  .btn-contorno{border:1.5px solid var(--preto);color:var(--preto);background:#fff}
+  .btn-zap{background:var(--zap);color:#fff}
+  .duas{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+  /* splash */
+  .splash{background:#fff;align-items:center;justify-content:center}
+  .spinner{position:absolute;bottom:120px;width:48px;height:48px;border-radius:50%;border:3px solid var(--c2);border-top-color:var(--verde);animation:gira 1s linear infinite}
+  @keyframes gira{to{transform:rotate(360deg)}}
+  .splash small{position:absolute;bottom:70px;font-size:12px;color:var(--suave)}
+
+  /* login */
+  .login-topo{background:linear-gradient(180deg,#2a2a2a,#111);color:#fff;padding:0 26px 40px;border-radius:0 0 32px 32px;flex:none;position:relative}
+  .login-topo::after{content:"";position:absolute;left:30px;right:30px;bottom:-6px;height:6px;border-radius:0 0 6px 6px;background:var(--verde)}
+  .login-topo .status{padding:0;color:#fff}
+  .login-topo .logo{margin:30px 0 24px;height:40px}
+  .login-topo h2{font-size:26px;font-weight:800}
+  .login-topo p{font-size:14px;color:#cfcfcf;margin-top:6px}
+
+  /* campos (sublinhados, como no case) */
+  .campo{display:block;margin-top:16px}
+  .campo span{display:block;font-size:12px;font-weight:700;color:var(--texto);margin-bottom:4px}
+  .campo input{width:100%;height:40px;border:0;border-bottom:1.5px solid var(--c2);background:transparent;font-size:15px;color:var(--grafite);outline:none}
+  .campo input:focus{border-bottom-color:var(--verde)}
+  .campo.caixa input{border:1.5px solid var(--c2);border-radius:12px;padding:0 14px;background:#fff;height:46px}
+  .checks{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:8px}
+  .check{display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;font-weight:500}
+  .check i{width:18px;height:18px;border-radius:4px;border:1.5px solid var(--suave);display:grid;place-items:center;background:#fff}
+  .check.on i{background:var(--verde);border-color:var(--verde)}
+  .check.on i::after{content:"";width:5px;height:9px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg) translate(-1px,-1px)}
+  .titulo{font-size:20px;font-weight:800;margin:16px 0 2px}
+  .sub{font-size:13px;color:var(--texto)}
+  .aviso{display:flex;gap:8px;align-items:flex-start;font-size:12px;background:var(--verde-claro);color:var(--verde-esc);border-radius:12px;padding:10px 12px;margin-top:14px;font-weight:600}
+  .aviso svg{width:16px;height:16px;flex:none;margin-top:1px}
+
+  /* gerador (home) */
+  .gerador{background:#fff;border-radius:22px;margin-top:20px;padding:22px 16px 18px;box-shadow:0 8px 24px -12px rgba(0,0,0,.25)}
+  .gerador h2{text-align:center;font-weight:500;color:var(--verde);font-size:19px;line-height:1.15}
+  .gerador h2 b{display:block;color:var(--preto);font-weight:800;font-size:22px}
+  .grade{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}
+  .cat{background:var(--c1);border:1.5px solid var(--c2);border-radius:14px;aspect-ratio:1/1.05;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:6px;transition:border-color .15s,transform .12s;overflow:hidden}
+  .cat:active{transform:scale(.96)}
+  .cat:hover{border-color:var(--verde)}
+  .cat img{width:52px;height:52px;object-fit:contain;mix-blend-mode:multiply}
+  .cat span{font-size:11px;font-weight:700;text-align:center;line-height:1.15}
+  .atalhos{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+  .atalho{background:#fff;border-radius:14px;padding:14px;text-align:left;box-shadow:0 6px 18px -12px rgba(0,0,0,.3)}
+  .atalho b{display:block;font-size:22px;color:var(--verde)}
+  .atalho span{font-size:12px;color:var(--texto)}
+
+  .passos{display:flex;gap:6px;margin:14px 0 2px}
+  .passos i{flex:1;height:4px;border-radius:2px;background:var(--c2)}
+  .passos i.on{background:var(--verde)}
+  .voltar{display:flex;align-items:center;gap:8px;font-weight:800;font-size:16px;padding:4px 18px 8px;flex:none}
+  .voltar svg{width:22px;height:22px}
+
+  /* catálogo com as fotos da loja */
+  .filtro{display:flex;gap:8px;overflow-x:auto;margin-top:12px;padding-bottom:2px}
+  .filtro::-webkit-scrollbar{height:0}
+  .chip{flex:none;font-size:12px;font-weight:700;border:1.5px solid var(--c2);border-radius:999px;padding:7px 13px;background:#fff}
+  .chip.on{background:var(--preto);border-color:var(--preto);color:#fff}
+  .produtos{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+  .prod{background:#fff;border-radius:14px;padding:10px;text-align:left;box-shadow:0 6px 18px -12px rgba(0,0,0,.35);transition:transform .12s}
+  .prod:active{transform:scale(.97)}
+  .foto{height:130px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .foto img{max-width:100%;max-height:100%;object-fit:contain}
+  .prod b{display:block;font-size:12.5px;margin-top:6px;line-height:1.25}
+  .prod small{display:block;font-size:10px;color:var(--suave);margin-top:2px}
+  .prod .preco{display:block;font-size:14px;font-weight:800;margin-top:6px}
+
+  /* configuração */
+  .vitrine{height:250px;border-radius:18px;background:#fff;display:flex;align-items:center;justify-content:center;margin-top:6px;box-shadow:0 8px 24px -14px rgba(0,0,0,.25);position:relative;overflow:hidden}
+  .vitrine img{max-height:100%;max-width:100%;object-fit:contain}
+  .vitrine small{position:absolute;left:14px;top:10px;font-size:10px;color:var(--suave);font-weight:600}
+  .rotulo{font-size:11px;font-weight:800;color:var(--texto);margin-top:14px;text-transform:uppercase;letter-spacing:.5px}
+  .opcoes{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .op{border:1.5px solid var(--c2);border-radius:999px;padding:8px 13px;font-size:13px;font-weight:700;background:#fff}
+  .op.on{border-color:var(--verde);color:var(--verde-esc);background:var(--verde-claro)}
+  .acabs{display:flex;gap:8px;overflow-x:auto;margin-top:8px;padding-bottom:2px}
+  .acabs::-webkit-scrollbar{height:0}
+  .acab{flex:none;width:58px;text-align:center;font-size:10px;font-weight:700;color:var(--texto)}
+  .acab img{width:58px;height:58px;object-fit:contain;background:#fff;border-radius:12px;border:1.5px solid var(--c2);display:block;margin-bottom:4px}
+  .acab.on img{border-color:var(--verde);box-shadow:0 0 0 2px var(--verde-claro)}
+  .acab.on{color:var(--preto)}
+  .linha-preco{display:flex;align-items:center;justify-content:space-between;margin:16px 0 12px}
+  .linha-preco b{font-size:22px;font-weight:800}
+  .linha-preco small{display:block;font-size:11px;color:var(--texto)}
+  .qtd{display:flex;align-items:center;gap:10px;font-weight:700}
+  .qtd button{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--c2);font-size:17px;background:#fff;display:grid;place-items:center}
+
+  /* carrinho (folha branca do case) */
+  .folha-branca{background:#fff;border-radius:18px;margin-top:14px;padding:16px;box-shadow:0 8px 24px -14px rgba(0,0,0,.3)}
+  .folha-branca header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+  .folha-branca header h2{font-size:19px;font-weight:800}
+  .fechar{width:28px;height:28px;display:grid;place-items:center;color:var(--suave);font-size:22px}
+  .item{display:grid;grid-template-columns:50px 1fr auto;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--c2)}
+  .item img{width:50px;height:50px;object-fit:contain;border-radius:8px;background:var(--c1)}
+  .item b{font-size:12.5px;font-weight:700;line-height:1.2;display:block}
+  .item small{display:block;font-size:11px;color:var(--texto)}
+  .item .valor{font-size:13px;font-weight:800;margin-top:3px;display:block}
+  .item .qtd button{width:24px;height:24px;font-size:14px}
+  .item .qtd{gap:6px;font-size:13px}
+  .lixo{width:26px;height:26px;border-radius:50%;color:var(--erro);display:grid;place-items:center;margin-left:2px}
+  .lixo svg{width:16px;height:16px}
+  .resumo{font-size:13px;margin-top:10px}
+  .resumo div{display:flex;justify-content:space-between;padding:3px 0}
+  .resumo .verde{color:var(--verde);font-weight:700}
+  .resumo .total{font-weight:800;font-size:17px;border-top:1px solid var(--c2);margin-top:6px;padding-top:8px}
+  .vazio{text-align:center;color:var(--texto);font-size:14px;padding:26px 0}
+
+  /* mini PDF */
+  .pdf{background:#fff;border-radius:6px;margin-top:12px;padding:16px;box-shadow:0 12px 30px -14px rgba(0,0,0,.45);font-size:10.5px}
+  .pdf-cab{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid var(--verde);padding-bottom:10px}
+  .pdf-cab .logo{height:26px}
+  .pdf-cab .num{text-align:right;line-height:1.4}
+  .pdf-cab .num b{font-size:12px}
+  .pdf h4{font-size:9.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--suave);margin:11px 0 4px}
+  .pdf table{width:100%;border-collapse:collapse}
+  .pdf th{font-size:9px;text-align:left;color:var(--suave);font-weight:700;padding-bottom:4px;border-bottom:1px solid var(--c2)}
+  .pdf td{padding:5px 0;border-bottom:1px solid var(--c2);vertical-align:middle}
+  .pdf td img{width:26px;height:26px;object-fit:contain;vertical-align:middle;margin-right:6px}
+  .pdf td:last-child,.pdf th:last-child{text-align:right}
+  .pdf .tot td{font-weight:800;font-size:12px;border-bottom:0;padding-top:8px}
+  .pdf .cond{display:grid;grid-template-columns:1fr 1fr;gap:3px 10px}
+  .pdf .ok{display:flex;gap:6px;align-items:center;margin-top:10px;color:var(--verde-esc);font-weight:700}
+  .pdf .assina{display:flex;justify-content:space-between;margin-top:12px;font-size:9.5px;color:var(--texto)}
+
+  /* envio */
+  .anexo{display:flex;align-items:center;gap:12px;background:#fff;border-radius:14px;padding:12px;margin-top:12px;box-shadow:0 6px 18px -12px rgba(0,0,0,.3)}
+  .anexo .ext{width:40px;height:48px;border-radius:6px;background:var(--erro);color:#fff;font-size:11px;font-weight:800;display:grid;place-items:center}
+  .anexo b{font-size:14px;display:block}
+  .anexo small{font-size:12px;color:var(--texto)}
+  .canais{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+  .canal{background:#fff;border:1.5px solid var(--c2);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:6px;font-weight:800;font-size:14px}
+  .canal svg{width:24px;height:24px}
+  .canal small{font-weight:500;font-size:11px;color:var(--texto)}
+  .canal.on{border-color:var(--verde);background:var(--verde-claro)}
+  .balao{background:#dcf8c6;border-radius:14px 14px 4px 14px;padding:12px 14px;font-size:13px;line-height:1.45;margin-top:8px}
+  .balao .arq{display:flex;align-items:center;gap:8px;background:#fff;border-radius:10px;padding:8px 10px;margin-bottom:8px;font-weight:700;font-size:12px}
+  .balao .arq i{width:22px;height:26px;border-radius:4px;background:var(--erro);color:#fff;font-style:normal;font-size:8px;font-weight:800;display:grid;place-items:center}
+  .balao small{display:block;text-align:right;font-size:10px;color:#6b7b6b;margin-top:4px}
+
+  /* enviada */
+  .sucesso{align-items:center;justify-content:center;text-align:center;padding:30px}
+  .selo{width:96px;height:96px;border-radius:50%;background:var(--verde);display:grid;place-items:center;color:#fff;box-shadow:0 0 0 12px var(--verde-claro)}
+  .selo svg{width:46px;height:46px}
+  .sucesso h2{font-size:24px;font-weight:800;margin-top:30px}
+  .sucesso p{color:var(--texto);margin-top:8px;font-size:15px}
+  .cronometro{display:inline-flex;gap:8px;align-items:center;background:var(--verde-claro);color:var(--verde-esc);font-weight:800;border-radius:999px;padding:8px 14px;margin-top:18px;font-size:14px}
+  .sucesso .btn{margin-top:26px}
+
+  /* propostas recentes (cartões escuros do case) */
+  .recentes{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+  .rec{background:linear-gradient(180deg,#2a2a2a,#151515);color:#fff;border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;text-align:left;width:100%}
+  .rec b{font-size:13px;font-weight:700;display:block}
+  .rec small{font-size:11px;opacity:.75}
+  .rec svg{width:26px;height:26px;opacity:.9;flex:none}
+  .st{font-size:10px;font-weight:800;border-radius:999px;padding:2px 8px;margin-top:5px;display:inline-block}
+  .st-ok{background:var(--verde);color:#fff}
+  .st-and{background:#444;color:#ddd}
+
+  /* showrooms */
+  .mapa{height:210px;border-radius:18px;margin-top:12px;position:relative;overflow:hidden;background:#eef0ec;
+    background-image:linear-gradient(90deg,rgba(255,255,255,.9) 2px,transparent 2px),linear-gradient(0deg,rgba(255,255,255,.9) 2px,transparent 2px),
+    linear-gradient(35deg,transparent 46%,#fff 46%,#fff 52%,transparent 52%),linear-gradient(-20deg,transparent 60%,#dfe7d8 60%,#dfe7d8 75%,transparent 75%);
+    background-size:44px 44px,44px 44px,100% 100%,100% 100%}
+  .pino{position:absolute;width:30px;height:30px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--preto);display:grid;place-items:center;box-shadow:0 6px 12px -4px rgba(0,0,0,.4)}
+  .pino b{transform:rotate(45deg);color:#fff;font-size:12px}
+  .pino.on{background:var(--verde);width:36px;height:36px}
+  .voce{position:absolute;width:18px;height:18px;border-radius:50%;background:#2f80ed;box-shadow:0 0 0 6px rgba(47,128,237,.25),0 0 0 3px #fff inset}
+  .rotulo-mapa{position:absolute;left:12px;bottom:12px;background:#fff;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:700}
+  .loja{background:#fff;border:1.5px solid transparent;border-radius:16px;padding:12px 14px;margin-top:10px;width:100%;text-align:left;box-shadow:0 6px 18px -12px rgba(0,0,0,.3)}
+  .loja.on{border-color:var(--verde)}
+  .loja header{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+  .loja b{font-size:14px;display:block}
+  .loja small{font-size:12px;color:var(--texto);display:block;margin-top:2px;line-height:1.35}
+  .loja .aberto{color:var(--verde-esc);font-weight:700}
+  .loja .dist{font-size:12px;font-weight:800;background:var(--cinza);border-radius:999px;padding:4px 10px;flex:none}
+  .loja .duas{margin-top:10px}
+  .loja .btn{height:38px;font-size:13px}
+
+  /* ---------- modo embutido (iframe do portfólio) ---------- */
+  body.modo-embed{background:transparent;padding:0;min-height:0;display:block}
+  body.modo-embed .topo{display:none}
+  body.modo-embed .celular{box-shadow:none}
+
+  /* ---------- modo telas ---------- */
+  body.modo-telas{display:block;padding:40px}
+  body.modo-telas .topo{text-align:left}
+  body.modo-telas .celular{display:none}
+  .quadro{display:none}
+  body.modo-telas .quadro{display:flex;flex-wrap:wrap;gap:48px}
+  .quadro figure{width:390px}
+  .quadro figcaption{color:#ccc;font-size:14px;font-weight:700;margin-bottom:12px}
+  .quadro .moldura{width:390px;height:844px;position:relative;overflow:hidden;border-radius:30px;background:var(--c1)}
+  .quadro .tela{opacity:1;transform:none;pointer-events:none}
+
+  /* impressão do PDF */
+  @media print{ body{background:#fff;padding:0;display:block} body>*{display:none!important} #impressao{display:block!important} }
+  #impressao{display:none}
+  #impressao .pdf{box-shadow:none;font-size:13px;padding:30px}
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <h1>Pormade · Gerador de Propostas</h1>
+  <p>Telas do case com a identidade e as fotos de produto da loja Pormade. Preços, clientes e lojas fictícios.
+    <span id="link-modo"></span></p>
+</header>
+
+<div class="celular"><div class="visor" id="visor"></div></div>
+<div class="quadro" id="quadro"></div>
+<div id="impressao"></div>
+
+<template id="telas">
+
+<!-- 01 Splash -->
+<section class="tela splash" data-id="splash" data-nome="01 · Splash">
+  <span class="logo grande"><img src="img/logo.png" alt="Pormade Portas"></span>
+  <div class="spinner"></div>
+  <small>Gerador de Propostas</small>
+  <button style="position:absolute;inset:0" data-go="login" aria-label="Continuar"></button>
+</section>
+
+<!-- 02 Login -->
+<section class="tela" data-id="login" data-nome="02 · Login (Token ID)">
+  <div class="login-topo">
+    <div class="status"><span>9:41</span><i>●●● ▮</i></div>
+    <span class="logo"><img src="img/logo-branco.png" alt="Pormade Portas"></span>
+    <h2>Olá, vendedor!</h2>
+    <p>Entre com o Token ID do sistema da Pormade.</p>
+  </div>
+  <div class="conteudo" style="padding-top:12px">
+    <label class="campo caixa"><span>Matrícula</span><input value="VND-0482"></label>
+    <label class="campo caixa"><span>Token ID</span><input value="••••••••"></label>
+    <div class="aviso">#escudo Acesso seguro: produtos, clientes e status sincronizados com o sistema da fábrica.</div>
+    <button class="btn btn-verde" style="margin-top:22px" data-go="home">Entrar</button>
+  </div>
+</section>
+
+<!-- 03 Gerador de Propostas -->
+<section class="tela" data-id="home" data-nome="03 · Gerador de Propostas">
+  <div class="cab-wrap"><div class="cab">
+    <div class="status"><span>9:41</span><i>●●● ▮</i></div>
+    <div class="cab-linha"><span class="logo"><img src="img/logo-branco.png" alt="Pormade Portas"></span><button class="menu-ic" data-go="recentes" aria-label="Menu"><i></i><i></i><i></i></button></div>
+  </div></div>
+  <div class="conteudo">
+    <div class="gerador">
+      <h2>Gerador de<b>Propostas</b></h2>
+      <div class="grade">
+        <button class="cat" data-cat="giro" data-go="cliente"><img src="img/branca.webp" alt=""><span>Kit Porta<br>Pronta</span></button>
+        <button class="cat" data-cat="laqueada" data-go="cliente"><img src="img/frizatta10.webp" alt=""><span>Porta<br>Laqueada</span></button>
+        <button class="cat" data-cat="correr" data-go="cliente"><img src="img/correr-branco.webp" alt=""><span>Porta de<br>Correr</span></button>
+        <button class="cat" data-cat="rodape" data-go="cliente"><img src="img/rodape-preto.webp" alt=""><span>Rodapé</span></button>
+        <button class="cat" data-cat="madeira" data-go="cliente"><img src="img/freijo.webp" alt=""><span>Madeirados</span></button>
+        <button class="cat" data-cat="escuras" data-go="cliente"><img src="img/preta.webp" alt=""><span>Preta e<br>Cinza</span></button>
+      </div>
+    </div>
+    <div class="atalhos">
+      <button class="atalho" data-go="recentes"><b>12</b><span>propostas este mês</span></button>
+      <button class="atalho" data-go="showrooms"><b>4</b><span>showrooms perto de você</span></button>
+    </div>
+  </div>
+  <nav class="nav js-nav" data-on="home"></nav>
+</section>
+
+<!-- 04 Cadastro de cliente -->
+<section class="tela" data-id="cliente" data-nome="04 · Cadastro de Cliente">
+  <div class="cab-claro">
+    <div class="status"><span>9:41</span><i>●●● ▮</i></div>
+    <span class="logo centro"><img src="img/logo.png" alt="Pormade Portas"></span>
+  </div>
+  <div class="conteudo">
+    <div class="passos"><i class="on"></i><i></i><i></i><i></i></div>
+    <h2 class="titulo">Cadastro de Cliente</h2>
+    <label class="campo"><span>Nome completo</span><input value="Construtora Horizonte"></label>
+    <label class="campo"><span>DDD + Telefone</span><input value="(42) 99999-0000"></label>
+    <div class="campo"><span>Este telefone é WhatsApp?</span>
+      <div class="checks"><span class="check on js-unico"><i></i>Sim</span><span class="check js-unico"><i></i>Não</span></div></div>
+    <label class="campo"><span>E-mail</span><input value="compras@construtorahorizonte.com"></label>
+    <label class="campo"><span>CEP</span><input value="84600-000"></label>
+    <label class="campo"><span>Endereço da obra</span><input value="Rua das Araucárias, 120 · Bloco B"></label>
+    <div class="campo"><span>Estilo do cliente</span>
+      <div class="checks"><span class="check on js-multi"><i></i>Moderno</span><span class="check js-multi"><i></i>Contemporâneo</span><span class="check js-multi"><i></i>Clássico</span><span class="check js-multi"><i></i>Tecnológico</span></div></div>
+    <div class="duas" style="margin-top:22px">
+      <button class="btn btn-contorno" data-go="home">Cancelar</button>
+      <button class="btn btn-verde" data-go="catalogo">Confirmar</button>
+    </div>
+  </div>
+  <nav class="nav js-nav"></nav>
+</section>
+
+<!-- 05 Catálogo -->
+<section class="tela" data-id="catalogo" data-nome="05 · Catálogo de Produtos">
+  <div class="cab-wrap"><div class="cab">
+    <div class="status"><span>9:41</span><i>●●● ▮</i></div>
+    <div class="cab-linha"><span class="logo"><img src="img/logo-branco.png" alt="Pormade Portas"></span><button class="menu-ic" data-go="recentes" aria-label="Menu"><i></i><i></i><i></i></button></div>
+  </div></div>
+  <div class="conteudo">
+    <div class="passos"><i class="on"></i><i class="on"></i><i></i><i></i></div>
+    <h2 class="titulo js-cat-nome">Kit Porta Pronta</h2>
+    <p class="sub">Cliente: Construtora Horizonte</p>
+    <div class="filtro js-filtros"></div>
+    <div class="produtos js-produtos"></div>
+  </div>
+  <nav class="nav js-nav" data-on="busca"></nav>
+</section>
+
+<!-- 06 Configuração -->
+<section class="tela" data-id="config" data-nome="06 · Configuração do Produto">
+  <div class="status"><span>9:41</span><i>●●● ▮</i></div>
+  <button class="voltar" data-go="catalogo">#voltar <span class="js-prod-curto">Configurar produto</span></button>
+  <div class="conteudo">
+    <div class="passos"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
+    <div class="vitrine"><small class="js-sku"></small><img class="js-foto-grande" src="img/freijo.webp" alt=""></div>
+    <h2 class="titulo js-prod-nome" style="font-size:17px"></h2>
+    <p class="rotulo">Acabamento</p>
+    <div class="acabs js-acabs"></div>
+    <p class="rotulo">Medida da folha</p>
+    <div class="opcoes js-grupo" data-campo="medida"><button class="op">70 × 210</button><button class="op on">80 × 210</button><button class="op">90 × 210</button></div>
+    <p class="rotulo">Abertura</p>
+    <div class="opcoes js-grupo" data-campo="abertura"><button class="op on">Direita</button><button class="op">Esquerda</button></div>
+    <div class="aviso">#ok Validado: medida compatível com o vão e kit completo (folha, marco, ferragens e alizares).</div>
+    <div class="linha-preco"><div><small>Valor unitário</small><b class="js-preco">R$ 0</b></div>
+      <div class="qtd"><button class="js-menos" aria-label="Menos">−</button><span class="js-qtd">1</span><button class="js-mais" aria-label="Mais">+</button></div></div>
+    <button class="btn btn-verde js-add">Adicionar ao carrinho</button>
+  </div>
+</section>
+
+<!-- 07 Carrinho -->
+<section class="tela" data-id="carrinho" data-nome="07 · Carrinho">
+  <div class="cab-claro">
+    <div class="status"><span>9:41</span><i>●●● ▮</i></div>
+    <span class="logo centro"><img src="img/logo.png" alt="Pormade Portas"></span>
+  </div>
+  <div class="conteudo">
+    <div class="folha-branca">
+      <header><h2>Carrinho <span class="js-cont" style="font-size:13px;color:var(--suave);font-weight:600"></span></h2><button class="fechar" data-go="home" aria-label="Fechar">×</button></header>
+      <div class="js-itens"></div>
+      <div class="js-resumo"></div>
+      <div class="duas" style="margin-top:14px">
+        <button class="btn btn-contorno js-limpar">Cancelar pedido</button>
+        <button class="btn btn-verde js-gerar" data-go="revisao">Gerar proposta</button>
+      </div>
+    </div>
+    <button class="btn btn-contorno" style="margin-top:12px" data-go="catalogo">+ Adicionar mais produtos</button>
+  </div>
+  <nav class="nav js-nav" data-on="carrinho"></nav>
+</section>
+
+<!-- 08 Revisão / mini PDF -->
+<section class="tela" data-id="revisao" data-nome="08 · Mini PDF da Proposta">
+  <div class="status"><span>9:41</span><i>●●● ▮</i></div>
+  <button class="voltar" data-go="carrinho">#voltar Revisão da proposta</button>
+  <div class="conteudo">
+    <div class="passos"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
+    <div class="js-pdf"></div>
+    <div class="duas" style="margin-top:14px">
+      <button class="btn btn-contorno js-baixar">#baixar PDF</button>
+      <button class="btn btn-verde" data-go="envio">Enviar</button>
+    </div>
+  </div>
+</section>
+
+<!-- 09 Envio -->
+<section class="tela" data-id="envio" data-nome="09 · Envio da Proposta">
+  <div class="status"><span>9:41</span><i>●●● ▮</i></div>
+  <button class="voltar" data-go="revisao">#voltar Enviar proposta</button>
+  <div class="conteudo">
+    <div class="anexo"><span class="ext">PDF</span><span><b>Proposta-Pormade-2048.pdf</b><small>1 página · 186 KB</small></span></div>
+    <p class="rotulo">Enviar por</p>
+    <div class="canais js-canais">
+      <button class="canal on" data-canal="zap">#zap WhatsApp<small>(42) 99999-0000</small></button>
+      <button class="canal" data-canal="mail">#mail E-mail<small>compras@construtora…</small></button>
+    </div>
+    <p class="rotulo">Mensagem</p>
+    <div class="balao"><div class="arq"><i>PDF</i>Proposta-Pormade-2048.pdf</div>
+      Olá, Construtora Horizonte! Segue a proposta nº 2048 das portas Pormade para a obra da Rua das Araucárias. Total de <b class="js-total"></b>, válida por 15 dias. — Ana Paula, Pormade<small>9:44 ✓✓</small></div>
+    <p class="sub" style="font-size:12px;margin-top:8px">Uma cópia vai automaticamente para o engenheiro responsável.</p>
+    <button class="btn btn-zap js-enviar" style="margin-top:16px" data-go="enviada">Enviar pelo WhatsApp</button>
+  </div>
+</section>
+
+<!-- 10 Enviada -->
+<section class="tela sucesso" data-id="enviada" data-nome="10 · Proposta Enviada">
+  <div class="selo">#okgrande</div>
+  <h2>Proposta enviada!</h2>
+  <p>A Construtora Horizonte recebeu a proposta nº 2048 ainda durante a visita.</p>
+  <span class="cronometro">⏱ Gerada em 3 min 20 s</span>
+  <button class="btn btn-verde" data-go="recentes">Ver propostas recentes</button>
+  <button class="btn btn-contorno" style="margin-top:10px" data-go="home" data-acao="nova">Nova proposta</button>
+</section>
+
+<!-- 11 Propostas recentes -->
+<section class="tela" data-id="recentes" data-nome="11 · Propostas Recentes">
+  <div class="cab-wrap"><div class="cab">
+    <div class="status"><span>9:41</span><i>●●● ▮</i></div>
+    <div class="cab-linha"><span class="logo"><img src="img/logo-branco.png" alt="Pormade Portas"></span><button class="menu-ic" data-go="home" aria-label="Menu"><i></i><i></i><i></i></button></div>
+  </div></div>
+  <div class="conteudo">
+    <div class="folha-branca">
+      <header><h2>Propostas Recentes</h2><button class="fechar" data-go="home" aria-label="Fechar">×</button></header>
+      <div class="recentes">
+        <button class="rec" data-go="revisao"><span><b>Cliente: Construtora Horizonte</b><small>Nº 2048 · hoje, 09:44</small><br><span class="st st-ok">Enviada</span></span>#doc</button>
+        <button class="rec" data-go="revisao"><span><b>Cliente: Lar Empreendimentos</b><small>Nº 2041 · 12/11, 14:32</small><br><span class="st st-ok">Aprovada</span></span>#doc</button>
+        <button class="rec" data-go="revisao"><span><b>Cliente: Luciana Soares</b><small>Nº 2037 · 11/11, 08:18</small><br><span class="st st-and">Com o engenheiro</span></span>#doc</button>
+        <button class="rec" data-go="revisao"><span><b>Cliente: Leonardo Pimenta</b><small>Nº 2030 · 10/11, 16:45</small><br><span class="st st-ok">Aprovada</span></span>#doc</button>
+        <button class="rec" data-go="revisao"><span><b>Cliente: Lucas Barros</b><small>Nº 2026 · 09/11, 10:00</small><br><span class="st st-and">Aguardando cliente</span></span>#doc</button>
+      </div>
+    </div>
+  </div>
+  <nav class="nav js-nav" data-on="docs"></nav>
+</section>
+
+<!-- 12 Showrooms (caminhãozinho) -->
+<section class="tela" data-id="showrooms" data-nome="12 · Showrooms Próximos">
+  <div class="cab-wrap"><div class="cab">
+    <div class="status"><span>9:41</span><i>●●● ▮</i></div>
+    <div class="cab-linha"><span class="logo"><img src="img/logo-branco.png" alt="Pormade Portas"></span><button class="menu-ic" data-go="home" aria-label="Menu"><i></i><i></i><i></i></button></div>
+  </div></div>
+  <div class="conteudo">
+    <h2 class="titulo">Showrooms próximos</h2>
+    <p class="sub">Leve o cliente para ver as portas de perto.</p>
+    <div class="mapa">
+      <span class="voce" style="left:46%;top:52%"></span>
+      <span class="pino js-pino" data-loja="0" style="left:34%;top:28%"><b>1</b></span>
+      <span class="pino js-pino" data-loja="1" style="left:66%;top:38%"><b>2</b></span>
+      <span class="pino js-pino" data-loja="2" style="left:20%;top:62%"><b>3</b></span>
+      <span class="pino js-pino" data-loja="3" style="left:76%;top:68%"><b>4</b></span>
+      <span class="rotulo-mapa">📍 Você está aqui</span>
+    </div>
+    <div class="js-lojas"></div>
+  </div>
+  <nav class="nav js-nav" data-on="showrooms"></nav>
+</section>
+
+</template>
+
+<script>
+const svg = (d, w=1.8) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+const IC = {
+  casa: svg('<path d="M3 11l9-7 9 7M5 10v10h14V10M10 20v-6h4v6"/>'),
+  carrinho: svg('<path d="M3 4h2l2.5 11h11L21 7H6.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/>'),
+  busca: svg('<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/>'),
+  caminhao: svg('<path d="M2 6h12v10H2zM14 9h4l3 3v4h-7"/><circle cx="6" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/>'),
+  folha: '<svg viewBox="0 0 24 24"><path d="M4 20C5 11 10 6 19 4c-1 9-6 14-15 16z" fill="#00a03c"/><path d="M4 20l9-9" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><path d="M11 20c1-5 4-8 10-9-1 5-4 8-10 9z" fill="#5cc27e"/></svg>',
+  doc: svg('<path d="M6 3h9l4 4v14H6z M14 3v5h5 M9 13h7 M9 17h5"/>',1.6),
+  voltar: svg('<path d="M15 5l-7 7 7 7"/>',2.2),
+  baixar: svg('<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',2),
+  lixo: svg('<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',2),
+  escudo: svg('<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>',2),
+  ok: svg('<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>',2),
+  okgrande: svg('<path d="M5 12l5 5 9-10"/>',2.6),
+  mail: svg('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>'),
+  zap: '<svg viewBox="0 0 24 24" fill="#25d366"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm5.3 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.8s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.7-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.3z"/></svg>',
+};
+
+/* nomes e SKUs do site pormade.com.br; preços ilustrativos */
+const PRODUTOS = [
+  {grupos:['giro','madeira'], nome:'Kit Porta Pronta Lisa Sólida Freijó', sku:'PORGI-FRE-LIS-PORMADE', img:'freijo', acab:'Freijó', preco:1299, tipo:'Lisa'},
+  {grupos:['giro'], nome:'Kit Porta Pronta Lisa Sólida Branca', sku:'PORGI-LIS-BRA-PORMADE', img:'branca', acab:'Branca', preco:1189, tipo:'Lisa'},
+  {grupos:['giro','madeira'], nome:'Kit Porta Pronta Lisa Sólida Cappuccino', sku:'PORGI-CAP-LIS-PORMADE', img:'cappuccino', acab:'Cappuccino', preco:1249, tipo:'Lisa'},
+  {grupos:['giro','escuras'], nome:'Kit Porta Pronta Lisa Sólida Preta', sku:'PORGI-LIS-PRE-PORMADE', img:'preta', acab:'Preta', preco:1299, tipo:'Lisa'},
+  {grupos:['giro','escuras'], nome:'Kit Porta Pronta Lisa Sólida Cinza', sku:'PORGI-CIN-LIS-PORMADE', img:'cinza', acab:'Cinza', preco:1249, tipo:'Lisa'},
+  {grupos:['giro','laqueada'], nome:'Kit Porta Pronta Lisa Sólida Laqueada', sku:'PORGI-LAQ-LIS-PORMADE', img:'laqueada', acab:'Laqueada', preco:1490, tipo:'Laqueada'},
+  {grupos:['laqueada'], nome:'Kit Porta Pronta Sólida Laqueada, Frizatta 10', sku:'PORGI-LAQ-FRI-FRI10-PORMADE', img:'frizatta10', acab:'Laqueada', preco:1590, tipo:'Frizatta'},
+  {grupos:['laqueada'], nome:'Kit Porta Pronta Linha Prisma Laqueada, CL 03', sku:'PORGI-LAQ-CL03-PORMADE', img:'prisma-cl03', acab:'Laqueada', preco:1690, tipo:'Prisma'},
+  {grupos:['correr'], nome:'Kit Porta de Correr Lisa Sólida Branco', sku:'PORCO-BRA-LIS-PORMADE', img:'correr-branco', acab:'Branca', preco:1690, tipo:'Lisa'},
+  {grupos:['rodape'], nome:'Rodapé em PVC Wood Liso 7,0 cm Preta', sku:'ROD-PRE-7CM-LIS-PORMADE', img:'rodape-preto', acab:'Preta', preco:39, tipo:'Liso', unidade:'m'},
+];
+const GRUPOS = {giro:'Kit Porta Pronta', laqueada:'Porta Laqueada', correr:'Porta de Correr', rodape:'Rodapé', madeira:'Madeirados', escuras:'Preta e Cinza'};
+const ACABS = [['Freijó','freijo'],['Branca','branca'],['Cappuccino','cappuccino'],['Preta','preta'],['Cinza','cinza'],['Laqueada','laqueada']];
+const LOJAS = [
+  {nome:'Showroom Pormade · Fábrica', end:'Rodovia BR 153, Km 492,8 · União da Vitória, PR', dist:'2,4 km', horario:'Aberto até 18h'},
+  {nome:'Showroom Centro', end:'Av. Exemplo, 1000 · Centro', dist:'5,1 km', horario:'Aberto até 19h'},
+  {nome:'Loja Parceira Bairro Novo', end:'Rua Ilustrativa, 45 · Bairro Novo', dist:'8,7 km', horario:'Abre às 9h'},
+  {nome:'Loja Parceira Rodovia', end:'Estrada Fictícia, 300 · Distrito Industrial', dist:'12,3 km', horario:'Aberto até 17h'},
+];
+const reais = v => 'R$ ' + v.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+const fotoAcab = a => (ACABS.find(x=>x[0]===a)||ACABS[0])[1];
+
+const estado = {
+  grupo:'giro', filtro:'Todos', prod:0, img:'freijo', acab:'Freijó', qtd:1, canal:'zap', loja:0,
+  carrinho:[
+    {nome:'Kit Porta Pronta Lisa Sólida Branca', img:'branca', det:'Branca · 80 × 210 · Direita', qtd:3, preco:1189},
+    {nome:'Rodapé em PVC Wood Liso 7,0 cm Preta', img:'rodape-preto', det:'Preta · barras de 2,4 m', qtd:24, preco:39, unidade:'m'},
+  ]
+};
+
+const modoTelas = new URLSearchParams(location.search).has('telas');
+document.body.classList.toggle('modo-telas', modoTelas);
+document.body.classList.toggle('modo-embed', new URLSearchParams(location.search).has('embed'));
+document.getElementById('link-modo').innerHTML = modoTelas
+  ? '· <a href="?">abrir o protótipo clicável</a>'
+  : '· <a href="?telas">ver todas as telas lado a lado (para importar no Figma)</a>';
+const molde = document.getElementById('telas').content;
+
+function preparar(raiz){
+  raiz.innerHTML = raiz.innerHTML.replace(/#([a-z]+)\b/g, (m,k)=> IC[k] || m);
+  raiz.querySelectorAll('.js-nav').forEach(n=>{
+    const on = n.dataset.on;
+    const b = (id, go, ic, rot, extra='') => `<button class="${on===id?'on':''}" data-go="${go}" aria-label="${rot}">${ic}${extra}</button>`;
+    n.innerHTML = b('home','home',IC.casa,'Início') + b('carrinho','carrinho',IC.carrinho,'Carrinho','<span class="badge js-badge"></span>')
+      + `<button class="folha" data-go="cliente" aria-label="Nova proposta">${IC.folha}</button>`
+      + b('busca','catalogo',IC.busca,'Catálogo') + b('showrooms','showrooms',IC.caminhao,'Showrooms próximos');
+  });
+  render(raiz);
+}
+
+function totais(){
+  const sub = estado.carrinho.reduce((s,i)=>s+i.qtd*i.preco,0);
+  const desc = Math.round(sub*5)/100;
+  return {sub, desc, total:sub-desc, n:estado.carrinho.reduce((s,i)=>s+(i.unidade?1:i.qtd),0)};
+}
+
+function pdfHTML(){
+  const t = totais();
+  const linhas = estado.carrinho.map(i=>`<tr><td><img src="img/${i.img}.webp" alt="">${i.nome}<br><span style="color:#9a9a9a;margin-left:32px">${i.det}</span></td><td>${i.qtd}${i.unidade?' '+i.unidade:''}</td><td>${reais(i.preco*i.qtd)}</td></tr>`).join('');
+  return `<div class="pdf">
+    <div class="pdf-cab"><span class="logo"><img src="img/logo.png" alt="Pormade Portas"></span><div class="num"><b>Proposta nº 2048</b><br>18/11/2026 · válida por 15 dias</div></div>
+    <h4>Cliente</h4><p>Construtora Horizonte · (42) 99999-0000<br>Obra: Rua das Araucárias, 120 · Bloco B</p>
+    <h4>Itens</h4>
+    <table><tr><th>Produto</th><th>Qtd.</th><th>Valor</th></tr>${linhas}
+      <tr><td colspan="2">Subtotal</td><td>${reais(t.sub)}</td></tr>
+      <tr><td colspan="2">Desconto à vista (5%)</td><td>− ${reais(t.desc)}</td></tr>
+      <tr class="tot"><td colspan="2">Total</td><td>${reais(t.total)}</td></tr></table>
+    <h4>Condições</h4>
+    <div class="cond"><span>Pix, boleto ou cartão em até 10×</span><span>Produção: 15 dias úteis</span><span>Frete grátis para a obra</span><span>Instalação credenciada</span></div>
+    <span class="ok">${IC.ok.replace('<svg','<svg width="14" height="14"')} Validada pelas regras técnicas · cópia para o engenheiro</span>
+    <div class="assina"><span>Ana Paula · Vendedora · VND-0482</span><span>pormade.com.br</span></div>
+  </div>`;
+}
+
+function render(raiz){
+  const t = totais();
+  raiz.querySelectorAll('.js-badge').forEach(b=>{b.textContent=t.n; b.style.display=t.n?'grid':'none';});
+  raiz.querySelectorAll('.js-cont').forEach(b=>b.textContent=`(${t.n} ${t.n===1?'item':'itens'})`);
+  raiz.querySelectorAll('.js-total').forEach(b=>b.textContent=reais(t.total));
+  raiz.querySelectorAll('.js-cat-nome').forEach(b=>b.textContent=GRUPOS[estado.grupo]);
+  const doGrupo = PRODUTOS.map((p,i)=>({...p,i})).filter(p=>p.grupos.includes(estado.grupo));
+  const tipos = ['Todos', ...new Set(doGrupo.map(p=>p.tipo))];
+  raiz.querySelectorAll('.js-filtros').forEach(f=>f.innerHTML = tipos.length>2 ? tipos.map(x=>`<button class="chip ${x===estado.filtro?'on':''}" data-filtro="${x}">${x}</button>`).join('') : '');
+  raiz.querySelectorAll('.js-produtos').forEach(g=>{
+    g.innerHTML = doGrupo.filter(p=>estado.filtro==='Todos'||p.tipo===estado.filtro).map(p=>`<button class="prod" data-prod="${p.i}" data-go="config">
+      <div class="foto"><img src="img/${p.img}.webp" alt="${p.nome}"></div>
+      <b>${p.nome}</b><small>SKU: ${p.sku}</small><span class="preco">${reais(p.preco)}${p.unidade?' /m':''}</span></button>`).join('');
+  });
+  const p = PRODUTOS[estado.prod];
+  raiz.querySelectorAll('.js-prod-nome').forEach(b=>b.textContent=p.nome.replace(/Lisa Sólida \S+$/,'Lisa Sólida '+estado.acab));
+  raiz.querySelectorAll('.js-sku').forEach(b=>b.textContent='SKU: '+p.sku);
+  raiz.querySelectorAll('.js-foto-grande').forEach(b=>b.src=`img/${estado.img}.webp`);
+  const temAcab = p.grupos.some(g=>['giro','madeira','escuras'].includes(g)) && p.tipo==='Lisa';
+  raiz.querySelectorAll('.js-acabs').forEach(c=>{
+    c.previousElementSibling.style.display = temAcab ? '' : 'none';
+    c.innerHTML = temAcab ? ACABS.map(([n,f])=>`<button class="acab ${n===estado.acab?'on':''}" data-acab="${n}" data-img="${f}"><img src="img/${f}.webp" alt="">${n}</button>`).join('') : '';
+  });
+  raiz.querySelectorAll('.js-qtd').forEach(b=>b.textContent=estado.qtd);
+  raiz.querySelectorAll('.js-preco').forEach(b=>b.textContent=reais(p.preco)+(p.unidade?' /m':''));
+  raiz.querySelectorAll('.js-itens').forEach(l=>{
+    l.innerHTML = estado.carrinho.length ? estado.carrinho.map((it,i)=>`<div class="item"><img src="img/${it.img}.webp" alt="">
+      <span><b>${it.nome}</b><small>${it.det}</small><span class="valor">${reais(it.preco*it.qtd)}</span></span>
+      <span class="qtd"><button data-menos="${i}" aria-label="Menos">−</button><span>${it.qtd}${it.unidade?' m':''}</span><button data-mais="${i}" aria-label="Mais">+</button><button class="lixo" data-remove="${i}" aria-label="Remover">${IC.lixo}</button></span></div>`).join('')
+      : '<p class="vazio">Carrinho vazio. Escolha um produto no catálogo.</p>';
+  });
+  raiz.querySelectorAll('.js-resumo').forEach(r=>r.innerHTML = estado.carrinho.length ? `<div class="resumo">
+    <div><span>Subtotal</span><span>${reais(t.sub)}</span></div><div><span>Desconto à vista (5%)</span><span>− ${reais(t.desc)}</span></div>
+    <div><span>Frete para a obra</span><span class="verde">Grátis</span></div><div class="total"><span>Total</span><span>${reais(t.total)}</span></div></div>` : '');
+  raiz.querySelectorAll('.js-gerar').forEach(b=>{b.style.opacity=estado.carrinho.length?1:.4; b.style.pointerEvents=estado.carrinho.length?'auto':'none';});
+  raiz.querySelectorAll('.js-pdf').forEach(d=>d.innerHTML=pdfHTML());
+  raiz.querySelectorAll('.js-canais .canal').forEach(c=>c.classList.toggle('on', c.dataset.canal===estado.canal));
+  raiz.querySelectorAll('.js-enviar').forEach(b=>{b.className='btn js-enviar '+(estado.canal==='zap'?'btn-zap':'btn-preto'); b.textContent=estado.canal==='zap'?'Enviar pelo WhatsApp':'Enviar por e-mail';});
+  raiz.querySelectorAll('.js-lojas').forEach(l=>l.innerHTML=LOJAS.map((s,i)=>`<div class="loja ${i===estado.loja?'on':''}" data-loja="${i}">
+    <header><span><b>${i+1}. ${s.nome}</b><small>${s.end}</small><small class="aberto">${s.horario}</small></span><span class="dist">${s.dist}</span></header>
+    ${i===estado.loja?`<div class="duas"><button class="btn btn-preto">${IC.caminhao} Como chegar</button><button class="btn btn-contorno">Agendar visita</button></div>`:''}</div>`).join(''));
+  raiz.querySelectorAll('.js-pino').forEach(p=>p.classList.toggle('on', +p.dataset.loja===estado.loja));
+}
+
+if (modoTelas) {
+  const quadro = document.getElementById('quadro');
+  [...molde.querySelectorAll('.tela')].forEach(t=>{
+    const fig = document.createElement('figure');
+    fig.innerHTML = `<figcaption>${t.dataset.nome}</figcaption><div class="moldura"></div>`;
+    const c = t.cloneNode(true); c.classList.add('ativa');
+    fig.querySelector('.moldura').appendChild(c);
+    quadro.appendChild(fig);
+  });
+  preparar(quadro);
+} else {
+  const visor = document.getElementById('visor');
+  visor.appendChild(molde.cloneNode(true));
+  preparar(visor);
+  const ir = id => {
+    visor.querySelectorAll('.tela').forEach(t=>t.classList.toggle('ativa', t.dataset.id===id));
+    const c = visor.querySelector('.tela.ativa .conteudo'); if (c) c.scrollTop = 0;
+    render(visor);
+  };
+  ir('splash');
+  setTimeout(()=>{ if (visor.querySelector('.tela.ativa').dataset.id==='splash') ir('login'); }, 2200);
+
+  visor.addEventListener('click', e=>{
+    const el = e.target.closest('button, .check, .loja, .pino'); if (!el) return;
+    const d = el.dataset;
+    if (d.cat) { estado.grupo = d.cat; estado.filtro = 'Todos'; }
+    if (d.filtro) { estado.filtro = d.filtro; render(visor); return; }
+    if (d.prod) { const p = PRODUTOS[+d.prod]; estado.prod = +d.prod; estado.img = p.img; estado.acab = p.acab; estado.qtd = 1; }
+    if (d.acab) { estado.acab = d.acab; estado.img = d.img; render(visor); return; }
+    if (d.canal) { estado.canal = d.canal; render(visor); return; }
+    if (d.loja !== undefined && !d.go && !el.closest('.duas')) { estado.loja = +d.loja; render(visor); return; }
+    if (d.mais !== undefined) { const it = estado.carrinho[+d.mais]; it.qtd += it.unidade ? 6 : 1; render(visor); return; }
+    if (d.menos !== undefined) { const it = estado.carrinho[+d.menos]; const p = it.unidade ? 6 : 1; it.qtd = Math.max(p, it.qtd - p); render(visor); return; }
+    if (d.remove !== undefined) { estado.carrinho.splice(+d.remove,1); render(visor); return; }
+    if (el.classList.contains('check')) {
+      if (el.classList.contains('js-unico')) el.parentElement.querySelectorAll('.check').forEach(c=>c.classList.remove('on'));
+      el.classList.toggle('on', el.classList.contains('js-unico') ? true : !el.classList.contains('on')); return; }
+    if (el.classList.contains('op')) { el.parentElement.querySelectorAll('.op').forEach(o=>o.classList.remove('on')); el.classList.add('on'); return; }
+    if (el.classList.contains('js-mais')) { estado.qtd++; render(visor); return; }
+    if (el.classList.contains('js-menos')) { estado.qtd = Math.max(1, estado.qtd-1); render(visor); return; }
+    if (el.classList.contains('js-limpar')) { estado.carrinho = []; render(visor); return; }
+    if (el.classList.contains('js-add')) {
+      const p = PRODUTOS[estado.prod];
+      const med = visor.querySelector('.tela.ativa [data-campo=medida] .on')?.textContent || '80 × 210';
+      const ab = visor.querySelector('.tela.ativa [data-campo=abertura] .on')?.textContent || 'Direita';
+      const nome = p.nome.replace(/Lisa Sólida \S+$/, 'Lisa Sólida ' + estado.acab);
+      estado.carrinho.unshift({nome, img:estado.img, det:p.unidade?`${estado.acab} · barras de 2,4 m`:`${estado.acab} · ${med} · ${ab}`, qtd:p.unidade?estado.qtd*6:estado.qtd, preco:p.preco, unidade:p.unidade});
+      ir('carrinho'); return;
+    }
+    if (el.classList.contains('js-baixar')) { document.getElementById('impressao').innerHTML = pdfHTML(); window.print(); return; }
+    if (d.acao === 'nova') estado.carrinho = [];
+    if (d.go) ir(d.go);
+  });
+}
+</script>
+</body>
+</html>

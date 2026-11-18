@@ -1,0 +1,802 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hora do Lar · App do empregador (protótipo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* Layout das telas finais do case (Ponto, Resumo do mês e Menu) e telas do app do empregador; branding do site
+     público horadolar.com.br: logo oficial, Roboto, laranja #FD6D04, grafite #323232,
+     pêssego #FDCCA4, verde #08A54D e roxo #6900AE. Dados fictícios. */
+  :root{
+    --laranja:#fd6d04; --laranja-esc:#d95a00; --pessego:#fdcca4; --creme:#fff4ec;
+    --tinta:#323232; --texto:#5c5c5c; --suave:#9a9a9a; --linha:#ececec; --cinza:#f1f1f1;
+    --verde:#08a54d; --verde-claro:#e7f6ee; --vermelho:#d8262f; --vermelho-claro:#fdecec; --roxo:#6900ae; --branco:#fff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Roboto",system-ui,sans-serif;background:#141414;color:var(--tinta);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:28px 16px}
+  button{font:inherit;border:0;background:none;cursor:pointer;color:inherit;text-align:inherit}
+  input,textarea{font:inherit;color:inherit}
+
+  .topo{color:#ddd;text-align:center;margin-bottom:18px;max-width:640px}
+  .topo h1{font-size:18px;font-weight:700}
+  .topo .selo-fic{display:inline-block;margin-top:6px;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--pessego);border:1px solid rgba(253,204,164,.4);border-radius:999px;padding:3px 10px}
+  .topo p{font-size:13px;color:#999;margin-top:6px}
+  .topo a{color:var(--pessego);font-weight:600}
+  .celular{width:390px;height:844px;border-radius:50px;background:#0b0b0b;padding:11px;box-shadow:0 30px 80px -20px rgba(0,0,0,.8),inset 0 0 0 2px #2a2a2a}
+  .visor{width:100%;height:100%;border-radius:40px;overflow:clip;position:relative;background:#fff}
+
+  /* ---------- tela ---------- */
+  .tela{position:absolute;inset:0;display:flex;flex-direction:column;overflow:clip;background:#fdfdfd;opacity:0;pointer-events:none;transform:translateX(20px);transition:opacity .3s ease,transform .3s ease}
+  .tela.ativa{opacity:1;pointer-events:auto;transform:none}
+  .status{height:44px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:14px;font-weight:600}
+  .status i{font-style:normal;letter-spacing:1px}
+  .conteudo{flex:1;overflow-y:auto;padding-bottom:18px}
+  .conteudo::-webkit-scrollbar{width:0}
+
+  /* logo oficial */
+  .logo{display:block;height:30px;margin:2px auto 0;width:max-content}
+  .logo img{height:100%;display:block}
+  .logo.grande{height:40px}
+
+  /* saudação + abas (layout do case) */
+  .saud{padding:18px 22px 0}
+  .saud h1{font-size:23px;font-weight:600}
+  .saud p{font-size:13px;color:var(--suave);margin-top:6px}
+  .abas{display:flex;align-items:center;justify-content:space-between;padding:20px 22px 0}
+  .aba{height:46px;padding:0 14px;border-radius:8px;color:var(--laranja);font-size:14px;display:flex;align-items:center;gap:8px;transition:background .15s}
+  .aba svg{width:19px;height:19px}
+  .aba.on{background:var(--laranja);color:#fff;font-weight:600;box-shadow:0 6px 14px -8px rgba(253,109,4,.8)}
+
+  /* marcações */
+  .marcas{padding:26px 44px 0;display:flex;flex-direction:column;gap:12px}
+  .marca{height:46px;border-radius:10px;background:#f3f3f3;display:flex;align-items:center;gap:12px;padding:0 14px;font-size:14px;color:var(--suave)}
+  .marca svg{width:19px;height:19px;flex:none}
+  .marca span{flex:1}
+  .marca b{font-weight:400;color:#b8b8b8;font-variant-numeric:tabular-nums}
+  .marca.feita{color:var(--tinta);font-weight:500}
+  .marca.feita svg{color:var(--laranja)}
+  .marca.feita b{color:var(--laranja);font-weight:600}
+  .btn-reg{height:42px;border-radius:21px;background:var(--laranja);color:#fff;font-weight:600;font-size:14px;width:100%;display:flex;align-items:center;justify-content:center;transition:transform .12s, background .15s}
+  .btn-reg:hover{background:var(--laranja-esc)}
+  .btn-reg:active{transform:scale(.97)}
+  .jornada{margin:18px 22px 0;border-radius:12px;background:var(--verde-claro);color:#0c6b35;padding:14px 16px;font-size:13px;display:flex;gap:12px;align-items:flex-start}
+  .jornada svg{width:22px;height:22px;flex:none}
+  .jornada b{display:block;font-size:15px;margin-bottom:2px}
+
+  /* resumo do mês */
+  .cartao-horas{margin:20px 22px 0;padding:18px 18px;border-radius:10px;background:var(--cinza);display:flex;align-items:center;gap:18px}
+  .anel{width:56px;height:56px;flex:none;transform:rotate(-90deg)}
+  .anel circle{fill:none;stroke-width:4}
+  .anel .fundo{stroke:#dedede}
+  .anel .valor{stroke:var(--laranja);stroke-linecap:round;transition:stroke-dasharray .5s ease}
+  .cartao-horas b{display:block;font-size:16px;font-weight:600}
+  .cartao-horas span{font-size:15px;color:var(--texto);font-variant-numeric:tabular-nums}
+  .resumo-cab{display:flex;align-items:center;justify-content:space-between;padding:22px 22px 12px;border-bottom:1px solid var(--linha)}
+  .resumo-cab h2{font-size:16px;font-weight:500}
+  .resumo-cab small{display:block;font-size:12px;color:var(--suave);margin-top:2px}
+  .btn-mes{height:36px;border-radius:7px;background:var(--laranja);color:#fff;font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px;padding:0 13px}
+  .btn-mes svg{width:16px;height:16px}
+  .resumo-lista{padding:16px 22px;font-size:14px;display:flex;flex-direction:column;gap:12px}
+  .ri{display:flex;align-items:center;gap:12px;padding-left:10px;width:100%;text-align:left}
+  .ri .bola{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;font-size:13px;flex:none}
+  .ri .bola svg{width:12px;height:12px}
+  .ri em{font-style:normal;flex:1}
+  .ri .seta{width:16px;height:16px;color:var(--suave)}
+  .rl b{font-weight:600}
+  .rl span{font-variant-numeric:tabular-nums}
+
+  /* espelho */
+  .espelho{margin:6px 16px 0;border:1px solid var(--linha);border-radius:12px;overflow:hidden;background:#fff}
+  .espelho table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums}
+  .espelho th{font-size:11px;color:var(--suave);font-weight:600;text-align:left;padding:10px 10px;background:#fafafa;border-bottom:1px solid var(--linha)}
+  .espelho td{padding:9px 10px;border-bottom:1px solid var(--linha)}
+  .espelho tr:last-child td{border-bottom:0}
+  .espelho td:first-child{font-weight:500}
+  .espelho td small{color:var(--suave);font-weight:400;margin-left:3px}
+  .espelho .mais{color:var(--verde);font-weight:600}
+  .espelho .menos{color:var(--vermelho);font-weight:600}
+  .espelho .falta td{color:var(--vermelho)}
+  .espelho .hoje td{background:var(--creme)}
+  .totais{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 16px 4px}
+  .totais div{background:var(--cinza);border-radius:10px;padding:9px 8px;text-align:center}
+  .totais small{display:block;font-size:10.5px;color:var(--suave)}
+  .totais b{font-size:15px;font-variant-numeric:tabular-nums}
+
+  /* cabeçalho com voltar */
+  .barra{display:flex;align-items:center;gap:8px;padding:2px 14px 10px;flex:none}
+  .barra button{width:36px;height:36px;display:grid;place-items:center;border-radius:50%}
+  .barra button svg{width:22px;height:22px}
+  .barra h2{font-size:18px;font-weight:600}
+  .titulo-sec{font-size:20px;font-weight:600;padding:18px 22px 4px}
+  .sub{font-size:13px;color:var(--suave);padding:0 22px}
+  .rotulo{font-size:11px;font-weight:700;color:var(--suave);text-transform:uppercase;letter-spacing:.6px;padding:18px 22px 8px}
+
+  /* menu (layout do case) */
+  .lista-menu{display:flex;flex-direction:column;gap:14px;padding:34px 24px 0}
+  .item-menu{height:56px;border-radius:8px;background:var(--cinza);display:flex;align-items:center;gap:16px;padding:0 18px;font-size:15px;width:100%;transition:background .15s}
+  .item-menu:hover{background:#e9e9e9}
+  .item-menu svg{width:20px;height:20px;flex:none}
+  .item-menu span{flex:1}
+  .item-menu .seta{width:18px;height:18px}
+
+  /* cartões e listas */
+  .cartoes{display:flex;flex-direction:column;gap:10px;padding:0 16px}
+  .cartao{background:#fff;border:1px solid var(--linha);border-radius:12px;padding:14px;width:100%;text-align:left;display:flex;gap:12px;align-items:flex-start}
+  .cartao .ic{width:38px;height:38px;border-radius:10px;background:var(--creme);color:var(--laranja);display:grid;place-items:center;flex:none}
+  .cartao .ic svg{width:20px;height:20px}
+  .cartao .txt{flex:1;min-width:0}
+  .cartao b{display:block;font-size:14px;font-weight:600}
+  .cartao p{font-size:13px;color:var(--texto);margin-top:3px;line-height:1.4}
+  .cartao small{font-size:11.5px;color:var(--suave);display:block;margin-top:6px}
+  .cartao.nao-lida{border-color:var(--pessego);background:#fffaf6}
+  .ponto-novo{width:8px;height:8px;border-radius:50%;background:var(--laranja);flex:none;margin-top:6px}
+  .st{display:inline-block;font-size:11px;font-weight:700;border-radius:999px;padding:3px 9px;margin-top:8px}
+  .st-ag{background:var(--creme);color:var(--laranja-esc)}
+  .st-ok{background:var(--verde-claro);color:#0c6b35}
+  .st-rec{background:var(--vermelho-claro);color:var(--vermelho)}
+  .compara{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px;font-size:12px}
+  .compara span{background:#f6f6f6;border-radius:8px;padding:7px 9px;color:var(--suave)}
+  .compara span:last-child{background:var(--creme)}
+  .compara b{font-size:13px;color:var(--tinta);margin-top:1px}
+  .compara span:last-child b{color:var(--laranja-esc)}
+  .doc-linha{display:flex;align-items:center;gap:12px;background:var(--cinza);border-radius:8px;height:54px;padding:0 14px;width:100%;font-size:14px;text-align:left}
+  .doc-linha svg{width:19px;height:19px;flex:none}
+  .doc-linha span{flex:1}
+  .doc-linha small{font-size:12px;color:var(--suave)}
+  .doc-linha.off{opacity:.55;cursor:default}
+  .doc-linha .seta{width:16px;height:16px}
+  .vazio{text-align:center;color:var(--texto);font-size:14px;padding:46px 28px 10px;line-height:1.5}
+  .vazio .ic-g{width:72px;height:72px;border-radius:50%;background:var(--creme);color:var(--laranja);display:grid;place-items:center;margin:0 auto 16px}
+  .vazio .ic-g svg{width:34px;height:34px}
+  .vazio b{display:block;color:var(--tinta);font-size:17px;margin-bottom:6px}
+
+  /* botões */
+  .btn{height:46px;border-radius:999px;font-weight:600;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;transition:transform .12s, background .15s}
+  .btn:active{transform:scale(.97)}
+  .btn svg{width:18px;height:18px}
+  .btn-laranja{background:var(--laranja);color:#fff}
+  .btn-laranja:hover{background:var(--laranja-esc)}
+  .btn-contorno{border:1.5px solid #d4d4d4;color:var(--tinta);background:#fff}
+  .btn-zap{background:#25d366;color:#fff}
+  .duas{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .pad{padding:0 22px}
+
+  /* formulário */
+  .campo{display:block;margin-top:16px}
+  .campo>span{display:block;font-size:12px;font-weight:600;color:var(--texto);margin-bottom:6px}
+  .campo input,.campo textarea{width:100%;height:48px;border:1.5px solid #e3e3e3;border-radius:10px;padding:0 14px;background:#fff;font-size:15px;outline:none;transition:border-color .15s}
+  .campo textarea{height:84px;padding:12px 14px;resize:none;line-height:1.4}
+  .campo input:focus,.campo textarea:focus{border-color:var(--laranja)}
+  .opcoes{display:flex;gap:8px;flex-wrap:wrap}
+  .op{border:1.5px solid #e3e3e3;border-radius:999px;padding:8px 13px;font-size:13px;font-weight:500;background:#fff}
+  .op.on{border-color:var(--laranja);color:var(--laranja-esc);background:var(--creme);font-weight:600}
+  .erro{font-size:12px;color:var(--vermelho);margin-top:8px;min-height:16px}
+  .aviso{display:flex;gap:10px;align-items:flex-start;font-size:12.5px;background:var(--creme);color:#8a3c00;border-radius:12px;padding:11px 13px;margin-top:16px;line-height:1.4}
+  .aviso svg{width:17px;height:17px;flex:none;margin-top:1px}
+
+  /* splash e login */
+  .splash{background:linear-gradient(160deg,var(--laranja) 0%,#f0571a 55%,var(--roxo) 130%);align-items:center;justify-content:center;color:#fff}
+  .splash .logo{height:46px}
+  .splash small{position:absolute;bottom:64px;font-size:13px;opacity:.85}
+  .carrega{position:absolute;bottom:110px;width:44px;height:44px;border-radius:50%;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;animation:gira 1s linear infinite}
+  @keyframes gira{to{transform:rotate(360deg)}}
+  .login-topo{padding:30px 26px 0;text-align:center}
+  .login-topo h2{font-size:24px;font-weight:600;margin-top:34px}
+  .login-topo p{font-size:14px;color:var(--suave);margin-top:6px}
+  .link{color:var(--laranja);font-weight:600;font-size:13px}
+  .rodape-login{margin-top:auto;padding:0 26px 34px;text-align:center;font-size:13px;color:var(--texto)}
+
+  /* configuração */
+  .perfil{display:flex;align-items:center;gap:14px;margin:8px 16px 0;padding:16px;border-radius:12px;background:var(--cinza)}
+  .avatar{width:52px;height:52px;border-radius:50%;background:var(--pessego);color:#8a3c00;display:grid;place-items:center;font-weight:700;font-size:18px;flex:none}
+  .perfil b{display:block;font-size:16px}
+  .perfil small{font-size:13px;color:var(--texto)}
+  .opcao{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 22px;border-bottom:1px solid var(--linha);font-size:14px;width:100%;text-align:left}
+  .opcao>svg{width:18px;height:18px;flex:none;color:var(--suave)}
+  .opcao small{display:block;font-size:12px;color:var(--suave);margin-top:2px}
+  .chave{width:46px;height:28px;border-radius:14px;background:#d7d7d7;position:relative;flex:none;transition:background .2s}
+  .chave::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
+  .chave.on{background:var(--laranja)}
+  .chave.on::after{transform:translateX(18px)}
+
+  /* documento */
+  .papel{margin:6px 16px 0;background:#fff;border-radius:8px;box-shadow:0 12px 30px -14px rgba(0,0,0,.4);padding:18px;font-size:12px;border:1px solid var(--linha)}
+  .papel-cab{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid var(--laranja);padding-bottom:10px;gap:10px}
+  .papel-cab .logo{height:22px;margin:0}
+  .papel-cab div{text-align:right;line-height:1.35}
+  .papel-cab b{font-size:13px}
+  .papel h4{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--suave);margin:12px 0 4px}
+  .papel table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+  .papel td{padding:6px 0;border-bottom:1px solid var(--linha)}
+  .papel td:last-child{text-align:right;white-space:nowrap}
+  .papel .tot td{font-weight:700;font-size:13.5px;border-bottom:0;padding-top:9px}
+  .papel .neg{color:var(--vermelho)}
+  .papel .nota{font-size:10.5px;color:var(--suave);margin-top:12px}
+
+  /* barra inferior (layout do case) */
+  .nav{flex:none;height:76px;background:#fdf3ee;border-top:1px solid #f6e3d8;display:flex;align-items:flex-start;justify-content:space-around;padding:10px 6px 0}
+  .nav button{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:#555;width:84px;position:relative}
+  .nav button svg{width:23px;height:23px}
+  .nav button.on{color:var(--laranja);font-weight:500}
+  .badge{position:absolute;top:-4px;left:calc(50% + 4px);min-width:17px;height:17px;border-radius:9px;background:var(--laranja);color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center;padding:0 4px;border:2px solid #fdf3ee}
+
+  /* folha inferior (confirmação) e aviso */
+  .veu{position:absolute;inset:0;background:rgba(20,20,20,.45);opacity:0;pointer-events:none;transition:opacity .25s;z-index:20;display:flex;align-items:flex-end}
+  .veu.aberto{opacity:1;pointer-events:auto}
+  .folha{width:100%;background:#fff;border-radius:24px 24px 0 0;padding:12px 22px 34px;transform:translateY(100%);transition:transform .3s ease}
+  .veu.aberto .folha{transform:none}
+  .folha .pegador{width:40px;height:4px;border-radius:2px;background:#ddd;margin:0 auto 16px}
+  .folha h3{font-size:18px;font-weight:600}
+  .folha p{font-size:13px;color:var(--texto);margin-top:4px;line-height:1.4}
+  .hora-grande{font-size:56px;font-weight:600;color:var(--laranja);text-align:center;margin:18px 0 2px;font-variant-numeric:tabular-nums;letter-spacing:-1px}
+  .folha .centro{text-align:center}
+  .meses{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+  .mes{height:50px;border-radius:10px;border:1.5px solid #e6e6e6;padding:0 16px;display:flex;align-items:center;justify-content:space-between;font-size:15px;width:100%}
+  .mes.on{border-color:var(--laranja);background:var(--creme);font-weight:600;color:var(--laranja-esc)}
+  .toast{position:absolute;left:16px;right:16px;bottom:94px;background:var(--tinta);color:#fff;border-radius:12px;padding:12px 14px;font-size:13px;display:flex;gap:10px;align-items:center;opacity:0;transform:translateY(10px);transition:opacity .25s,transform .25s;pointer-events:none;z-index:30}
+  .toast.mostra{opacity:1;transform:none}
+  .toast svg{width:18px;height:18px;color:#7be0a5;flex:none}
+
+  /* ---------- modo embutido (iframe do portfólio) ---------- */
+  body.modo-embed{background:transparent;padding:0;min-height:0;display:block}
+  body.modo-embed .topo{display:none}
+  body.modo-embed .celular{box-shadow:none}
+
+  /* ---------- modo telas ---------- */
+  body.modo-telas{display:block;padding:40px}
+  body.modo-telas .topo{text-align:left;max-width:none}
+  body.modo-telas .celular{display:none}
+  .quadro{display:none}
+  body.modo-telas .quadro{display:flex;flex-wrap:wrap;gap:48px}
+  .quadro figure{width:390px}
+  .quadro figcaption{color:#ccc;font-size:14px;font-weight:700;margin-bottom:12px}
+  .quadro .moldura{width:390px;height:844px;position:relative;overflow:clip;border-radius:30px;background:#fff}
+  .quadro .tela{opacity:1;transform:none;pointer-events:none}
+
+  /* ---------- só no app do empregador ---------- */
+  .cab-emp{padding:6px 22px 4px}
+  .cab-emp h1{font-size:22px;font-weight:600;margin-top:16px}
+  .cab-emp p{font-size:13px;color:var(--suave);margin-top:5px}
+  .alerta{display:flex;align-items:center;gap:12px;margin:16px 16px 0;padding:13px 14px;border-radius:12px;background:var(--creme);border:1px solid var(--pessego);width:calc(100% - 32px);text-align:left}
+  .alerta .ic{width:36px;height:36px;border-radius:50%;background:var(--laranja);color:#fff;display:grid;place-items:center;flex:none}
+  .alerta .ic svg{width:19px;height:19px}
+  .alerta b{display:block;font-size:14px}
+  .alerta small{font-size:12px;color:#8a3c00}
+  .alerta>svg{width:18px;height:18px;color:var(--laranja);margin-left:auto;flex:none}
+  .func{background:#fff;border:1px solid var(--linha);border-radius:14px;padding:14px;width:100%;text-align:left;display:block;transition:border-color .15s}
+  .func:hover{border-color:var(--pessego)}
+  .func header{display:flex;align-items:center;gap:12px}
+  .func header .txt{flex:1}
+  .func header b{display:block;font-size:15px;font-weight:600}
+  .func header small{font-size:12.5px;color:var(--texto)}
+  .func header>svg{width:18px;height:18px;color:var(--suave)}
+  .func .avatar{width:44px;height:44px;font-size:15px}
+  .situ{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;border-radius:999px;padding:4px 10px;margin-top:12px}
+  .situ i{width:7px;height:7px;border-radius:50%;background:currentColor}
+  .situ.trab{background:var(--verde-claro);color:#0c6b35}
+  .situ.pausa{background:var(--creme);color:var(--laranja-esc)}
+  .mini-marcas{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
+  .mini-marcas span{background:#f5f5f5;border-radius:8px;padding:7px 4px;text-align:center;font-size:10.5px;color:var(--suave)}
+  .mini-marcas b{display:block;font-size:13px;color:#b8b8b8;font-weight:500;font-variant-numeric:tabular-nums;margin-top:1px}
+  .mini-marcas span.feita b{color:var(--laranja);font-weight:600}
+  .fichas{display:flex;gap:8px;padding:0 16px;margin-top:4px}
+  .ficha{border:1.5px solid #e3e3e3;border-radius:999px;padding:7px 14px 7px 7px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;background:#fff}
+  .ficha .avatar{width:26px;height:26px;font-size:10px}
+  .ficha.on{border-color:var(--laranja);background:var(--creme);color:var(--laranja-esc);font-weight:600}
+  .grade-num{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 22px 0}
+  .grade-num div{background:var(--cinza);border-radius:10px;padding:12px 14px}
+  .grade-num small{display:block;font-size:12px;color:var(--suave)}
+  .grade-num b{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+  .pedido{background:#fff;border:1px solid var(--linha);border-radius:14px;padding:14px;transition:opacity .3s}
+  .pedido header{display:flex;align-items:center;gap:10px}
+  .pedido header .avatar{width:34px;height:34px;font-size:12px}
+  .pedido header b{display:block;font-size:14.5px;font-weight:600}
+  .pedido header small{font-size:12px;color:var(--suave)}
+  .pedido .motivo{font-size:13px;color:var(--texto);margin-top:10px;line-height:1.4}
+  .pedido .duas{margin-top:12px}
+  .pedido .btn{height:40px;font-size:13.5px}
+  .resolvido{display:flex;align-items:center;gap:8px;margin-top:12px;padding:9px 11px;border-radius:9px;font-size:12.5px;font-weight:600}
+  .resolvido svg{width:16px;height:16px;flex:none}
+  .resolvido.ok{background:var(--verde-claro);color:#0c6b35}
+  .resolvido.rec{background:var(--vermelho-claro);color:var(--vermelho)}
+  .doc-emp{display:flex;align-items:center;gap:12px;background:var(--cinza);border-radius:10px;min-height:60px;padding:10px 14px;width:100%;font-size:14px;text-align:left}
+  .doc-emp>svg{width:20px;height:20px;flex:none}
+  .doc-emp .txt{flex:1}
+  .doc-emp .txt small{display:block;font-size:12px;color:var(--suave);margin-top:2px}
+  .pilula{font-size:12px;font-weight:700;border-radius:999px;padding:6px 12px;flex:none}
+  .pilula.emitir{background:var(--laranja);color:#fff}
+  .pilula.emitido{background:var(--verde-claro);color:#0c6b35}
+  .pilula.prazo{background:#fff;color:var(--laranja-esc);border:1px solid var(--pessego)}
+  .pilula.gerando{background:#fff;color:var(--suave);border:1px solid #e3e3e3}
+  .push{position:absolute;left:10px;right:10px;top:48px;background:rgba(255,255,255,.97);border-radius:16px;padding:12px 14px;box-shadow:0 14px 34px -10px rgba(0,0,0,.4);z-index:40;transform:translateY(-140%);transition:transform .35s ease;cursor:pointer;width:auto;text-align:left}
+  .push:not(.mostra){visibility:hidden;opacity:0;transition:transform .35s ease,opacity .2s ease,visibility 0s .35s}
+  .push.mostra{transform:none;visibility:visible;opacity:1}
+  .push header{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--suave)}
+  .push header img{width:20px;height:20px;border-radius:5px}
+  .push header span{flex:1;font-weight:600;color:var(--tinta)}
+  .push b{display:block;font-size:14px;margin-top:6px}
+  .push p{font-size:13px;color:var(--texto);margin-top:2px}
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <h1>Hora do Lar · App do empregador</h1>
+  <span class="selo-fic">Recriação ilustrativa · dados fictícios</span>
+  <p>App novo, projetado do zero no case, com a identidade do site público do Hora do Lar. Nomes, horários e valores são inventados.
+    <span id="link-modo"></span></p>
+</header>
+
+<div class="celular"><div class="visor" id="visor"></div></div>
+<div class="quadro" id="quadro"></div>
+
+<template id="telas">
+
+<!-- 01 Splash -->
+<section class="tela splash" data-id="splash" data-nome="01 · Abertura">
+  <span class="logo"><img src="img/logo-branco.webp" alt="hora do lar"></span>
+  <div class="carrega"></div>
+  <small>App do empregador</small>
+  <button style="position:absolute;inset:0" data-go="login" aria-label="Continuar"></button>
+</section>
+
+<!-- 02 Login -->
+<section class="tela" data-id="login" data-nome="02 · Entrar">
+  <div class="status"><span>12:20</span><i>●●● ▮</i></div>
+  <div class="login-topo">
+    <span class="logo grande"><img src="img/logo.png" alt="hora do lar"></span>
+    <h2>Sua casa em dia, sem juridiquês</h2>
+    <p>Entre com a conta da plataforma Hora do Lar.</p>
+  </div>
+  <div class="pad">
+    <label class="campo"><span>E-mail</span><input value="carla.souza@exemplo.com" autocomplete="off"></label>
+    <label class="campo"><span>Senha</span><input type="password" value="demonstracao" autocomplete="off"></label>
+    <div style="text-align:right;margin-top:10px"><button class="link" data-act="esqueci">Esqueci minha senha</button></div>
+    <button class="btn btn-laranja" style="margin-top:22px" data-go="inicio">Entrar</button>
+  </div>
+  <div class="rodape-login">Precisa de ajuda? <button class="link" data-act="suporte">Fale com o suporte</button></div>
+</section>
+
+<!-- 03 Ponto de hoje -->
+<section class="tela" data-id="inicio" data-nome="03 · Ponto de hoje">
+  <div class="status"><span>12:20</span><i>●●● ▮</i></div>
+  <span class="logo"><img src="img/logo.png" alt="hora do lar"></span>
+  <div class="conteudo">
+    <div class="cab-emp" style="padding-top:12px"><h1 style="margin-top:6px">Oi, Carla!</h1><p>Sexta-feira, 31 de janeiro de 2025</p></div>
+    <div class="js-alerta"></div>
+    <p class="rotulo">Ponto de hoje</p>
+    <div class="cartoes js-funcs"></div>
+  </div>
+  <nav class="nav js-nav" data-on="inicio"></nav>
+</section>
+
+<!-- 04 Resumo do mês -->
+<section class="tela" data-id="resumo" data-nome="04 · Resumo do mês">
+  <div class="status"><span>12:20</span><i>●●● ▮</i></div>
+  <div class="barra"><button data-go="inicio" aria-label="Voltar">#voltar</button><h2>Resumo do mês</h2></div>
+  <div class="conteudo">
+    <div class="fichas js-fichas"></div>
+    <div class="js-horas"></div>
+    <div class="grade-num js-grade"></div>
+    <div class="resumo-cab" style="border:0;padding-bottom:0"><div><h2>Período</h2><small class="js-mes-nome"></small></div><button class="btn-mes" data-act="mes">#cal Buscar mês</button></div>
+    <div class="pad" style="margin-top:16px;display:flex;flex-direction:column;gap:10px">
+      <button class="btn btn-laranja" data-go="espelho">#relogio Ver espelho de ponto</button>
+      <button class="btn btn-contorno" data-go="documentos">#doc Documentos do mês</button>
+    </div>
+  </div>
+  <nav class="nav js-nav" data-on="inicio"></nav>
+</section>
+
+<!-- 05 Espelho de ponto -->
+<section class="tela" data-id="espelho" data-nome="05 · Espelho de ponto">
+  <div class="status"><span>12:20</span><i>●●● ▮</i></div>
+  <div class="barra"><button data-go="resumo" aria-label="Voltar">#voltar</button><h2>Espelho de ponto</h2></div>
+  <div class="conteudo">
+    <div class="fichas js-fichas"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 4px"><span class="js-mes-nome" style="font-size:14px;font-weight:500"></span><button class="btn-mes" data-act="mes">#cal Buscar mês</button></div>
+    <div class="totais js-totais"></div>
+    <div class="espelho js-espelho"></div>
+    <p class="sub" style="margin-top:12px;font-size:12px">Ajustes aprovados já entram no espelho.</p>
+  </div>
+  <nav class="nav js-nav" data-on="inicio"></nav>
+</section>
+
+<!-- 06 Aprovações -->
+<section class="tela" data-id="aprovacoes" data-nome="06 · Aprovações">
+  <div class="status"><span>12:20</span><i>●●● ▮</i></div>
+  <span class="logo"><img src="img/logo.png" alt="hora do lar"></span>
+  <div class="conteudo">
+    <h2 class="titulo-sec">Aprovações</h2>
+    <p class="sub js-aprov-sub"></p>
+    <div class="js-aprov"></div>
+  </div>
+  <nav class="nav js-nav" data-on="aprovacoes"></nav>
+</section>
+
+<!-- 07 Notificações -->
+<section class="tela" data-id="notificacoes" data-nome="07 · Notificações">
+  <div class="status"><span>12:20</span><i>●●● ▮</i></div>
+  <span class="logo"><img src="img/logo.png" alt="hora do lar"></span>
+  <div class="conteudo">
+    <h2 class="titulo-sec">Notificações</h2>
+    <p class="sub" style="margin-bottom:14px">Tudo o que depende de você aparece aqui.</p>
+    <div class="cartoes js-notifs"></div>
+  </div>
+  <nav class="nav js-nav" data-on="notificacoes"></nav>
+</section>
+
+<!-- 08 Menu -->
+<section class="tela" data-id="menu" data-nome="08 · Menu">
+  <div class="status"><span>12:20</span><i>●●● ▮</i></div>
+  <div class="conteudo">
+    <span class="logo grande" style="margin-top:26px"><img src="img/logo.png" alt="hora do lar"></span>
+    <div class="lista-menu">
+      <button class="item-menu" data-go="inicio">#aprov <span>Funcionários</span>#seta</button>
+      <button class="item-menu" data-go="resumo">#cal <span>Resumo de horas</span>#seta</button>
+      <button class="item-menu" data-go="documentos">#doc <span>Recibos e documentos</span>#seta</button>
+      <button class="item-menu" data-go="config">#engrenagem <span>Configuração</span>#seta</button>
+      <button class="item-menu" data-act="suporte">#zap <span>Falar com o suporte</span>#seta</button>
+    </div>
+  </div>
+  <nav class="nav js-nav" data-on="menu"></nav>
+</section>
+
+<!-- 09 Documentos -->
+<section class="tela" data-id="documentos" data-nome="09 · Recibos e documentos">
+  <div class="status"><span>12:20</span><i>●●● ▮</i></div>
+  <div class="barra"><button data-go="menu" aria-label="Voltar">#voltar</button><h2>Recibos e documentos</h2></div>
+  <div class="conteudo">
+    <div class="fichas js-fichas"></div>
+    <p class="rotulo">Janeiro de 2025</p>
+    <div class="cartoes js-docs"></div>
+    <p class="rotulo">Dezembro de 2024</p>
+    <div class="cartoes js-docs-ant"></div>
+  </div>
+  <nav class="nav js-nav" data-on="menu"></nav>
+</section>
+
+<!-- 10 Documento -->
+<section class="tela" data-id="doc" data-nome="10 · Documento">
+  <div class="status"><span>12:20</span><i>●●● ▮</i></div>
+  <div class="barra"><button data-go="documentos" aria-label="Voltar">#voltar</button><h2 class="js-doc-titulo">Documento</h2></div>
+  <div class="conteudo">
+    <div class="js-doc"></div>
+    <div class="pad duas" style="margin-top:16px"><button class="btn btn-contorno" data-act="baixar">#baixar Baixar PDF</button><button class="btn btn-laranja js-enviar" data-act="enviar-doc">Enviar</button></div>
+  </div>
+</section>
+
+<!-- 11 Configuração -->
+<section class="tela" data-id="config" data-nome="11 · Configuração">
+  <div class="status"><span>12:20</span><i>●●● ▮</i></div>
+  <div class="barra"><button data-go="menu" aria-label="Voltar">#voltar</button><h2>Configuração</h2></div>
+  <div class="conteudo">
+    <div class="perfil"><span class="avatar">CS</span><span><b>Carla Souza</b><small>Empregadora · 2 funcionários</small></span></div>
+    <p class="rotulo">Notificações</p>
+    <button class="opcao" data-chave="pedidos"><span>Pedidos de ajuste de ponto<small>Quando alguém pede para corrigir uma marcação</small></span><i class="chave js-chave" data-k="pedidos"></i></button>
+    <button class="opcao" data-chave="docs"><span>Documentos prontos<small>Recibos e folhas de ponto emitidos</small></span><i class="chave js-chave" data-k="docs"></i></button>
+    <button class="opcao" data-chave="dae"><span>Vencimento da guia DAE<small>Três dias antes do vencimento</small></span><i class="chave js-chave" data-k="dae"></i></button>
+    <p class="rotulo">Conta</p>
+    <button class="opcao" data-act="reiniciar"><span>Reiniciar demonstração<small>Volta os pedidos e documentos ao início</small></span>#seta</button>
+    <button class="opcao" data-go="login" style="color:var(--vermelho)"><span>Sair</span>#sair</button>
+  </div>
+  <nav class="nav js-nav" data-on="menu"></nav>
+</section>
+
+</template>
+
+<script>
+const svg = (d, w=1.8) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+const IC = {
+  relogio: svg('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',2),
+  cal: svg('<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M8 3v4M16 3v4"/>',2),
+  sino: svg('<path d="M6 16v-5a6 6 0 0112 0v5l2 2H4zM10 21a2 2 0 004 0"/>'),
+  aprov: svg('<circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5"/>'),
+  casa: svg('<path d="M3 11l9-7 9 7M5 10v10h14V10M10 20v-6h4v6"/>'),
+  menu: svg('<path d="M4 7h16M4 12h16M4 17h16"/>'),
+  seta: svg('<path d="M9 5l7 7-7 7"/>',2.4),
+  voltar: svg('<path d="M15 5l-7 7 7 7"/>',2.2),
+  doc: svg('<path d="M7 3h7l5 5v13H7zM14 3v5h5"/>'),
+  sair: svg('<path d="M14 4h5v16h-5M10 8l-4 4 4 4M6 12h10"/>'),
+  engrenagem: svg('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/>',1.6),
+  ok: svg('<path d="M5 12l5 5 9-10"/>',3),
+  okc: svg('<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>',2),
+  xc: svg('<circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/>',2),
+  info: svg('<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',2),
+  guia: svg('<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/>'),
+  baixar: svg('<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',2),
+  zap: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm5.3 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.8s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.7-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.3z"/></svg>',
+};
+
+/* ---------- dados fictícios ---------- */
+const FUNCS = {
+  rosa:{nome:'Rosa Almeida', curto:'Rosa', ini:'RA', cargo:'Empregada doméstica', salario:1800, hoje:['08:00','12:00',null,null],
+        entra:'08:00', sai:'17:00', var:{jan:{9:{e:'08:15'}, 14:{s:'18:30'}, 23:{s:'18:00'}}, dez:{6:{s:'19:00'}, 12:{s:'18:00'}, 20:{s:'18:00'}}}},
+  jose:{nome:'José Ferreira', curto:'José', ini:'JF', cargo:'Caseiro', salario:1650, hoje:['07:30',null,null,null],
+        entra:'07:30', sai:'16:30', var:{jan:{7:{falta:true}, 21:{s:'17:30'}, 29:{e:'07:55'}}, dez:{16:{e:'07:50'}}}},
+};
+const MARC = ['Entrada','Intervalo','Retorno','Saída'];
+const DIAS = ['dom','seg','ter','qua','qui','sex','sáb'];
+const MESES = {
+  jan:{nome:'Janeiro de 2025', ano:2025, m:0, feriados:[1], hoje:31},
+  dez:{nome:'Dezembro de 2024', ano:2024, m:11, feriados:[25]},
+};
+const min = h => { const [a,b] = h.split(':').map(Number); return a*60+b; };
+const hhmm = m => `${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;
+const horasDec = m => (m/60).toFixed(2);
+const reais = v => 'R$ ' + v.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+function inss(b){ const f = [[1518,.075],[2793.88,.09],[4190.83,.12]]; let ant=0, t=0;
+  for (const [teto,a] of f){ if (b>ant) t += (Math.min(b,teto)-ant)*a; ant = teto; } return Math.round(t*100)/100; }
+
+function estadoInicial(){
+  return {
+    func:'rosa', mes:'jan', doc:{tipo:'recibo', func:'rosa', mes:'jan'}, recusando:null,
+    chaves:{pedidos:true, docs:true, dae:true},
+    emitidos:{}, enviados:{},
+    pedidos:[
+      {id:1, func:'rosa', dia:30, rot:'30/01 (qui)', marc:'Saída', campo:'s', de:'17:00', para:'18:00', motivo:'Fiquei mais uma hora para ajudar no jantar.', quando:'hoje, 09:12', status:'ag'},
+      {id:2, func:'jose', dia:29, rot:'29/01 (qua)', marc:'Entrada', campo:'e', de:'07:55', para:'07:30', motivo:'Cheguei no horário, mas o celular estava sem bateria.', quando:'ontem, 18:40', status:'ag'},
+    ],
+    notifs:[
+      {t:'Pedido de ajuste de ponto', d:'Rosa pediu para corrigir a saída de 30/01 para 18:00.', q:'hoje, 09:12', lida:false, go:'aprovacoes', ic:'relogio'},
+      {t:'Pedido de ajuste de ponto', d:'José pediu para corrigir a entrada de 29/01 para 07:30.', q:'ontem, 18:40', lida:false, go:'aprovacoes', ic:'relogio'},
+      {t:'Guia DAE de janeiro', d:'Vence em 07/02. O valor já está calculado em Recibos e documentos.', q:'ontem, 08:00', lida:true, go:'documentos', ic:'guia'},
+      {t:'Recibos de dezembro emitidos', d:'Os recibos de Rosa e José foram enviados para o app de cada um.', q:'06/01', lida:true, go:'documentos', ic:'doc'},
+    ],
+  };
+}
+let estado = estadoInicial();
+
+function espelho(fk, mk){
+  const F = FUNCS[fk], M = MESES[mk], V = Object.assign({}, F.var[mk]||{}), L = [];
+  // ajustes aprovados entram no espelho
+  estado.pedidos.filter(p=>p.func===fk && p.status==='ok' && mk==='jan').forEach(p=>{ V[p.dia] = {...(V[p.dia]||{}), [p.campo]:p.para}; });
+  const fim = new Date(M.ano, M.m+1, 0).getDate();
+  for (let d=1; d<=fim; d++){
+    const ds = new Date(M.ano, M.m, d).getDay();
+    if (ds===0 || ds===6 || M.feriados.includes(d)) continue;
+    if (M.hoje && d>M.hoje) break;
+    const rot = `${String(d).padStart(2,'0')}/${String(M.m+1).padStart(2,'0')}`, base = {d, ds, rot};
+    if (M.hoje===d){
+      const [e,i,r,s] = F.hoje; let tot = 0;
+      if (e&&i) tot += min(i)-min(e); if (r&&s) tot += min(s)-min(r);
+      L.push({...base, hoje:true, e, s, tot, atraso:0, extra:0}); continue;
+    }
+    const v = V[d]||{};
+    if (v.falta){ L.push({...base, falta:true, tot:0, atraso:0, extra:0}); continue; }
+    const e = v.e||F.entra, s = v.s||F.sai, tot = min(s)-min(e)-60;
+    L.push({...base, e, s, tot, atraso:Math.max(0,min(e)-min(F.entra)), extra:Math.max(0,tot-480)});
+  }
+  return L;
+}
+function resumoMes(fk, mk){
+  const L = espelho(fk, mk); let trab=0, extra=0, atraso=0, faltas=0;
+  L.forEach(l=>{ trab += Math.min(l.tot,480); extra += l.extra; atraso += l.atraso; if (l.falta) faltas++; });
+  return {meta:L.length*480, trab, extra, atraso, faltas, L};
+}
+function folhaValores(fk, mk){
+  const F = FUNCS[fk], R = resumoMes(fk, mk), sal = F.salario;
+  const extra = Math.round(sal/220*1.5*(R.extra/60)*100)/100;
+  const falta = Math.round(R.faltas*sal/30*100)/100, atr = Math.round(sal/220*(R.atraso/60)*100)/100;
+  const bruto = sal + extra - falta - atr, desc = inss(bruto);
+  return {R, sal, extra, falta, atr, bruto, inss:desc, liq:bruto-desc};
+}
+
+/* ---------- modos ---------- */
+const params = new URLSearchParams(location.search);
+const modoTelas = params.has('telas');
+document.body.classList.toggle('modo-telas', modoTelas);
+document.body.classList.toggle('modo-embed', params.has('embed'));
+document.getElementById('link-modo').innerHTML = modoTelas
+  ? '· <a href="?">abrir o protótipo clicável</a>'
+  : '· <a href="?telas">ver todas as telas lado a lado</a>';
+const molde = document.getElementById('telas').content;
+
+function preparar(raiz){
+  raiz.innerHTML = raiz.innerHTML.replace(/#([a-z]+)\b/g, (m,k)=> IC[k] || m);
+  raiz.querySelectorAll('.js-nav').forEach(n=>{
+    const on = n.dataset.on;
+    const b = (id, ic, rot, badge='') => `<button class="${on===id?'on':''}" data-go="${id}" aria-label="${rot}">${IC[ic]}${rot}${badge?`<span class="badge ${badge}"></span>`:''}</button>`;
+    n.innerHTML = b('inicio','relogio','Ponto') + b('notificacoes','sino','Notificações','js-badge-notif')
+      + b('aprovacoes','aprov','Aprovações','js-badge-aprov') + b('menu','menu','Menu');
+  });
+  render(raiz);
+}
+
+const fichas = () => Object.entries(FUNCS).map(([k,F])=>`<button class="ficha ${k===estado.func?'on':''}" data-func="${k}"><span class="avatar">${F.ini}</span>${F.curto}</button>`).join('');
+
+function htmlFuncs(){
+  return Object.entries(FUNCS).map(([k,F])=>{
+    const n = F.hoje.filter(Boolean).length, ult = F.hoje[n-1];
+    const situ = n===1||n===3 ? `<span class="situ trab"><i></i>Trabalhando desde ${ult}</span>` : n===2 ? `<span class="situ pausa"><i></i>Em intervalo desde ${ult}</span>` : n===4 ? `<span class="situ trab"><i></i>Jornada concluída</span>` : '<span class="situ pausa"><i></i>Ainda não chegou</span>';
+    return `<button class="func" data-func="${k}" data-go="resumo"><header><span class="avatar">${F.ini}</span><span class="txt"><b>${F.nome}</b><small>${F.cargo}</small></span>${IC.seta}</header>
+      ${situ}<div class="mini-marcas">${MARC.map((m,i)=>`<span class="${F.hoje[i]?'feita':''}">${m}<b>${F.hoje[i]||'--:--'}</b></span>`).join('')}</div></button>`;
+  }).join('');
+}
+
+function htmlPedido(p){
+  const F = FUNCS[p.func];
+  const fim = p.status==='ok' ? `<div class="resolvido ok">${IC.okc} Ajuste aprovado. As horas foram atualizadas.</div>`
+    : p.status==='rec' ? `<div class="resolvido rec">${IC.xc} Recusado${p.resp?`: ${p.resp}`:''}</div>`
+    : `<div class="duas"><button class="btn btn-contorno" data-recusar="${p.id}">Recusar</button><button class="btn btn-laranja" data-aprovar="${p.id}">Aprovar</button></div>`;
+  return `<div class="pedido"><header><span class="avatar">${F.ini}</span><span><b>Ajuste de ponto · ${F.curto}</b><small>${p.marc} de ${p.rot} · ${p.quando}</small></span></header>
+    <div class="compara"><span>Registrado<b style="display:block">${p.marc} ${p.de}</b></span><span>Pedido<b style="display:block">${p.marc} ${p.para}</b></span></div>
+    <p class="motivo">“${p.motivo}”</p>${fim}</div>`;
+}
+
+function docLinha(fk, tipo, rotulo, mk){
+  const chave = `${tipo}:${fk}:${mk}`;
+  if (tipo==='recibo' && mk==='jan'){
+    const st = estado.emitidos[chave];
+    if (st==='gerando') return `<div class="doc-emp">${IC.doc}<span class="txt">${rotulo}<small>Calculando com as horas do mês…</small></span><span class="pilula gerando">Gerando…</span></div>`;
+    if (!st) return `<div class="doc-emp">${IC.doc}<span class="txt">${rotulo}<small>Salário, horas extras e descontos de janeiro</small></span><button class="pilula emitir" data-emitir="${chave}">Emitir</button></div>`;
+    return `<button class="doc-emp" data-doc="${chave}">${IC.doc}<span class="txt">${rotulo}<small>${estado.enviados[chave]?'Enviado para o app do funcionário':'Pronto para baixar e enviar'}</small></span><span class="pilula emitido">Emitido</span></button>`;
+  }
+  if (tipo==='dae') return `<button class="doc-emp" data-doc="${chave}">${IC.guia}<span class="txt">${rotulo}<small>eSocial Doméstico · ${mk==='jan'?'todos os funcionários':'paga em 07/01'}</small></span>${mk==='jan'?'<span class="pilula prazo">Vence 07/02</span>':IC.seta}</button>`;
+  return `<button class="doc-emp" data-doc="${chave}">${IC.doc}<span class="txt">${rotulo}<small>${mk==='jan'?'Atualizada até hoje':'Fechada'}</small></span>${IC.seta}</button>`;
+}
+
+function htmlDoc(){
+  const {tipo, func, mes} = estado.doc, F = FUNCS[func], M = MESES[mes];
+  const cab = (t, sub, quem=true) => `<div class="papel-cab"><span class="logo"><img src="img/logo.png" alt="hora do lar"></span><div><b>${t}</b><br>${sub}</div></div>
+    <h4>Empregador</h4><p>Carla Souza (fictícia)</p>${quem?`<h4>Funcionário</h4><p>${F.nome} · ${F.cargo}</p>`:''}`;
+  const linha = ([k,v]) => `<tr><td>${k}</td><td class="${v<0?'neg':''}">${v<0?'− ':''}${reais(Math.abs(v))}</td></tr>`;
+  if (tipo==='folha'){
+    const R = resumoMes(func, mes);
+    return `<div class="papel">${cab('Folha de ponto', M.nome)}<h4>Marcações</h4><table>
+      ${R.L.map(l=>`<tr><td>${l.rot} ${l.hoje?'hoje':DIAS[l.ds]}</td><td>${l.falta?'Falta':`${l.e||'--:--'} – ${l.s||'--:--'}`}</td><td>${hhmm(l.tot)}</td></tr>`).join('')}
+      <tr class="tot"><td colspan="2">Horas trabalhadas</td><td>${hhmm(R.trab)}</td></tr></table>
+      <p class="nota">Horas extras: ${hhmm(R.extra)} · Atrasos: ${hhmm(R.atraso)} · Faltas: ${R.faltas}</p></div>`;
+  }
+  if (tipo==='dae'){
+    let tot = 0; const itens = Object.keys(FUNCS).map(k=>{ const v = folhaValores(k, mes); const enc = Math.round(v.bruto*0.2*100)/100 + v.inss; tot += enc; return [FUNCS[k].nome, enc]; });
+    return `<div class="papel">${cab('Guia DAE', `Competência ${mes==='jan'?'01/2025':'12/2024'}`, false)}<h4>Encargos por funcionário</h4><table>${itens.map(linha).join('')}
+      <tr class="tot"><td>Total da guia</td><td>${reais(tot)}</td></tr></table>
+      <p class="nota">INSS, FGTS, seguro contra acidentes e indenização compensatória, gerados pelo eSocial Doméstico. Vencimento: ${mes==='jan'?'07/02/2025':'07/01/2025'}. Valores fictícios.</p></div>`;
+  }
+  const v = folhaValores(func, mes);
+  const itens = [['Salário', v.sal]];
+  if (v.extra) itens.push([`Horas extras 50% (${hhmm(v.R.extra)})`, v.extra]);
+  if (v.falta) itens.push([`Faltas (${v.R.faltas} dia)`, -v.falta]);
+  if (v.atr) itens.push([`Atrasos (${hhmm(v.R.atraso)})`, -v.atr]);
+  itens.push(['INSS', -v.inss]);
+  return `<div class="papel">${cab('Recibo de pagamento', M.nome)}<h4>Valores</h4><table>${itens.map(linha).join('')}
+    <tr class="tot"><td>Líquido a pagar</td><td>${reais(v.liq)}</td></tr></table>
+    <p class="nota">Calculado com o espelho de ponto do mês${mes==='jan'?' (até 31/01)':''}. Documento ilustrativo · valores fictícios.</p></div>`;
+}
+
+function render(raiz){
+  const naoLidas = estado.notifs.filter(n=>!n.lida).length, pend = estado.pedidos.filter(p=>p.status==='ag').length;
+  raiz.querySelectorAll('.js-badge-notif').forEach(b=>{b.textContent=naoLidas; b.style.display=naoLidas?'grid':'none';});
+  raiz.querySelectorAll('.js-badge-aprov').forEach(b=>{b.textContent=pend; b.style.display=pend?'grid':'none';});
+  raiz.querySelectorAll('.js-alerta').forEach(c=>c.innerHTML = pend ? `<button class="alerta" data-go="aprovacoes"><span class="ic">${IC.relogio}</span><span><b>${pend} ${pend===1?'pedido aguarda':'pedidos aguardam'} você</b><small>Ajustes de ponto para aprovar</small></span>${IC.seta}</button>`
+    : `<div class="alerta" style="background:var(--verde-claro);border-color:#bfe8cf"><span class="ic" style="background:var(--verde)">${IC.ok}</span><span><b>Tudo em dia</b><small style="color:#0c6b35">Nenhum pedido aguardando você</small></span></div>`);
+  raiz.querySelectorAll('.js-funcs').forEach(c=>c.innerHTML=htmlFuncs());
+  raiz.querySelectorAll('.js-fichas').forEach(c=>c.innerHTML=fichas());
+  const F = FUNCS[estado.func], M = MESES[estado.mes], R = resumoMes(estado.func, estado.mes);
+  raiz.querySelectorAll('.js-mes-nome').forEach(b=>b.textContent = `${F.curto} · ${M.nome}${M.hoje?' · até hoje':''}`);
+  raiz.querySelectorAll('.js-horas').forEach(c=>{
+    const pct = Math.min(100, R.trab/R.meta*100);
+    c.innerHTML = `<div class="cartao-horas" style="margin-top:14px"><svg class="anel" viewBox="0 0 36 36"><circle class="fundo" cx="18" cy="18" r="15"/><circle class="valor" cx="18" cy="18" r="15" stroke-dasharray="${(pct*94.25/100).toFixed(1)} 94.25"/></svg>
+      <div><b>Horas trabalhadas</b><span>${horasDec(R.trab)}/${horasDec(R.meta)} horas</span></div></div>`;
+  });
+  raiz.querySelectorAll('.js-grade').forEach(c=>c.innerHTML = `<div><small>Horas extras</small><b style="color:var(--verde)">${hhmm(R.extra)}</b></div><div><small>Atrasos</small><b style="color:var(--vermelho)">${hhmm(R.atraso)}</b></div>
+    <div><small>Faltas</small><b>${R.faltas}</b></div><div><small>Dias trabalhados</small><b>${R.L.filter(l=>!l.falta && l.e).length}</b></div>`);
+  raiz.querySelectorAll('.js-totais').forEach(c=>c.innerHTML = `<div><small>Trabalhadas</small><b>${hhmm(R.trab)}</b></div><div><small>Extras</small><b style="color:var(--verde)">${hhmm(R.extra)}</b></div><div><small>Atrasos</small><b style="color:var(--vermelho)">${hhmm(R.atraso)}</b></div><div><small>Faltas</small><b>${R.faltas}</b></div>`);
+  raiz.querySelectorAll('.js-espelho').forEach(c=>c.innerHTML = `<table><tr><th>Dia</th><th>Entrada</th><th>Saída</th><th>Total</th><th>Saldo</th></tr>
+    ${R.L.slice().reverse().map(l=>{
+      if (l.falta) return `<tr class="falta"><td>${l.rot}<small>${DIAS[l.ds]}</small></td><td colspan="3">Falta</td><td class="menos">−08:00</td></tr>`;
+      const saldo = l.hoje ? '' : (l.extra ? `<span class="mais">+${hhmm(l.extra)}</span>` : l.atraso ? `<span class="menos">−${hhmm(l.atraso)}</span>` : '—');
+      return `<tr class="${l.hoje?'hoje':''}"><td>${l.rot}<small>${l.hoje?'hoje':DIAS[l.ds]}</small></td><td>${l.e||'--:--'}</td><td>${l.s||'--:--'}</td><td>${l.e?hhmm(l.tot):'—'}</td><td>${saldo}</td></tr>`;
+    }).join('')}</table>`);
+  raiz.querySelectorAll('.js-aprov-sub').forEach(b=>b.textContent = pend ? `${pend} ${pend===1?'pedido aguardando':'pedidos aguardando'} você` : 'Nenhum pedido pendente');
+  raiz.querySelectorAll('.js-aprov').forEach(c=>{
+    const ag = estado.pedidos.filter(p=>p.status==='ag'), feitos = estado.pedidos.filter(p=>p.status!=='ag');
+    c.innerHTML = (ag.length ? `<p class="rotulo">Aguardando você</p><div class="cartoes">${ag.map(htmlPedido).join('')}</div>`
+      : `<div class="vazio" style="padding-top:30px"><div class="ic-g">${IC.okc}</div><b>Tudo aprovado por aqui</b>Quando alguém pedir um ajuste de ponto, você recebe uma notificação.</div>`)
+      + (feitos.length ? `<p class="rotulo">Resolvidos agora</p><div class="cartoes">${feitos.map(htmlPedido).join('')}</div>` : '');
+  });
+  raiz.querySelectorAll('.js-notifs').forEach(c=>c.innerHTML = estado.notifs.map((n,i)=>`<button class="cartao ${n.lida?'':'nao-lida'}" data-notif="${i}">
+    <span class="ic">${IC[n.ic]}</span><span class="txt"><b>${n.t}</b><p>${n.d}</p><small>${n.q}</small></span>${n.lida?'':'<span class="ponto-novo"></span>'}</button>`).join(''));
+  raiz.querySelectorAll('.js-docs').forEach(c=>c.innerHTML = docLinha(estado.func,'recibo','Recibo de pagamento','jan') + docLinha(estado.func,'folha','Folha de ponto','jan') + docLinha(estado.func,'dae','Guia DAE','jan'));
+  raiz.querySelectorAll('.js-docs-ant').forEach(c=>c.innerHTML = docLinha(estado.func,'recibo-ant','Recibo de pagamento','dez').replace('recibo-ant','recibo') + docLinha(estado.func,'folha','Folha de ponto','dez') + docLinha(estado.func,'dae','Guia DAE','dez'));
+  const titulos = {recibo:'Recibo de pagamento', folha:'Folha de ponto', dae:'Guia DAE'};
+  raiz.querySelectorAll('.js-doc-titulo').forEach(b=>b.textContent=titulos[estado.doc.tipo]);
+  raiz.querySelectorAll('.js-doc').forEach(c=>c.innerHTML=htmlDoc());
+  raiz.querySelectorAll('.js-enviar').forEach(b=>{
+    const d = estado.doc, ch = `${d.tipo}:${d.func}:${d.mes}`;
+    b.textContent = d.tipo==='dae' ? 'Pagar depois' : estado.enviados[ch] ? 'Enviado ✓' : `Enviar para ${FUNCS[d.func].curto}`;
+  });
+  raiz.querySelectorAll('.js-chave').forEach(k=>k.classList.toggle('on', !!estado.chaves[k.dataset.k]));
+}
+
+if (modoTelas) {
+  const quadro = document.getElementById('quadro');
+  [...molde.querySelectorAll('.tela')].forEach(t=>{
+    const fig = document.createElement('figure');
+    fig.innerHTML = `<figcaption>${t.dataset.nome}</figcaption><div class="moldura"></div>`;
+    const c = t.cloneNode(true); c.classList.add('ativa');
+    fig.querySelector('.moldura').appendChild(c);
+    quadro.appendChild(fig);
+  });
+  preparar(quadro);
+} else {
+  const visor = document.getElementById('visor');
+  visor.appendChild(molde.cloneNode(true));
+  visor.insertAdjacentHTML('beforeend', `<div class="veu" id="veu"><div class="folha" id="folha"></div></div><div class="toast" id="toast"></div>
+    <button class="push" id="push" data-go="documentos"><header><img src="img/icone.webp" alt=""><span>Hora do Lar</span>agora</header><b class="js-push-t"></b><p class="js-push-d"></p></button>`);
+  preparar(visor);
+  const veu = document.getElementById('veu'), folha = document.getElementById('folha'), toast = document.getElementById('toast'), push = document.getElementById('push');
+  let tToast, tPush;
+  const avisar = (txt, ic='okc') => { toast.innerHTML = IC[ic] + `<span>${txt}</span>`; toast.classList.add('mostra'); clearTimeout(tToast); tToast = setTimeout(()=>toast.classList.remove('mostra'), 2600); };
+  const notificar = (t, d) => { push.querySelector('.js-push-t').textContent = t; push.querySelector('.js-push-d').textContent = d; push.classList.add('mostra'); clearTimeout(tPush); tPush = setTimeout(()=>push.classList.remove('mostra'), 4200); };
+  const abrir = html => { folha.innerHTML = '<div class="pegador"></div>' + html; veu.classList.add('aberto'); };
+  const fechar = () => veu.classList.remove('aberto');
+  const ir = id => {
+    fechar(); push.classList.remove('mostra');
+    visor.querySelectorAll('.tela').forEach(t=>t.classList.toggle('ativa', t.dataset.id===id));
+    const c = visor.querySelector('.tela.ativa .conteudo'); if (c) c.scrollTop = 0;
+    render(visor);
+  };
+  ir('splash');
+  setTimeout(()=>{ if (visor.querySelector('.tela.ativa').dataset.id==='splash') ir('login'); }, 2200);
+
+  veu.addEventListener('click', e=>{ if (e.target===veu) fechar(); });
+  visor.addEventListener('click', e=>{
+    const el = e.target.closest('button'); if (!el) return;
+    const d = el.dataset, act = d.act;
+    if (d.func){ estado.func = d.func; if (!d.go){ render(visor); return; } }
+    if (d.aprovar){
+      const p = estado.pedidos.find(x=>x.id===+d.aprovar); p.status = 'ok';
+      render(visor); avisar(`Ajuste de ${FUNCS[p.func].curto} aprovado. O espelho foi atualizado.`); return;
+    }
+    if (d.recusar){
+      estado.recusando = +d.recusar; const p = estado.pedidos.find(x=>x.id===estado.recusando);
+      abrir(`<h3>Recusar o ajuste de ${FUNCS[p.func].curto}?</h3><p>${p.marc} de ${p.rot}: fica valendo ${p.de}. Escolha o motivo; ${FUNCS[p.func].curto} recebe a resposta no app.</p>
+        <div class="opcoes js-motivos" style="margin-top:14px"><button class="op on">O horário registrado está correto</button><button class="op">Vamos conversar antes</button><button class="op">Outro motivo</button></div>
+        <div class="duas" style="margin-top:20px"><button class="btn btn-contorno" data-act="fechar">Voltar</button><button class="btn btn-laranja" style="background:var(--vermelho)" data-act="confirmar-recusa">Recusar</button></div>`);
+      return;
+    }
+    if (act==='confirmar-recusa'){
+      const p = estado.pedidos.find(x=>x.id===estado.recusando); p.status = 'rec';
+      p.resp = folha.querySelector('.js-motivos .on').textContent;
+      fechar(); render(visor); avisar(`Resposta enviada para ${FUNCS[p.func].curto}.`); return;
+    }
+    if (act==='fechar'){ fechar(); return; }
+    if (act==='mes'){
+      abrir(`<h3>Buscar mês</h3><p>Horas de ${FUNCS[estado.func].curto} em meses anteriores.</p><div class="meses">
+        ${Object.entries(MESES).map(([k,M])=>`<button class="mes ${k===estado.mes?'on':''}" data-mes="${k}">${M.nome}${k===estado.mes?IC.ok.replace('<svg','<svg width="18" height="18"'):''}</button>`).join('')}</div>`);
+      return;
+    }
+    if (d.mes){ estado.mes = d.mes; fechar(); render(visor); return; }
+    if (d.notif !== undefined){ const n = estado.notifs[+d.notif]; n.lida = true; ir(n.go); return; }
+    if (d.emitir){
+      const ch = d.emitir; estado.emitidos[ch] = 'gerando'; render(visor);
+      setTimeout(()=>{
+        estado.emitidos[ch] = 'ok';
+        const nome = FUNCS[ch.split(':')[1]].curto;
+        estado.notifs.unshift({t:'Recibo de janeiro pronto', d:`O recibo de ${nome} está pronto para baixar e enviar.`, q:'agora', lida:false, go:'documentos', ic:'doc'});
+        render(visor); notificar('Recibo de janeiro pronto', `O recibo de ${nome} está pronto para baixar e enviar.`);
+      }, 1300);
+      return;
+    }
+    if (d.doc){ const [tipo, func, mes] = d.doc.split(':'); estado.doc = {tipo, func, mes}; ir('doc'); return; }
+    if (act==='baixar'){ avisar('PDF salvo nos downloads (simulação).'); return; }
+    if (act==='enviar-doc'){
+      const dd = estado.doc, ch = `${dd.tipo}:${dd.func}:${dd.mes}`;
+      if (dd.tipo==='dae'){ avisar('Lembrete criado para 07/02.', 'info'); return; }
+      estado.enviados[ch] = true; render(visor); avisar(`Enviado para o app de ${FUNCS[dd.func].curto}.`); return;
+    }
+    if (act==='esqueci'){ avisar('Enviamos um link de nova senha para o seu e-mail (simulação).'); return; }
+    if (act==='suporte'){ avisar('Aqui abriria a conversa com o suporte no WhatsApp.'); return; }
+    if (el.classList.contains('op')){ el.parentElement.querySelectorAll('.op').forEach(o=>o.classList.remove('on')); el.classList.add('on'); return; }
+    if (d.chave){ estado.chaves[d.chave] = !estado.chaves[d.chave]; render(visor); return; }
+    if (act==='reiniciar'){ estado = estadoInicial(); ir('inicio'); avisar('Demonstração reiniciada.'); return; }
+    if (d.go) ir(d.go);
+  });
+}
+</script>
+</body>
+</html>

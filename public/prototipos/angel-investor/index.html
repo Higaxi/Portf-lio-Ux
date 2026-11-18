@@ -1,0 +1,839 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Angel Investor Club · App da comunidade (protótipo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* Layout e branding das telas do case (portfólio): roxo #703EFE, azul-noite #0A0057,
+     logo Angel Investor Club, fotos em formas roxas, fundo branco com ícones de aparelhos em cinza claro. */
+  :root{
+    --roxo:#703efe; --roxo-esc:#5a2be0; --roxo-claro:#efe9ff; --noite:#0a0057;
+    --preto:#111; --texto:#3d3d3d; --suave:#8e8e93; --linha:#ececf0;
+    --fundo:#f7f7f9; --branco:#fff; --online:#34c759; --off:#b8b8bd; --erro:#e5484d;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Inter",system-ui,sans-serif;background:#16121f;color:var(--preto);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:28px 16px}
+  button{font:inherit;border:0;background:none;cursor:pointer;color:inherit;text-align:inherit}
+  input,textarea{font:inherit}
+  h1,h2,h3,.pop{font-family:"Poppins",system-ui,sans-serif}
+
+  .topo{color:#ddd;text-align:center;margin-bottom:18px;max-width:560px}
+  .topo .faixa{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;background:#2a2140;color:#c9b8ff;border-radius:999px;padding:5px 12px;margin-bottom:10px}
+  .topo h1{font-size:18px;font-weight:600}
+  .topo p{font-size:13px;color:#999;margin-top:4px}
+  .topo a{color:#b39bff;font-weight:600}
+  .celular{width:390px;height:844px;border-radius:50px;background:#0b0b0b;padding:11px;box-shadow:0 30px 80px -20px rgba(0,0,0,.8),inset 0 0 0 2px #2a2a2a;flex:none}
+  .visor{width:100%;height:100%;border-radius:40px;overflow:clip;position:relative;background:var(--branco)}
+
+  /* ---------- tela ---------- */
+  .tela{position:absolute;inset:0;display:flex;flex-direction:column;overflow:clip;background:var(--fundo);opacity:0;pointer-events:none;transform:translateX(20px);transition:opacity .3s ease,transform .3s ease}
+  .tela.ativa{opacity:1;pointer-events:auto;transform:none}
+  .padrao{background-color:#fff;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' fill='none' stroke='%23000' stroke-opacity='.045' stroke-width='2'%3E%3Crect x='14' y='18' width='46' height='66' rx='6' transform='rotate(-12 37 51)'/%3E%3Crect x='96' y='30' width='62' height='42' rx='4' transform='rotate(18 127 51)'/%3E%3Cpath d='M92 76h70' transform='rotate(18 127 51)'/%3E%3Crect x='30' y='112' width='70' height='48' rx='4' transform='rotate(8 65 136)'/%3E%3Crect x='124' y='108' width='36' height='56' rx='5' transform='rotate(-20 142 136)'/%3E%3C/svg%3E")}
+  .status{height:44px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 26px 0 30px;font-size:14px;font-weight:600;color:var(--preto);position:relative;z-index:3}
+  .status svg{height:12px;width:auto;display:block}
+  .status .ics{display:flex;gap:5px;align-items:center}
+  .conteudo{flex:1;min-height:0;overflow-y:auto;padding:0 16px 18px}
+  .conteudo::-webkit-scrollbar{width:0}
+
+  .logo{display:block;width:84px;margin:6px auto 0}
+  .logo img{width:100%;display:block}
+  .produzido{display:flex;align-items:center;justify-content:center;gap:8px;font-size:15px;font-weight:500;color:var(--preto);padding:14px 0 22px;flex:none}
+  .produzido img{height:22px}
+
+  .btn{height:56px;border-radius:999px;font-weight:500;font-size:16px;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:var(--roxo);color:#fff;transition:transform .12s ease,opacity .2s}
+  .btn:active{transform:scale(.97)}
+  .btn[disabled]{opacity:.45;cursor:default}
+  .btn-linha{background:#fff;color:var(--roxo);border:1.5px solid var(--roxo)}
+
+  /* 01 abertura */
+  .abertura .grade4{display:grid;grid-template-columns:1fr 1fr;gap:8px 6px;padding:10px 22px 0;width:100%}
+  .abertura .grade4 img{width:100%;display:block}
+  .abertura h2{font-size:18px;font-weight:600;text-align:center;line-height:1.3;padding:20px 34px 0}
+  .abertura p.sub{font-size:13px;color:var(--texto);text-align:center;line-height:1.35;padding:8px 40px 0}
+  .abertura .acao{padding:0 22px;margin-top:auto}
+
+  /* 02/03 cadastro e código */
+  .heroi{flex:1;min-height:0;display:flex;align-items:flex-end;justify-content:center;padding:6px 26px 0}
+  .heroi img{width:100%;max-width:300px;display:block}
+  .form{padding:18px 22px 0;flex:none}
+  .fone{display:flex;height:56px;border:1px solid #d9d9de;border-radius:6px;background:#fff;overflow:hidden}
+  .fone:focus-within{border-color:var(--roxo);box-shadow:0 0 0 3px var(--roxo-claro)}
+  .fone .bandeira{width:58px;background:#f1f1f3;display:grid;place-items:center;border-right:1px solid #d9d9de;flex:none}
+  .fone .bandeira svg{width:30px;height:21px}
+  .fone .ddi{display:flex;align-items:center;padding-left:14px;color:var(--suave);font-size:16px}
+  .fone input{flex:1;border:0;outline:none;font-size:16px;padding:0 10px 0 6px;color:var(--preto);min-width:0}
+  .fone input::placeholder{color:#b5b5ba;letter-spacing:.5px}
+  .dica{font-size:12px;color:var(--suave);margin-top:8px;min-height:16px}
+  .dica.erro{color:var(--erro);font-weight:600}
+  .form .btn{margin-top:10px}
+  .codigo-topo{padding:10px 26px 0;text-align:center}
+  .codigo-topo h2{font-size:22px;font-weight:600;margin-top:26px}
+  .codigo-topo p{font-size:14px;color:var(--texto);margin-top:8px;line-height:1.45}
+  .codigo-topo b{color:var(--preto)}
+  .caixas{position:relative;display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:28px 0 0}
+  .caixas span{height:56px;border-radius:10px;border:1.5px solid #d9d9de;background:#fff;display:grid;place-items:center;font-family:"Poppins";font-size:22px;font-weight:600}
+  .caixas span.foco{border-color:var(--roxo);box-shadow:0 0 0 3px var(--roxo-claro)}
+  .caixas span.cheia{border-color:var(--roxo)}
+  .caixas input{position:absolute;inset:0;opacity:0;width:100%;font-size:16px}
+  .reenviar{font-size:13px;color:var(--suave);text-align:center;margin-top:16px}
+  .reenviar button{color:var(--roxo);font-weight:600}
+  .selo-sms{width:92px;height:92px;border-radius:50% 50% 50% 0;background:var(--roxo);display:grid;place-items:center;margin:26px auto 0;color:#fff}
+  .selo-sms svg{width:40px;height:40px}
+  .voltar-topo{position:absolute;left:14px;top:50px;width:40px;height:40px;display:grid;place-items:center;z-index:4}
+  .voltar-topo svg{width:24px;height:24px}
+
+  /* avatares */
+  .av{border-radius:50%;flex:none;background:#ddd center 8%/190% no-repeat;display:grid;place-items:center;color:#fff;font-weight:600;font-family:"Poppins";position:relative}
+  .av.logo-av{background:#fff url(img/logo.png) center/78% no-repeat;border:1px solid var(--linha)}
+  .av .pt{position:absolute;right:0;bottom:1px;width:12px;height:12px;border-radius:50%;border:2px solid #fff;background:var(--off)}
+  .av .pt.on{background:var(--online)}
+
+  /* 04 feed */
+  .stories{display:flex;gap:12px;overflow-x:auto;padding:4px 16px 12px;background:#fff;flex:none}
+  .stories::-webkit-scrollbar{height:0}
+  .story{flex:none;width:62px;text-align:center;font-size:10px;color:var(--texto);line-height:1.2}
+  .story .anel{width:60px;height:60px;border-radius:50%;padding:2px;border:2px solid var(--roxo);margin:0 auto 5px}
+  .story.visto .anel{border-color:#d4d4d8}
+  .story .av{width:100%;height:100%;font-size:18px}
+  .feed{padding-top:12px}
+  .post{background:#fff;border-radius:8px;padding:14px;margin-bottom:12px;box-shadow:0 1px 0 var(--linha)}
+  .post header{display:flex;align-items:center;gap:10px}
+  .post header .av{width:32px;height:32px;font-size:12px}
+  .post header b{font-family:"Poppins";font-size:15px;font-weight:600;flex:1}
+  .post header small{display:block;font-family:"Inter";font-size:11px;color:var(--suave);font-weight:400}
+  .post .ico{width:28px;height:28px;display:grid;place-items:center;color:#7a7a80}
+  .post .ico svg{width:19px;height:19px}
+  .post p{font-size:12.5px;line-height:1.5;color:var(--texto);margin-top:10px}
+  .post p .mais{color:var(--roxo);font-weight:600;text-decoration:underline;font-size:12px}
+  .post .foto{margin-top:10px;border-radius:4px;overflow:hidden;background:#eee}
+  .post .foto img{width:100%;display:block;aspect-ratio:1/1;object-fit:cover}
+  .post footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px;font-size:11.5px;color:var(--texto)}
+  .post footer button{display:flex;align-items:center;gap:6px;font-weight:500}
+  .post footer svg{width:20px;height:20px}
+  .curtir.on{color:var(--roxo)}
+  .curtir.on svg{fill:var(--roxo);stroke:var(--roxo)}
+  .curtir.pulsa svg{animation:pulsa .35s ease}
+  @keyframes pulsa{50%{transform:scale(1.3)}}
+  .post .menc{color:var(--roxo);text-decoration:underline}
+
+  /* navegação inferior (4 destinos + botão flutuante) */
+  .nav{flex:none;height:78px;background:#fff;display:grid;grid-template-columns:1fr 1fr 1.3fr 1fr 1fr;align-items:center;padding:0 12px 12px;position:relative;z-index:5;box-shadow:0 -1px 0 var(--linha)}
+  .nav button{height:48px;display:grid;place-items:center;color:#8a8a90}
+  .nav button svg{width:28px;height:28px}
+  .nav button.on{color:var(--roxo)}
+  .nav .fab{width:66px;height:66px;border-radius:50%;background:var(--roxo);color:#fff;margin:-58px auto 0;box-shadow:0 10px 20px -6px rgba(112,62,254,.55);transition:transform .12s}
+  .nav .fab:active{transform:scale(.94)}
+  .nav .fab svg{width:30px;height:30px}
+
+  /* 05 story aberto */
+  .tela-story{background:#000;color:#fff}
+  .tela-story .status{color:#fff}
+  .barras{display:flex;gap:4px;padding:4px 14px 0;flex:none}
+  .barras i{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.35);overflow:hidden}
+  .barras i b{display:block;height:100%;width:0;background:#fff}
+  .barras i.feita b{width:100%}
+  .barras i.agora b{animation:enche linear forwards}
+  @keyframes enche{to{width:100%}}
+  .story-cab{display:flex;align-items:center;gap:10px;padding:12px 14px;flex:none}
+  .story-cab .av{width:36px;height:36px;font-size:13px;border:2px solid #fff}
+  .story-cab b{font-size:14px;font-weight:600;flex:1}
+  .story-cab small{font-weight:400;opacity:.7;margin-left:6px}
+  .story-cab button{width:36px;height:36px;display:grid;place-items:center}
+  .story-cab svg{width:24px;height:24px}
+  .slide{flex:1;min-height:0;margin:0 8px;border-radius:16px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;text-align:center}
+  .slide.grad{background:linear-gradient(160deg,var(--roxo),var(--noite))}
+  .slide.foto{background:#fff}
+  .slide.foto img{width:88%;max-height:80%;object-fit:contain}
+  .slide.evento img{width:100%;height:100%;object-fit:cover}
+  .slide .txt{position:absolute;left:18px;right:18px;bottom:26px;font-family:"Poppins";font-size:19px;font-weight:600;line-height:1.3;text-shadow:0 2px 12px rgba(0,0,0,.35)}
+  .slide.grad .txt{position:static;font-size:24px;padding:0 26px}
+  .slide.foto .txt{color:var(--preto);text-shadow:none}
+  .toque{position:absolute;top:0;bottom:0;width:38%;z-index:2}
+  .toque.esq{left:0}.toque.dir{right:0;width:62%}
+  .responder{display:flex;gap:10px;align-items:center;padding:12px 14px 22px;flex:none}
+  .responder input{flex:1;height:44px;border-radius:999px;border:1.5px solid rgba(255,255,255,.6);background:transparent;color:#fff;padding:0 16px;outline:none;font-size:14px}
+  .responder input::placeholder{color:rgba(255,255,255,.75)}
+  .responder button{width:44px;height:44px;display:grid;place-items:center}
+  .responder svg{width:24px;height:24px}
+
+  /* 06 publicar */
+  .cab-simples{display:flex;align-items:center;gap:8px;padding:4px 12px 10px;background:#fff;flex:none;box-shadow:0 1px 0 var(--linha)}
+  .cab-simples h2{font-size:17px;font-weight:600;flex:1}
+  .cab-simples .ic{width:40px;height:40px;display:grid;place-items:center}
+  .cab-simples .ic svg{width:24px;height:24px}
+  .cab-simples .pub{height:36px;border-radius:999px;background:var(--roxo);color:#fff;font-weight:600;font-size:14px;padding:0 16px}
+  .cab-simples .pub[disabled]{opacity:.4;cursor:default}
+  .autor{display:flex;gap:10px;align-items:center;margin-top:16px}
+  .autor .av{width:42px;height:42px;background:var(--roxo);font-size:15px}
+  .autor b{font-family:"Poppins";font-weight:600;font-size:15px;display:block}
+  .autor small{font-size:12px;color:var(--suave)}
+  .area{width:100%;min-height:150px;border:0;outline:none;resize:none;background:transparent;font-size:16px;line-height:1.5;margin-top:14px;color:var(--preto)}
+  .rot{font-size:12px;font-weight:600;color:var(--suave);text-transform:uppercase;letter-spacing:.5px;margin-top:10px}
+  .anexos{display:flex;gap:10px;margin-top:10px}
+  .anexo{width:92px;height:92px;border-radius:10px;overflow:hidden;border:2px solid transparent;background:#eee;position:relative}
+  .anexo img{width:100%;height:100%;object-fit:cover;display:block}
+  .anexo.on{border-color:var(--roxo);box-shadow:0 0 0 3px var(--roxo-claro)}
+  .anexo.on::after{content:"✓";position:absolute;right:5px;top:5px;width:20px;height:20px;border-radius:50%;background:var(--roxo);color:#fff;font-size:12px;display:grid;place-items:center;font-weight:700}
+  .anexo.nada{display:grid;place-items:center;color:var(--suave);font-size:12px;background:#fff;border:1.5px dashed #ccc}
+  .anexo.nada.on{border-style:solid}
+
+  /* 07 explorar */
+  .busca-linha{display:flex;gap:12px;padding:6px 16px 12px;flex:none}
+  .busca{flex:1;height:52px;background:#fff;border-radius:6px;display:flex;align-items:center;gap:10px;padding:0 14px;box-shadow:0 1px 0 var(--linha)}
+  .busca svg{width:24px;height:24px;color:#7a7a80;flex:none}
+  .busca input{flex:1;border:0;outline:none;font-size:15px;background:transparent;min-width:0}
+  .busca input::placeholder{color:#a3a3a8}
+  .quadrado{width:52px;height:52px;background:#fff;border-radius:6px;display:grid;place-items:center;color:#7a7a80;box-shadow:0 1px 0 var(--linha);flex:none}
+  .quadrado svg{width:22px;height:22px}
+  .chips{display:flex;gap:8px;margin-bottom:12px}
+  .chip{font-size:13px;font-weight:600;border-radius:999px;padding:8px 14px;background:#fff;color:var(--texto);box-shadow:0 1px 0 var(--linha)}
+  .chip.on{background:var(--roxo);color:#fff}
+  .card{background:#fff;border-radius:8px;padding:14px;margin-bottom:10px;display:flex;gap:12px;align-items:center;box-shadow:0 1px 0 var(--linha)}
+  .card .sig{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;color:#fff;font-family:"Poppins";font-weight:700;font-size:16px;flex:none}
+  .card .info{flex:1;min-width:0}
+  .card .tag{white-space:nowrap}
+  .card b{font-family:"Poppins";font-size:14px;font-weight:600;display:block}
+  .card small{font-size:12px;color:var(--suave);display:block;margin-top:2px;line-height:1.35}
+  .card .tag{display:inline-block;font-size:10px;font-weight:700;background:var(--roxo-claro);color:var(--roxo-esc);border-radius:999px;padding:2px 8px;margin-top:5px}
+  .card .acao-p{margin-left:auto;flex:none;height:32px;border-radius:999px;border:1.5px solid var(--roxo);color:var(--roxo);font-size:12px;font-weight:600;padding:0 12px}
+  .card .acao-p.on{background:var(--roxo);color:#fff}
+  .card .av{width:48px;height:48px;font-size:16px}
+
+  /* 08 conversas */
+  .lista{position:relative}
+  .conv{display:flex;gap:12px;align-items:center;background:#fff;border-radius:6px;padding:12px 14px;margin-bottom:10px;width:100%;box-shadow:0 1px 0 var(--linha)}
+  .conv .av{width:50px;height:50px;font-size:16px}
+  .conv .meio{flex:1;min-width:0}
+  .conv b{font-family:"Inter";font-size:14.5px;font-weight:600;display:block}
+  .conv small{display:block;font-size:12.5px;color:var(--suave);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px}
+  .conv small.nl{color:var(--preto);font-weight:500}
+  .conv .lado{display:flex;flex-direction:column;align-items:flex-end;gap:7px;flex:none;align-self:flex-start;padding-top:2px}
+  .conv .hora{font-size:11px;color:var(--suave)}
+  .conv .cont{min-width:24px;height:24px;border-radius:12px;background:var(--roxo);color:#fff;font-size:12px;font-weight:600;display:grid;place-items:center;padding:0 7px}
+  .aba-lateral{position:absolute;left:0;top:118px;width:20px;height:118px;background:var(--roxo);border-radius:0 8px 8px 0;color:#fff;font-size:7.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;writing-mode:vertical-rl;transform:rotate(180deg);display:grid;place-items:center;z-index:4;border-radius:8px 0 0 8px}
+  .vazio{text-align:center;color:var(--suave);font-size:14px;padding:40px 10px}
+
+  /* 09 chat */
+  .chat-cab{display:flex;align-items:center;gap:10px;padding:6px 14px 12px;background:#fff;flex:none;box-shadow:0 1px 0 var(--linha)}
+  .chat-cab .ic{width:36px;height:36px;display:grid;place-items:center;flex:none}
+  .chat-cab .ic svg{width:24px;height:24px}
+  .chat-cab .av{width:42px;height:42px;font-size:15px}
+  .chat-cab .meio{flex:1;min-width:0}
+  .chat-cab b{font-family:"Poppins";font-size:15px;font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .chat-cab small{font-size:12px;color:var(--online);font-weight:500}
+  .chat-cab small.off{color:var(--suave)}
+  .msgs{display:flex;flex-direction:column;gap:14px;padding:18px 16px 18px 28px}
+  .msg{max-width:78%;padding:14px 16px;border-radius:18px;font-size:14px;line-height:1.45;word-wrap:break-word}
+  .msg.anim{animation:entra .25s ease}
+  @keyframes entra{from{opacity:0;transform:translateY(6px)}}
+  .msg.in{background:#fff;align-self:flex-start;border-radius:18px 18px 18px 4px;color:var(--preto)}
+  .msg.out{background:var(--roxo);color:#fff;align-self:flex-end;border-radius:18px 18px 4px 18px}
+  .msg time{display:block;font-size:10px;opacity:.6;margin-top:4px;text-align:right}
+  .msg.link{padding:10px}
+  .msg.link img{width:100%;display:block;border-radius:10px}
+  .msg.link p{padding:8px 4px 2px;font-size:13px}
+  .msg.link u{opacity:.9}
+  .msg.digitando{display:flex;gap:4px;padding:16px 18px}
+  .msg.digitando i{width:7px;height:7px;border-radius:50%;background:#b9b9bf;animation:pisca 1s infinite}
+  .msg.digitando i:nth-child(2){animation-delay:.15s}.msg.digitando i:nth-child(3){animation-delay:.3s}
+  @keyframes pisca{50%{opacity:.25}}
+  .dia{align-self:center;font-size:11px;color:var(--suave);background:#ececf1;border-radius:999px;padding:3px 10px}
+  .compor{display:flex;align-items:center;gap:6px;padding:10px 12px 22px 18px;background:#fff;flex:none;box-shadow:0 -1px 0 var(--linha)}
+  .compor input{flex:1;height:44px;border:0;outline:none;font-size:15px;background:transparent;min-width:0}
+  .compor input::placeholder{color:#a3a3a8}
+  .compor .ic{width:38px;height:38px;display:grid;place-items:center;color:#5d5d63;flex:none}
+  .compor .ic svg{width:23px;height:23px}
+  .compor .enviar{width:44px;height:44px;border-radius:50%;background:var(--roxo);color:#fff;display:none;place-items:center;flex:none}
+  .compor .enviar svg{width:20px;height:20px}
+  .compor.tem .enviar{display:grid}
+  .compor.tem .ic.som{display:none}
+
+  /* 10 ajustes / perfil */
+  .perfil{background:#fff;border-radius:8px;padding:18px;display:flex;gap:14px;align-items:center;margin-top:6px;box-shadow:0 1px 0 var(--linha)}
+  .perfil .av{width:64px;height:64px;background:var(--roxo);font-size:22px}
+  .perfil b{font-family:"Poppins";font-size:17px;font-weight:600;display:block}
+  .perfil small{font-size:13px;color:var(--suave);display:block;margin-top:2px}
+  .perfil .tag{display:inline-block;font-size:10px;font-weight:700;background:var(--roxo-claro);color:var(--roxo-esc);border-radius:999px;padding:3px 9px;margin-top:6px}
+  .numeros{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+  .numeros div{background:#fff;border-radius:8px;padding:12px 6px;text-align:center;box-shadow:0 1px 0 var(--linha)}
+  .numeros b{font-family:"Poppins";font-size:19px;color:var(--roxo);display:block}
+  .numeros small{font-size:11px;color:var(--suave)}
+  .opcoes{background:#fff;border-radius:8px;margin-top:12px;box-shadow:0 1px 0 var(--linha)}
+  .opc{display:flex;align-items:center;gap:12px;padding:15px 16px;width:100%;border-bottom:1px solid var(--linha);font-size:14.5px;font-weight:500}
+  .opc:last-child{border-bottom:0}
+  .opc svg{width:22px;height:22px;color:var(--roxo);flex:none}
+  .opc span{flex:1}
+  .opc .seta{color:#c4c4c8;width:18px;height:18px}
+  .chave{width:44px;height:26px;border-radius:13px;background:#d4d4d8;position:relative;transition:background .2s;flex:none}
+  .chave::after{content:"";position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+  .on>.chave{background:var(--roxo)}
+  .on>.chave::after{transform:translateX(18px)}
+  .opc.sair{color:var(--erro)}
+  .opc.sair svg{color:var(--erro)}
+
+  /* folha inferior (comentários / nova conversa) */
+  .veu{position:absolute;inset:0;background:rgba(10,0,40,.4);z-index:20;opacity:0;visibility:hidden;transition:opacity .25s,visibility 0s .25s}
+  .veu.on{opacity:1;visibility:visible;transition:opacity .25s}
+  .veu:not(.on){pointer-events:none}
+  .folha{position:absolute;left:0;right:0;bottom:0;max-height:78%;background:#fff;border-radius:22px 22px 0 0;z-index:21;display:flex;flex-direction:column;transform:translateY(100%);visibility:hidden;transition:transform .3s ease,visibility 0s .3s}
+  .folha.on{transform:none;visibility:visible;transition:transform .3s ease}
+  .folha .puxador{width:40px;height:4px;border-radius:2px;background:#d4d4d8;margin:10px auto 6px;flex:none}
+  .folha h3{font-size:16px;font-weight:600;text-align:center;padding-bottom:10px;border-bottom:1px solid var(--linha);flex:none}
+  .folha .rolar{overflow-y:auto;padding:6px 16px;flex:1;min-height:0}
+  .coment{display:flex;gap:10px;padding:10px 0}
+  .coment .av{width:36px;height:36px;font-size:13px}
+  .coment b{font-size:13px;font-weight:600}
+  .coment p{font-size:13px;color:var(--texto);line-height:1.4;margin-top:2px}
+  .coment small{font-size:11px;color:var(--suave)}
+  .folha .compor{padding-bottom:18px}
+  .membro{display:flex;gap:12px;align-items:center;padding:10px 0;width:100%;border-bottom:1px solid var(--linha)}
+  .membro .av{width:44px;height:44px;font-size:15px}
+  .membro b{font-size:14px;font-weight:600;display:block}
+  .membro small{font-size:12px;color:var(--suave)}
+
+  /* aviso que desce do topo: 100% escondido quando inativo */
+  .toast{position:absolute;left:16px;right:16px;top:50px;z-index:30;background:var(--noite);color:#fff;border-radius:14px;padding:12px 14px;font-size:13.5px;font-weight:500;display:flex;gap:10px;align-items:center;box-shadow:0 12px 30px -10px rgba(10,0,87,.6);
+    opacity:0;visibility:hidden;transform:translateY(-12px);transition:opacity .25s,transform .25s,visibility 0s .25s;pointer-events:none}
+  .toast.on{opacity:1;visibility:visible;transform:none;transition:opacity .25s,transform .25s}
+  .toast i{width:22px;height:22px;border-radius:50%;background:var(--roxo);display:grid;place-items:center;flex:none;font-style:normal;font-size:12px}
+
+  /* ---------- modo embutido (iframe do portfólio) ---------- */
+  body.modo-embed{background:transparent;padding:0;min-height:0;display:block;overflow:hidden}
+  body.modo-embed .topo{display:none}
+  body.modo-embed .celular{box-shadow:none;margin:11px}
+
+  /* ---------- modo telas ---------- */
+  body.modo-telas{display:block;padding:40px}
+  body.modo-telas .topo{text-align:left;max-width:none}
+  body.modo-telas .celular{display:none}
+  .quadro{display:none}
+  body.modo-telas .quadro{display:flex;flex-wrap:wrap;gap:48px}
+  .quadro figure{width:390px}
+  .quadro figcaption{color:#ccc;font-size:14px;font-weight:700;margin-bottom:12px}
+  .quadro .moldura{width:390px;height:844px;position:relative;overflow:hidden;border-radius:30px;background:#fff}
+  .quadro .tela{opacity:1;transform:none;pointer-events:none}
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <span class="faixa">Recriação ilustrativa · dados fictícios</span>
+  <h1>Angel Investor Club · App da comunidade</h1>
+  <p>Telas do case com o layout e a identidade do projeto. Nomes, mensagens e números são fictícios.
+    <span id="link-modo"></span></p>
+</header>
+
+<div class="celular"><div class="visor" id="visor"></div></div>
+<div class="quadro" id="quadro"></div>
+
+<template id="telas">
+
+<!-- 01 Abertura -->
+<section class="tela padrao abertura" data-id="abertura" data-nome="01 · Abertura">
+  <div class="status">#status</div>
+  <span class="logo"><img src="img/logo.png" alt="Angel Investor Club"></span>
+  <div class="grade4">
+    <img src="img/pessoa1.png" alt=""><img src="img/pessoa2.png" alt="">
+    <img src="img/pessoa3.png" alt=""><img src="img/pessoa4.png" alt="">
+  </div>
+  <h2>Investimos em pessoas, transformamos vidas, realizamos sonhos!</h2>
+  <p class="sub">Uma comunidade de investidores-anjo e empreendedores, na palma da mão.</p>
+  <div class="acao"><button class="btn" data-go="cadastro">Iniciar</button></div>
+  <div class="produzido">Produzido por <img src="img/ivy.png" alt="Ivy"></div>
+</section>
+
+<!-- 02 Cadastro -->
+<section class="tela padrao" data-id="cadastro" data-nome="02 · Cadastro pelo telefone">
+  <div class="status">#status</div>
+  <button class="voltar-topo" data-go="abertura" aria-label="Voltar">#voltar</button>
+  <span class="logo" style="width:96px"><img src="img/logo.png" alt="Angel Investor Club"></span>
+  <div class="heroi"><img src="img/pessoa1.png" alt=""></div>
+  <div class="form">
+    <label class="fone"><span class="bandeira">#brasil</span><span class="ddi">+55</span>
+      <input class="js-fone" type="tel" inputmode="numeric" placeholder="(__) _____-____" autocomplete="off" aria-label="Número de celular com DDD"></label>
+    <p class="dica js-dica-fone">Use um número fictício: só os dígitos com DDD.</p>
+    <button class="btn js-cadastrar">Cadastre o seu número</button>
+  </div>
+  <div class="produzido">Produzido por <img src="img/ivy.png" alt="Ivy"></div>
+</section>
+
+<!-- 03 Código -->
+<section class="tela padrao" data-id="codigo" data-nome="03 · Código de verificação">
+  <div class="status">#status</div>
+  <button class="voltar-topo" data-go="cadastro" aria-label="Voltar">#voltar</button>
+  <span class="logo" style="width:96px"><img src="img/logo.png" alt="Angel Investor Club"></span>
+  <div class="codigo-topo">
+    <div class="selo-sms">#sms</div>
+    <h2>Digite o código</h2>
+    <p>Enviamos um SMS com 6 dígitos para<br><b class="js-fone-txt">+55 (11) 98765-4321</b></p>
+    <label class="caixas js-caixas"><span></span><span></span><span></span><span></span><span></span><span></span>
+      <input class="js-codigo" type="tel" inputmode="numeric" maxlength="6" autocomplete="one-time-code" aria-label="Código de 6 dígitos"></label>
+    <p class="reenviar js-reenviar">Reenviar código em 0:30</p>
+  </div>
+  <div class="form" style="margin-top:auto">
+    <p class="dica js-dica-cod" style="text-align:center">Protótipo: qualquer código de 6 dígitos funciona.</p>
+    <button class="btn js-confirmar" disabled>Confirmar</button>
+  </div>
+  <div class="produzido">Produzido por <img src="img/ivy.png" alt="Ivy"></div>
+</section>
+
+<!-- 04 Feed -->
+<section class="tela" data-id="feed" data-nome="04 · Feed com stories">
+  <div class="status" style="background:#fff">#status</div>
+  <div class="stories js-stories"></div>
+  <div class="conteudo feed js-feed"></div>
+  <nav class="nav js-nav" data-on="feed" data-fab="publicar"></nav>
+</section>
+
+<!-- 05 Story aberto -->
+<section class="tela tela-story" data-id="story" data-nome="05 · Story aberto">
+  <div class="status">#status</div>
+  <div class="js-story" style="flex:1;min-height:0;display:flex;flex-direction:column"></div>
+</section>
+
+<!-- 06 Publicar -->
+<section class="tela" data-id="publicar" data-nome="06 · Nova publicação">
+  <div class="status" style="background:#fff">#status</div>
+  <div class="cab-simples"><button class="ic" data-go="feed" aria-label="Fechar">#fechar</button><h2>Nova publicação</h2><button class="pub js-publicar" disabled>Publicar</button></div>
+  <div class="conteudo" style="background:#fff">
+    <div class="autor"><span class="av js-meu-av">VC</span><span><b class="js-meu-nome">Você</b><small>Publicando no feed da comunidade</small></span></div>
+    <textarea class="area js-texto" placeholder="Compartilhe uma novidade, um evento ou uma oportunidade com o clube…" maxlength="400"></textarea>
+    <p class="rot">Imagem</p>
+    <div class="anexos js-anexos"></div>
+  </div>
+</section>
+
+<!-- 07 Explorar -->
+<section class="tela" data-id="explorar" data-nome="07 · Explorar">
+  <div class="status">#status</div>
+  <div class="busca-linha"><label class="busca">#busca<input class="js-busca-exp" placeholder="Busque startups, eventos…"></label></div>
+  <div class="conteudo">
+    <div class="chips js-chips"></div>
+    <div class="js-explorar"></div>
+  </div>
+  <nav class="nav js-nav" data-on="explorar" data-fab="publicar"></nav>
+</section>
+
+<!-- 08 Conversas -->
+<section class="tela" data-id="conversas" data-nome="08 · Conversas">
+  <div class="status">#status</div>
+  <div class="busca-linha"><label class="busca">#busca<input class="js-busca-conv" placeholder="Pesquise por mensagem…"></label><button class="quadrado js-nova" aria-label="Nova conversa">#editar</button></div>
+  <span class="aba-lateral">Meus grupos</span>
+  <div class="conteudo"><div class="lista js-lista"></div></div>
+  <nav class="nav js-nav" data-on="conversas" data-fab="nova"></nav>
+</section>
+
+<!-- 09 Chat -->
+<section class="tela" data-id="chat" data-nome="09 · Chat">
+  <div class="status" style="background:#fff">#status</div>
+  <div class="chat-cab js-chat-cab"></div>
+  <span class="aba-lateral" style="top:132px">Meus grupos</span>
+  <div class="conteudo js-rolar-chat" style="padding:0"><div class="msgs js-msgs"></div></div>
+  <form class="compor js-compor-chat" autocomplete="off">
+    <input class="js-msg" placeholder="Digite aqui…" aria-label="Mensagem">
+    <button type="button" class="ic js-toast" data-msg="Figurinhas não fazem parte do protótipo" aria-label="Figurinhas">#emoji</button>
+    <button type="button" class="ic som js-toast" data-msg="Câmera não faz parte do protótipo" aria-label="Câmera">#camera</button>
+    <button type="submit" class="enviar" aria-label="Enviar">#enviar</button>
+  </form>
+</section>
+
+<!-- 10 Ajustes -->
+<section class="tela" data-id="ajustes" data-nome="10 · Ajustes e perfil">
+  <div class="status">#status</div>
+  <div class="conteudo">
+    <h2 style="font-size:22px;font-weight:600;margin:4px 0 10px">Ajustes</h2>
+    <div class="perfil"><span class="av js-meu-av">VC</span><span><b class="js-meu-nome">Você</b><small class="js-fone-txt">+55 (11) 98765-4321</small><span class="tag">Membro desde nov/2026</span></span></div>
+    <div class="numeros"><div><b class="js-n-posts">0</b><small>publicações</small></div><div><b class="js-n-conex">0</b><small>conexões</small></div><div><b class="js-n-int">0</b><small>interesses</small></div></div>
+    <div class="opcoes">
+      <button class="opc on js-chave">#sino<span>Notificações</span><i class="chave"></i></button>
+      <button class="opc js-chave">#lua<span>Resumo semanal por e-mail</span><i class="chave"></i></button>
+      <button class="opc js-toast" data-msg="Privacidade: tela ilustrativa">#cadeado<span>Privacidade</span>#seta</button>
+      <button class="opc js-toast" data-msg="Ajuda: tela ilustrativa">#ajuda<span>Ajuda e suporte</span>#seta</button>
+      <button class="opc sair js-sair">#sair<span>Sair</span></button>
+    </div>
+    <p style="text-align:center;font-size:12px;color:var(--suave);margin-top:16px">Angel Investor Club · versão 1.0 · produzido por Ivy</p>
+  </div>
+  <nav class="nav js-nav" data-on="ajustes" data-fab="publicar"></nav>
+</section>
+
+</template>
+
+<script>
+const svg = (d, w=1.8, extra='') => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" ${extra}>${d}</svg>`;
+const IC = {
+  status: '<span>14:10</span><span class="ics"><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1" fill="currentColor"/><rect x="5" y="5.5" width="3" height="6.5" rx="1" fill="currentColor"/><rect x="10" y="3" width="3" height="9" rx="1" fill="currentColor"/><rect x="15" y="0" width="3" height="12" rx="1" fill="currentColor"/></svg><svg viewBox="0 0 16 12"><path d="M8 11.5l2.4-2.9a3.4 3.4 0 00-4.8 0z M2.6 5.9a7.6 7.6 0 0110.8 0l-1.6 1.9a5 5 0 00-7.6 0z M0 3.1a11.4 11.4 0 0116 0L14.4 5A9 9 0 001.6 5z" fill="currentColor"/></svg><svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="22" height="11" rx="3" fill="none" stroke="currentColor" opacity=".45"/><rect x="2" y="2" width="19" height="8" rx="1.8" fill="currentColor"/><rect x="23.5" y="4" width="1.8" height="4" rx=".9" fill="currentColor" opacity=".45"/></svg></span>',
+  voltar: svg('<path d="M20 12H5M11 5l-7 7 7 7"/>',2),
+  fechar: svg('<path d="M6 6l12 12M18 6L6 18"/>',2),
+  brasil: '<svg viewBox="0 0 30 21"><rect width="30" height="21" rx="2" fill="#229e45"/><path d="M15 2.5L27 10.5 15 18.5 3 10.5z" fill="#f8e509"/><circle cx="15" cy="10.5" r="4.6" fill="#2b49a3"/><path d="M10.6 9.4c3-.6 6.2 0 8.8 1.6" stroke="#fff" stroke-width=".9" fill="none"/></svg>',
+  sms: svg('<path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h.01M12 10h.01M16 10h.01"/>',2.2),
+  globo: svg('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/>',1.6),
+  conversas: svg('<path d="M20 11.5a7.5 7.5 0 01-11 6.6L4 19.5l1.4-4.3A7.5 7.5 0 1120 11.5z"/>',1.6),
+  conversasOn: '<svg viewBox="0 0 24 24"><path d="M20 11.5a7.5 7.5 0 01-11 6.6L4 19.5l1.4-4.3A7.5 7.5 0 1120 11.5z" fill="currentColor"/><path d="M9 21c1.2.5 2.4.7 3.7.6" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".5"/></svg>',
+  casa: svg('<path d="M4 10.5L12 4l8 6.5V20h-5.5v-5.5h-5V20H4z"/>',1.6),
+  casaOn: '<svg viewBox="0 0 24 24"><path d="M4 10.5L12 4l8 6.5V20h-5.5v-5.5h-5V20H4z" fill="currentColor"/></svg>',
+  engrenagem: svg('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.6 1.6 0 00-1.8-.3 1.6 1.6 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.6 1.6 0 00-1-1.5 1.6 1.6 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.6 1.6 0 00.3-1.8 1.6 1.6 0 00-1.5-1H3a2 2 0 110-4h.1a1.6 1.6 0 001.5-1 1.6 1.6 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.6 1.6 0 001.8.3H9a1.6 1.6 0 001-1.5V3a2 2 0 114 0v.1a1.6 1.6 0 001 1.5 1.6 1.6 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.6 1.6 0 00-.3 1.8V9a1.6 1.6 0 001.5 1H21a2 2 0 110 4h-.1a1.6 1.6 0 00-1.5 1z"/>',1.5),
+  mais: svg('<path d="M12 5v14M5 12h14"/>',2),
+  aviao: svg('<path d="M21 3L10 14M21 3l-7 18-4-7-7-4z"/>',1.6),
+  pontos: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>',
+  coracao: svg('<path d="M12 20s-7-4.4-9-9a4.6 4.6 0 019-2.4A4.6 4.6 0 0121 11c-2 4.6-9 9-9 9z"/>',1.6),
+  balao: svg('<path d="M21 12a8 8 0 01-11.6 7.1L4 20l1.1-4.6A8 8 0 1121 12z"/>',1.6),
+  busca: svg('<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/>',1.8),
+  editar: svg('<path d="M12 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-6"/><path d="M17.5 3.5a2.1 2.1 0 013 3L12 15l-4 1 1-4z"/>',1.6),
+  video: svg('<rect x="3" y="6" width="13" height="12" rx="3"/><path d="M16 10l5-3v10l-5-3"/>',1.6),
+  fone: svg('<path d="M21 16.9v3a2 2 0 01-2.2 2A19.8 19.8 0 012.1 5.2 2 2 0 014.1 3h3a2 2 0 012 1.7c.1 1 .4 1.9.7 2.8a2 2 0 01-.5 2.1L8 10.9a16 16 0 006 6l1.3-1.3a2 2 0 012.1-.5c.9.3 1.8.6 2.8.7a2 2 0 011.7 2z"/>',1.6),
+  emoji: svg('<circle cx="12" cy="12" r="9"/><path d="M8.5 14.5a4.5 4.5 0 007 0M9 9.5h.01M15 9.5h.01"/>',1.6),
+  camera: svg('<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',1.6),
+  enviar: svg('<path d="M5 12h13M13 6l6 6-6 6"/>',2.2),
+  sino: svg('<path d="M6 16V11a6 6 0 0112 0v5l2 2H4zM10 21h4"/>',1.7),
+  lua: svg('<path d="M4 6h16v12H4zM4 7l8 6 8-6"/>',1.7),
+  cadeado: svg('<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/>',1.7),
+  ajuda: svg('<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 114 2c-.9.6-1.5 1.1-1.5 2.2M12 17h.01"/>',1.7),
+  sair: svg('<path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/>',1.7),
+  seta: svg('<path d="M9 6l6 6-6 6"/>',2,'class="seta"'),
+};
+
+/* ---------- dados fictícios ---------- */
+const CORES = ['#703efe','#0a0057','#9b7bff','#3d1fa8','#5a2be0','#1d1270'];
+const MEMBROS = {
+  camila:{nome:'Camila Rocha', foto:'pessoa1', papel:'Investidora-anjo · Fintech', on:true},
+  julia:{nome:'Júlia Martins', foto:'pessoa2', papel:'Fundadora · Edtech', on:false},
+  rafael:{nome:'Rafael Souza', foto:'pessoa3', papel:'Investidor-anjo · Agro', on:true},
+  bia:{nome:'Beatriz Lima', foto:'pessoa4', papel:'Fundadora · Saúde', on:true},
+  miguel:{nome:'Miguel Arruda', papel:'Investidor-anjo · SaaS', on:true},
+  sara:{nome:'Sara Nogueira', papel:'Mentora · Varejo', on:false},
+  teresa:{nome:'Teresa Vidal', papel:'Investidora-anjo · Clima', on:true},
+  davi:{nome:'Davi Lemos', papel:'Fundador · Logística', on:false},
+  jessica:{nome:'Jéssica Barros', papel:'Investidora-anjo · Mobilidade', on:false},
+  bruno:{nome:'Bruno Simões', papel:'Fundador · Fintech', on:true},
+  clube:{nome:'Angel Investor Club', logo:true, papel:'Perfil oficial', on:true},
+};
+const meuIni = () => estado.nome==='Você' ? 'VC' : iniciais(estado.nome);
+const iniciais = n => n.split(' ').filter(Boolean).slice(0,2).map(p=>p[0]).join('').toUpperCase();
+const esc = s => s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function av(id, ponto=false){
+  const m = MEMBROS[id]; if (!m) return '';
+  const pt = ponto ? `<i class="pt ${m.on?'on':''}"></i>` : '';
+  if (m.logo) return `<span class="av logo-av">${pt}</span>`;
+  if (m.foto) return `<span class="av" style="background-image:url(img/${m.foto}.png);background-color:#eee">${pt}</span>`;
+  const cor = CORES[[...id].reduce((s,c)=>s+c.charCodeAt(0),0)%CORES.length];
+  return `<span class="av" style="background:${cor}">${iniciais(m.nome)}${pt}</span>`;
+}
+
+const STORIES = [
+  {id:'camila', slides:[{tipo:'foto', img:'pessoa1', txt:'Rodada de pitches na quinta, 19h. Quem vem?'},{tipo:'grad', txt:'5 startups de fintech, 7 minutos cada.'}]},
+  {id:'rafael', slides:[{tipo:'grad', txt:'Fechamos nosso primeiro aporte em grupo!'},{tipo:'foto', img:'pessoa3', txt:'Obrigado a todo o clube pela confiança.'}]},
+  {id:'julia', slides:[{tipo:'foto', img:'pessoa2', txt:'Abrimos a captação da nossa edtech.'}]},
+  {id:'bia', slides:[{tipo:'foto', img:'pessoa4', txt:'Mentoria aberta sábado: saúde digital.'}]},
+  {id:'clube', slides:[{tipo:'evento', img:'evento', txt:'Encontro presencial do clube: obrigado a todos!'},{tipo:'grad', txt:'Próximo encontro: 12/12. Garanta sua vaga no app.'}]},
+  {id:'miguel', slides:[{tipo:'grad', txt:'Dica do dia: leia o cap table antes do pitch deck.'}]},
+];
+
+const estado = {
+  telefone:'', nome:'Você',
+  story:0, slide:0, vistos:new Set(),
+  anexo:'', filtroExp:'Startups', buscaExp:'', buscaConv:'',
+  conversa:'miguel', postAberto:null,
+  interesses:new Set(), conexoes:new Set(),
+  posts:[
+    {id:1, autor:'clube', tempo:'2 h', texto:'Uma comunidade forte com pessoas engajadas.', resto:'Em pouco mais de um ano, fizemos a construção do Angel Investor Club com encontros presenciais, rodadas de pitch e muita troca entre investidores e empreendedores. Obrigado a cada membro!', aberto:false, img:'evento', curtidas:478, curtiu:false,
+      coments:[{id:'camila',t:'Que noite incrível! Já quero o próximo.',h:'1 h'},{id:'rafael',t:'Orgulho de fazer parte.',h:'48 min'}]},
+    {id:2, autor:'miguel', tempo:'5 h', texto:'Desde o momento em que conheci a <span class="menc">Helena Duarte</span>, fiquei impressionado com a dedicação e a energia de todos os membros do Angel Investor Club.', resto:'Hoje fechei minha terceira participação em uma startup indicada por aqui. Bora para a próxima!', aberto:false, img:'', curtidas:126, curtiu:false,
+      coments:[{id:'teresa',t:'Parabéns, Miguel!',h:'3 h'}]},
+    {id:3, autor:'bia', tempo:'1 d', texto:'Alguém vai ao demo day de healthtechs na semana que vem? Bora combinar de ir juntos.', resto:'', aberto:false, img:'', curtidas:58, curtiu:false, coments:[]},
+  ],
+  conversas:[
+    {id:'miguel', hora:'09:34', nl:0, msgs:[
+      {de:'in', t:'Oi! Alguma novidade hoje?'},
+      {de:'out', t:'Tudo certo! Temos novidades.'},
+      {de:'out', link:true, t:'Aqui está a nova página do encontro: <u>www.exemplo.com.br</u>'},
+      {de:'in', t:'Legal! Tenho alguns comentários sobre a seção "Como funciona", mas no geral ficou ótima!'},
+      {de:'out', t:'Perfeito! Vou conferir.'}]},
+    {id:'rafael', hora:'09:24', nl:2, msgs:[{de:'in',t:'Valeu, Davi! A gente se fala mais tarde.'},{de:'in',t:'Me manda o deck da AgroPix quando puder?'}]},
+    {id:'sara', hora:'09:11', nl:3, msgs:[{de:'out',t:'Fechado para quinta?'},{de:'in',t:'Fechado!'},{de:'in',t:'Levo o contrato impresso.'},{de:'in',t:'Parece ótimo para mim também!'}]},
+    {id:'teresa', hora:'08:54', nl:0, msgs:[{de:'in',t:'Você viu o relatório de clima?'},{de:'out',t:'Vi sim, muito bom o material.'}]},
+    {id:'camila', hora:'Ontem', nl:0, msgs:[{de:'in',t:'Quinta tem rodada de pitches, confirma?'}]},
+    {id:'davi', hora:'Ontem', nl:0, msgs:[{de:'in',t:'Obrigado pela mentoria de ontem!'}]},
+    {id:'julia', hora:'Seg', nl:0, msgs:[{de:'out',t:'Me avisa quando abrir a captação.'}]},
+    {id:'bruno', hora:'Dom', nl:2, msgs:[{de:'in',t:'Topa um café semana que vem?'},{de:'in',t:'Quero te apresentar um sócio.'}]},
+  ],
+};
+const EXPLORAR = {
+  Startups:[
+    {k:'s1', sig:'AP', cor:'#703efe', nome:'AgroPix', txt:'Pagamentos para pequenos produtores rurais', tag:'Semente · R$ 1,2 mi'},
+    {k:'s2', sig:'LV', cor:'#0a0057', nome:'Lumina Edu', txt:'Plataforma de reforço escolar com IA', tag:'Pré-semente · R$ 600 mil'},
+    {k:'s3', sig:'VS', cor:'#3d1fa8', nome:'VitaSync', txt:'Prontuário integrado para clínicas', tag:'Série A · R$ 8 mi'},
+    {k:'s4', sig:'RT', cor:'#9b7bff', nome:'Rota Verde', txt:'Logística de última milha elétrica', tag:'Semente · R$ 2 mi'},
+  ],
+  Eventos:[
+    {k:'e1', sig:'28', cor:'#703efe', nome:'Demo Day Fintech', txt:'Quinta, 28/11 · 19h · Online', tag:'5 startups'},
+    {k:'e2', sig:'05', cor:'#0a0057', nome:'Café dos Anjos', txt:'Quinta, 05/12 · 8h · São Paulo', tag:'Presencial · 30 vagas'},
+    {k:'e3', sig:'12', cor:'#3d1fa8', nome:'Encontro de fim de ano', txt:'Sexta, 12/12 · 18h30 · São Paulo', tag:'Membros e convidados'},
+  ],
+  Membros:['camila','julia','rafael','bia','teresa','jessica','bruno'].map(id=>({k:id, membro:true})),
+};
+
+const ICONE_NAV = (on, fab) => {
+  const b = (id, ic, icOn, rot) => `<button class="${on===id?'on':''}" data-go="${id}" aria-label="${rot}">${on===id?icOn:ic}</button>`;
+  return b('explorar',IC.globo,IC.globo,'Explorar') + b('conversas',IC.conversas,IC.conversasOn,'Conversas')
+    + `<button class="fab" data-fab="${fab}" aria-label="${fab==='nova'?'Nova conversa':'Nova publicação'}">${IC.mais}</button>`
+    + b('feed',IC.casa,IC.casaOn,'Início') + b('ajustes',IC.engrenagem,IC.engrenagem,'Ajustes');
+};
+
+const params = new URLSearchParams(location.search);
+const modoTelas = params.has('telas');
+document.body.classList.toggle('modo-telas', modoTelas);
+document.body.classList.toggle('modo-embed', params.has('embed'));
+document.getElementById('link-modo').innerHTML = modoTelas
+  ? '· <a href="?">abrir o protótipo clicável</a>'
+  : '· <a href="?telas">ver todas as telas lado a lado</a>';
+const molde = document.getElementById('telas').content;
+
+function preparar(raiz){
+  raiz.querySelectorAll('.tela').forEach(t=>{ t.innerHTML = t.innerHTML.replace(/#([a-zA-Z]+)\b/g, (m,k)=> IC[k] || m); });
+  raiz.querySelectorAll('.js-nav').forEach(n=> n.innerHTML = ICONE_NAV(n.dataset.on, n.dataset.fab));
+  render(raiz);
+}
+
+const fmtFone = d => { d = d.slice(0,11); if (!d) return '';
+  if (d.length<3) return '('+d; const a='('+d.slice(0,2)+') ';
+  if (d.length<=6) return a+d.slice(2); if (d.length<=10) return a+d.slice(2,6)+'-'+d.slice(6); return a+d.slice(2,7)+'-'+d.slice(7); };
+const totalComent = p => p.coments.length + (p.id===1?254:p.id===2?12:0);
+const conv = id => estado.conversas.find(c=>c.id===id);
+const ultima = c => { const m = c.msgs[c.msgs.length-1]; return m ? (m.de==='out'?'Você: ':'') + m.t.replace(/<[^>]+>/g,'') : ''; };
+
+function render(raiz){
+  const foneTxt = estado.telefone ? '+55 '+fmtFone(estado.telefone) : '+55 (11) 98765-4321';
+  raiz.querySelectorAll('.js-fone-txt').forEach(e=>e.textContent=foneTxt);
+
+  // stories
+  raiz.querySelectorAll('.js-stories').forEach(s=>{
+    s.innerHTML = `<button class="story" data-fab="publicar"><div class="anel" style="border-color:transparent">${av('clube')}</div>Seu Story</button>`
+      + STORIES.map((st,i)=>`<button class="story ${estado.vistos.has(i)?'visto':''}" data-story="${i}"><div class="anel">${av(st.id)}</div>${MEMBROS[st.id].nome.replace(' ','<br>')}</button>`).join('');
+  });
+
+  // feed
+  raiz.querySelectorAll('.js-feed').forEach(f=>{
+    f.innerHTML = estado.posts.map(p=>{ const m = MEMBROS[p.autor] || {nome:estado.nome};
+      const a = MEMBROS[p.autor] ? av(p.autor) : `<span class="av" style="background:var(--roxo)">${meuIni()}</span>`;
+      return `<article class="post">
+        <header>${a}<b>${esc(m.nome)}<small>${p.tempo}</small></b>
+          <button class="ico js-toast" data-msg="Link da publicação copiado" aria-label="Compartilhar">${IC.aviao}</button><button class="ico js-toast" data-msg="Opções da publicação: ilustrativo" aria-label="Mais opções">${IC.pontos}</button></header>
+        <p>${p.texto}${p.resto ? (p.aberto ? ' '+p.resto : ` <button class="mais" data-vermais="${p.id}">ver mais</button>`) : ''}</p>
+        ${p.img?`<div class="foto"><img src="img/${p.img}.jpg" alt="Foto da publicação"></div>`:''}
+        <footer><button class="curtir ${p.curtiu?'on':''}" data-curtir="${p.id}" aria-pressed="${p.curtiu}">${IC.coracao}${p.curtidas} Curtidas</button>
+          <button data-coment="${p.id}">${totalComent(p)} Comentários</button></footer></article>`; }).join('');
+  });
+
+  // story aberto
+  raiz.querySelectorAll('.js-story').forEach(s=>{
+    const st = STORIES[estado.story], sl = st.slides[estado.slide], m = MEMBROS[st.id];
+    const img = sl.tipo==='evento' ? `<img src="img/${sl.img}.jpg" alt="">` : sl.tipo==='foto' ? `<img src="img/${sl.img}.png" alt="">` : '';
+    s.innerHTML = `<div class="barras">${st.slides.map((_,i)=>`<i class="${i<estado.slide?'feita':i===estado.slide?'agora':''}"><b style="animation-duration:4.5s"></b></i>`).join('')}</div>
+      <div class="story-cab">${av(st.id)}<b>${m.nome}<small>${2+estado.story} h</small></b><button data-go="feed" aria-label="Fechar story">${IC.fechar}</button></div>
+      <div class="slide ${sl.tipo}">${img}<div class="txt">${sl.txt}</div><button class="toque esq" data-passo="-1" aria-label="Anterior"></button><button class="toque dir" data-passo="1" aria-label="Próximo"></button></div>
+      <form class="responder js-resp-story" autocomplete="off"><input placeholder="Responder a ${m.nome.split(' ')[0]}…" aria-label="Responder story"><button aria-label="Enviar">${IC.aviao}</button></form>`;
+  });
+
+  // publicar
+  raiz.querySelectorAll('.js-anexos').forEach(a=>{
+    a.innerHTML = `<button class="anexo nada ${!estado.anexo?'on':''}" data-anexo="">Sem imagem</button>`
+      + ['evento'].map(n=>`<button class="anexo ${estado.anexo===n?'on':''}" data-anexo="${n}"><img src="img/${n}.jpg" alt=""></button>`).join('');
+  });
+  raiz.querySelectorAll('.js-meu-av').forEach(e=>e.textContent=meuIni());
+  raiz.querySelectorAll('.js-meu-nome').forEach(e=>e.textContent=estado.nome);
+
+  // explorar
+  raiz.querySelectorAll('.js-chips').forEach(c=>c.innerHTML=Object.keys(EXPLORAR).map(k=>`<button class="chip ${k===estado.filtroExp?'on':''}" data-chip="${k}">${k}</button>`).join(''));
+  raiz.querySelectorAll('.js-explorar').forEach(l=>{
+    const q = estado.buscaExp.toLowerCase();
+    const itens = EXPLORAR[estado.filtroExp].filter(i=> !q || (i.membro ? MEMBROS[i.k].nome+MEMBROS[i.k].papel : i.nome+i.txt+i.tag).toLowerCase().includes(q));
+    l.innerHTML = itens.length ? itens.map(i=> i.membro
+      ? `<div class="card">${av(i.k,true)}<span class="info"><b>${MEMBROS[i.k].nome}</b><small>${MEMBROS[i.k].papel}</small></span><button class="acao-p ${estado.conexoes.has(i.k)?'on':''}" data-conectar="${i.k}">${estado.conexoes.has(i.k)?'Conectado':'Conectar'}</button></div>`
+      : `<div class="card"><span class="sig" style="background:${i.cor}">${i.sig}</span><span class="info"><b>${i.nome}</b><small>${i.txt}</small><span class="tag">${i.tag}</span></span><button class="acao-p ${estado.interesses.has(i.k)?'on':''}" data-interesse="${i.k}">${estado.interesses.has(i.k)?(estado.filtroExp==='Eventos'?'Inscrito':'Interessado'):(estado.filtroExp==='Eventos'?'Participar':'Interesse')}</button></div>`).join('')
+      : '<p class="vazio">Nada encontrado para essa busca.</p>';
+  });
+
+  // conversas
+  raiz.querySelectorAll('.js-lista').forEach(l=>{
+    const q = estado.buscaConv.toLowerCase();
+    const itens = estado.conversas.filter(c=> !q || (MEMBROS[c.id].nome+' '+c.msgs.map(m=>m.t).join(' ')).toLowerCase().includes(q));
+    l.innerHTML = itens.length ? itens.map(c=>`<button class="conv" data-abrir="${c.id}">${av(c.id,true)}<span class="meio"><b>${MEMBROS[c.id].nome}</b><small class="${c.nl?'nl':''}">${esc(ultima(c))}</small></span>
+      <span class="lado"><span class="hora">${c.hora}</span>${c.nl?`<span class="cont" aria-label="${c.nl} não lidas">${c.nl}</span>`:''}</span></button>`).join('')
+      : '<p class="vazio">Nenhuma mensagem encontrada.</p>';
+  });
+
+  // chat
+  const c = conv(estado.conversa) || estado.conversas[0], m = MEMBROS[c.id];
+  raiz.querySelectorAll('.js-chat-cab').forEach(h=>h.innerHTML=`<button class="ic" data-go="conversas" aria-label="Voltar">${IC.voltar}</button>${av(c.id,true)}<span class="meio"><b>${m.nome}</b><small class="${m.on?'':'off'}">${m.on?'Online':'Visto por último hoje'}</small></span>
+    <button class="ic js-toast" data-msg="Chamadas de vídeo não fazem parte do protótipo" aria-label="Chamada de vídeo">${IC.video}</button><button class="ic js-toast" data-msg="Chamadas de voz não fazem parte do protótipo" aria-label="Ligar">${IC.fone}</button>`);
+  raiz.querySelectorAll('.js-msgs').forEach(b=>{
+    setTimeout(()=>c.msgs.forEach(x=>delete x.novo));
+    b.innerHTML = '<span class="dia">Hoje</span>' + c.msgs.map(x=> x.link
+      ? `<div class="msg ${x.de} link"><img src="img/preview.jpg" alt="Prévia do link"><p>${x.t}</p></div>`
+      : `<div class="msg ${x.de}${x.novo?' anim':''}">${esc(x.t)}${x.h?`<time>${x.h}</time>`:''}</div>`).join('') + (c.digitando?'<div class="msg in digitando anim"><i></i><i></i><i></i></div>':'');
+  });
+
+  // ajustes
+  raiz.querySelectorAll('.js-n-posts').forEach(e=>e.textContent=estado.posts.filter(p=>p.autor==='eu').length);
+  raiz.querySelectorAll('.js-n-conex').forEach(e=>e.textContent=24+estado.conexoes.size);
+  raiz.querySelectorAll('.js-n-int').forEach(e=>e.textContent=estado.interesses.size);
+}
+
+if (modoTelas) {
+  const quadro = document.getElementById('quadro');
+  [...molde.querySelectorAll('.tela')].forEach(t=>{
+    const fig = document.createElement('figure');
+    fig.innerHTML = `<figcaption>${t.dataset.nome}</figcaption><div class="moldura"></div>`;
+    const c = t.cloneNode(true); c.classList.add('ativa');
+    fig.querySelector('.moldura').appendChild(c);
+    quadro.appendChild(fig);
+  });
+  preparar(quadro);
+} else {
+  const visor = document.getElementById('visor');
+  visor.appendChild(molde.cloneNode(true));
+  visor.insertAdjacentHTML('beforeend', `<div class="veu js-veu"></div>
+    <div class="folha js-folha"><div class="puxador"></div><h3 class="js-folha-tit">Comentários</h3><div class="rolar js-folha-corpo"></div>
+      <form class="compor js-compor-coment" autocomplete="off" style="display:none"><input placeholder="Escreva um comentário…" aria-label="Comentário"><button type="submit" class="enviar" aria-label="Enviar comentário">${IC.enviar}</button></form></div>
+    <div class="toast js-toast-el" role="status" aria-live="polite"><i>✓</i><span></span></div>`);
+  preparar(visor);
+  const $ = s => visor.querySelector(s);
+  let atual = 'abertura', timerStory = null, timerToast = null, timerReenvio = null;
+
+  const toast = txt => { const t = $('.js-toast-el'); t.querySelector('span').textContent = txt; t.classList.add('on'); clearTimeout(timerToast); timerToast = setTimeout(()=>t.classList.remove('on'), 2200); };
+  const rolarChat = () => { const r = $('.tela.ativa .js-rolar-chat'); if (r) r.scrollTop = r.scrollHeight; };
+
+  function ir(id){
+    atual = id; fecharFolha();
+    visor.querySelectorAll('.tela').forEach(t=>t.classList.toggle('ativa', t.dataset.id===id));
+    clearTimeout(timerStory);
+    if (id==='chat') { const c = conv(estado.conversa); if (c) c.nl = 0; }
+    render(visor);
+    const c = visor.querySelector('.tela.ativa .conteudo'); if (c) c.scrollTop = 0;
+    if (id==='chat') rolarChat();
+    if (id==='story') agendarStory();
+    if (id==='codigo') iniciarCodigo();
+    if (id==='publicar') setTimeout(()=>$('.tela.ativa .js-texto')?.focus(), 320);
+  }
+
+  /* stories */
+  function agendarStory(){ clearTimeout(timerStory); estado.vistos.add(estado.story); timerStory = setTimeout(()=>passo(1), 4500); }
+  function passo(d){
+    const st = STORIES[estado.story];
+    estado.slide += d;
+    if (estado.slide >= st.slides.length) { estado.story++; estado.slide = 0; if (estado.story >= STORIES.length) { ir('feed'); return; } }
+    if (estado.slide < 0) { if (estado.story>0) { estado.story--; estado.slide = STORIES[estado.story].slides.length-1; } else estado.slide = 0; }
+    render(visor); agendarStory();
+  }
+
+  /* código */
+  function iniciarCodigo(){
+    const inp = $('.tela.ativa .js-codigo'); inp.value = ''; atualizarCaixas(); setTimeout(()=>inp.focus(), 320);
+    let s = 30; clearInterval(timerReenvio);
+    const r = $('.tela.ativa .js-reenviar');
+    const tique = () => { r.innerHTML = s>0 ? `Reenviar código em 0:${String(s).padStart(2,'0')}` : 'Não recebeu? <button class="js-reenviar-btn">Reenviar código</button>'; s--; if (s<-1) clearInterval(timerReenvio); };
+    tique(); timerReenvio = setInterval(tique, 1000);
+  }
+  function atualizarCaixas(){
+    const inp = $('[data-id=codigo] .js-codigo'); const v = inp.value;
+    $('[data-id=codigo] .js-caixas').querySelectorAll('span').forEach((s,i)=>{ s.textContent = v[i]||''; s.classList.toggle('cheia', !!v[i]); s.classList.toggle('foco', document.activeElement===inp && i===Math.min(v.length,5)); });
+    $('[data-id=codigo] .js-confirmar').disabled = v.length < 6;
+  }
+
+  /* folha inferior */
+  function abrirComentarios(id){
+    estado.postAberto = id; const p = estado.posts.find(x=>x.id===id);
+    $('.js-folha-tit').textContent = `Comentários (${totalComent(p)})`;
+    $('.js-folha-corpo').innerHTML = (p.coments.length ? p.coments.map(c=>`<div class="coment">${MEMBROS[c.id]?av(c.id):`<span class="av" style="background:var(--roxo)">${meuIni()}</span>`}<div><b>${MEMBROS[c.id]?MEMBROS[c.id].nome:esc(estado.nome)}</b> <small>${c.h}</small><p>${esc(c.t)}</p></div></div>`).join('')
+      : '<p class="vazio" style="padding:24px 0">Seja o primeiro a comentar.</p>');
+    $('.js-compor-coment').style.display = 'flex';
+    $('.js-veu').classList.add('on'); $('.js-folha').classList.add('on');
+    const r = $('.js-folha-corpo'); r.scrollTop = r.scrollHeight;
+  }
+  function abrirNova(){
+    estado.postAberto = null;
+    $('.js-folha-tit').textContent = 'Nova conversa';
+    $('.js-folha-corpo').innerHTML = Object.keys(MEMBROS).filter(k=>k!=='clube').map(k=>`<button class="membro" data-abrir="${k}">${av(k,true)}<span><b>${MEMBROS[k].nome}</b><small>${MEMBROS[k].papel}</small></span></button>`).join('');
+    $('.js-compor-coment').style.display = 'none';
+    $('.js-veu').classList.add('on'); $('.js-folha').classList.add('on');
+  }
+  function fecharFolha(){ $('.js-veu').classList.remove('on'); $('.js-folha').classList.remove('on'); }
+
+  /* respostas automáticas do chat */
+  const RESPOSTAS = ['Boa! Combinado.','Perfeito, obrigado pelo retorno.','Show! Vou dar uma olhada e te aviso.','Fechado. Te mando os detalhes por aqui.','Ótima ideia, bora marcar.'];
+  const hora = () => { const d = new Date(); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); };
+  function enviar(txt){
+    const c = conv(estado.conversa);
+    c.msgs.push({de:'out', t:txt, h:hora(), novo:true}); c.hora = hora();
+    estado.conversas = [c, ...estado.conversas.filter(x=>x!==c)];
+    render(visor); rolarChat();
+    const id = c.id;
+    setTimeout(()=>{ c.digitando = true; if (atual==='chat' && estado.conversa===id) { render(visor); rolarChat(); } }, 700);
+    setTimeout(()=>{ c.digitando = false; c.msgs.push({de:'in', t:RESPOSTAS[c.msgs.length%RESPOSTAS.length], h:hora(), novo:true});
+      if (!(atual==='chat' && estado.conversa===id)) { c.nl++; toast(`Nova mensagem de ${MEMBROS[id].nome.split(' ')[0]}`); }
+      render(visor); rolarChat(); }, 2200);
+  }
+
+  ir('abertura');
+
+  visor.addEventListener('input', e=>{
+    const t = e.target;
+    if (t.matches('.js-fone')) { const d = t.value.replace(/\D/g,'').slice(0,11); t.value = fmtFone(d); estado.telefone = d;
+      const dica = $('.js-dica-fone'); dica.classList.remove('erro'); dica.textContent = d.length>=10 ? 'Número válido. Vamos enviar um código por SMS.' : 'Use um número fictício: só os dígitos com DDD.'; }
+    if (t.matches('.js-codigo')) { t.value = t.value.replace(/\D/g,'').slice(0,6); atualizarCaixas(); }
+    if (t.matches('.js-texto')) $('.js-publicar').disabled = !t.value.trim() && !estado.anexo;
+    if (t.matches('.js-busca-exp')) { estado.buscaExp = t.value; render(visor); }
+    if (t.matches('.js-busca-conv')) { estado.buscaConv = t.value; render(visor); }
+    if (t.matches('.js-msg')) t.closest('.compor').classList.toggle('tem', !!t.value.trim());
+  });
+  visor.addEventListener('focusin', e=>{ if (e.target.matches('.js-codigo')) atualizarCaixas(); });
+  visor.addEventListener('focusout', e=>{ if (e.target.matches('.js-codigo')) setTimeout(atualizarCaixas); });
+  visor.addEventListener('keydown', e=>{ if (e.key==='Enter' && e.target.matches('.js-fone')) $('.js-cadastrar').click(); if (e.key==='Enter' && e.target.matches('.js-codigo')) $('.js-confirmar').click(); });
+
+  visor.addEventListener('submit', e=>{
+    e.preventDefault();
+    const f = e.target, inp = f.querySelector('input'), txt = inp.value.trim(); if (!txt) return;
+    if (f.matches('.js-compor-chat')) { inp.value=''; f.classList.remove('tem'); enviar(txt); return; }
+    if (f.matches('.js-compor-coment')) { const p = estado.posts.find(x=>x.id===estado.postAberto); p.coments.push({id:'eu', t:txt, h:'agora'}); inp.value=''; render(visor); abrirComentarios(p.id); return; }
+    if (f.matches('.js-resp-story')) { const id = STORIES[estado.story].id; inp.value = ''; inp.blur();
+      if (id!=='clube') { let c = conv(id); if (!c) { c = {id, hora:hora(), nl:0, msgs:[]}; estado.conversas.unshift(c); } c.msgs.push({de:'out', t:'Respondeu ao story: '+txt, h:hora()}); c.hora = hora(); c.nl = 0; estado.conversas = [c, ...estado.conversas.filter(x=>x!==c)]; }
+      toast('Resposta enviada'); agendarStory(); }
+  });
+
+  visor.addEventListener('click', e=>{
+    if (e.target.closest('.js-veu')) { fecharFolha(); return; }
+    const el = e.target.closest('button, .js-chave'); if (!el) return;
+    const d = el.dataset;
+    if (el.classList.contains('js-toast')) { toast(d.msg); return; }
+    if (el.classList.contains('js-cadastrar')) {
+      if (estado.telefone.length < 10) { const dica = $('.js-dica-fone'); dica.classList.add('erro'); dica.textContent = 'Digite o DDD e o número (10 ou 11 dígitos).'; $('.js-fone').focus(); return; }
+      ir('codigo'); toast('Código enviado por SMS'); return; }
+    if (el.classList.contains('js-reenviar-btn')) { iniciarCodigo(); toast('Novo código enviado'); return; }
+    if (el.classList.contains('js-confirmar')) { if (el.disabled) return; clearInterval(timerReenvio); ir('feed'); toast('Bem-vindo ao Angel Investor Club!'); return; }
+    if (d.story !== undefined) { estado.story = +d.story; estado.slide = 0; ir('story'); return; }
+    if (d.passo) { passo(+d.passo); return; }
+    if (d.vermais) { estado.posts.find(p=>p.id===+d.vermais).aberto = true; render(visor); return; }
+    if (d.curtir) { const p = estado.posts.find(x=>x.id===+d.curtir); p.curtiu = !p.curtiu; p.curtidas += p.curtiu?1:-1; render(visor);
+      if (p.curtiu) $(`.tela.ativa [data-curtir="${p.id}"]`)?.classList.add('pulsa'); return; }
+    if (d.coment) { abrirComentarios(+d.coment); return; }
+    if (d.fab === 'nova' || el.classList.contains('js-nova')) { abrirNova(); return; }
+    if (d.fab === 'publicar') { estado.anexo=''; ir('publicar'); const t = $('.tela.ativa .js-texto'); t.value=''; $('.js-publicar').disabled = true; return; }
+    if (d.anexo !== undefined) { estado.anexo = d.anexo; render(visor); $('.js-publicar').disabled = !$('.js-texto').value.trim() && !estado.anexo; return; }
+    if (el.classList.contains('js-publicar')) { const t = $('.js-texto').value.trim(); if (!t && !estado.anexo) return;
+      estado.posts.unshift({id:Date.now(), autor:'eu', tempo:'agora', texto:esc(t).replace(/\n/g,'<br>'), resto:'', img:estado.anexo, curtidas:0, curtiu:false, coments:[]});
+      ir('feed'); toast('Publicação enviada para a comunidade'); return; }
+    if (d.chip) { estado.filtroExp = d.chip; render(visor); return; }
+    if (d.interesse) { estado.interesses.has(d.interesse) ? estado.interesses.delete(d.interesse) : (estado.interesses.add(d.interesse), toast(estado.filtroExp==='Eventos'?'Inscrição confirmada':'Interesse enviado ao fundador')); render(visor); return; }
+    if (d.conectar) { estado.conexoes.has(d.conectar) ? estado.conexoes.delete(d.conectar) : (estado.conexoes.add(d.conectar), toast('Pedido de conexão enviado')); render(visor); return; }
+    if (d.abrir) { if (!conv(d.abrir)) estado.conversas.unshift({id:d.abrir, hora:hora(), nl:0, msgs:[]}); estado.conversa = d.abrir; ir('chat'); setTimeout(()=>$('.tela.ativa .js-msg')?.focus(), 320); return; }
+    if (el.classList.contains('js-chave')) { el.classList.toggle('on'); const rot = el.querySelector('span').textContent, on = el.classList.contains('on'), masc = rot.startsWith('Resumo'); toast(`${rot} ${on?'ativad':'desativad'}${masc?'o':'as'}`); return; }
+    if (el.classList.contains('js-sair')) { estado.telefone=''; const f = $('.js-fone'); f.value=''; ir('abertura'); return; }
+    if (d.go) ir(d.go);
+  });
+}
+</script>
+</body>
+</html>

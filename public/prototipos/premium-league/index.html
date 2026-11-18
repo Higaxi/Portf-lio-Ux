@@ -1,0 +1,1076 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Premium League · Escalação (protótipo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  /* Layout das telas finais do case (redesign); branding do site premiumleague.io:
+     águia oficial, Roboto, azul #143BEE e a escala de cinzas azulados (slate) do site. */
+  :root{
+    --azul:#143bee; --azul-esc:#1435bf; --azul-claro:#eff6ff; --azul-linha:#b9dcff;
+    --tinta:#0f172a; --texto:#475569; --suave:#94a3b8; --linha:#e2e8f0; --fundo:#f8fafc; --branco:#fff;
+    --check:#22b55a; --amarelo:#fcb900; --erro:#e5484d; --zap:#25d366; --escuro:#2c2e35;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Roboto",system-ui,sans-serif;background:#0d1330;color:var(--tinta);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:28px 16px}
+  button{font:inherit;border:0;background:none;cursor:pointer;color:inherit;text-align:inherit}
+  input{font:inherit}
+
+  .topo{color:#dbe2ff;text-align:center;margin-bottom:18px}
+  .topo h1{font-size:18px;font-weight:700}
+  .topo p{font-size:13px;color:#93a0cc;margin-top:4px}
+  .topo .selo-ficticio{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;background:#fcb900;color:#0f172a;border-radius:999px;padding:4px 10px;margin-bottom:8px}
+  .topo a{color:#9fb4ff;font-weight:600}
+  .celular{width:390px;height:844px;border-radius:50px;background:#05070f;padding:11px;box-shadow:0 30px 80px -20px rgba(0,0,0,.8),inset 0 0 0 2px #232a45;flex:none}
+  .visor{width:100%;height:100%;border-radius:40px;overflow:clip;position:relative;background:var(--fundo)}
+
+  /* ---------- tela ---------- */
+  .tela{position:absolute;inset:0;display:flex;flex-direction:column;overflow:clip;background:var(--fundo);opacity:0;pointer-events:none;transform:translateX(20px);transition:opacity .28s ease,transform .28s ease}
+  .tela.ativa{opacity:1;pointer-events:auto;transform:none}
+  .status{height:44px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:14px;font-weight:700}
+  .status i{font-style:normal;display:flex;gap:5px;align-items:center}
+  .status i svg{width:17px;height:12px}
+  .conteudo{flex:1;overflow-y:auto;overflow-x:clip}
+  .conteudo::-webkit-scrollbar{width:0}
+  .pad{padding:0 16px 18px}
+
+  /* cabeçalho azul do redesign */
+  .cab{background:var(--azul);color:#fff;flex:none}
+  .cab .status{color:#fff}
+  .barra{position:relative;height:46px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700}
+  .barra .esq{position:absolute;left:10px;width:38px;height:38px;display:grid;place-items:center;border-radius:10px}
+  .barra .dir{position:absolute;right:10px;width:38px;height:38px;display:grid;place-items:center;border-radius:10px}
+  .barra svg{width:22px;height:22px}
+  .marca{display:flex;align-items:center;gap:8px;font-weight:900;font-size:18px;letter-spacing:.2px}
+  .marca img{height:24px}
+  .marca small{display:block;font-size:8px;letter-spacing:4px;font-weight:700;margin-top:-2px}
+
+  /* métricas (preço do time · mercado · patrimônio) */
+  .metricas{display:grid;grid-template-columns:repeat(3,1fr);text-align:center;background:#fff;border-bottom:1px solid var(--linha);padding:9px 6px;flex:none}
+  .metricas span{display:block;font-size:9px;color:var(--suave);letter-spacing:.3px;text-transform:uppercase}
+  .metricas b{display:block;font-size:14px;font-weight:700;margin-top:2px}
+  .metricas b.neg{color:var(--erro)}
+
+  /* formação e alternância campo/lista */
+  .ferramentas{display:flex;align-items:center;justify-content:space-between;padding:10px 18px 0;position:relative;flex:none}
+  .form-btn{display:flex;align-items:center;gap:8px;border:1px solid var(--linha);border-radius:8px;padding:7px 11px;font-size:14px;font-weight:700;background:#fff}
+  .form-btn svg{width:14px;height:14px}
+  .vistas{display:flex;gap:8px}
+  .vistas button{width:34px;height:34px;border-radius:8px;border:1px solid var(--linha);background:#fff;display:grid;place-items:center}
+  .vistas button.on{background:var(--azul);border-color:var(--azul);color:#fff}
+  .vistas svg{width:18px;height:18px}
+  .menu-form{position:absolute;left:18px;top:52px;background:#fff;border-radius:12px;box-shadow:0 14px 34px -10px rgba(15,23,42,.35);padding:6px;z-index:20;min-width:150px}
+  .menu-form button{display:flex;justify-content:space-between;width:100%;padding:10px 12px;border-radius:8px;font-size:14px;font-weight:600}
+  .menu-form button.on{background:var(--azul-claro);color:var(--azul)}
+
+  /* campo em perspectiva */
+  .campo{position:relative;margin:12px 20px 0;height:350px;flex:none}
+  .gramado{position:absolute;inset:0;clip-path:polygon(6% 0,94% 0,100% 100%,0 100%);background:repeating-linear-gradient(180deg,#2cb556 0 12.5%,#25a64d 12.5% 25%);filter:drop-shadow(0 8px 10px rgba(0,0,0,.3))}
+  .campo > svg{position:absolute;inset:0;width:100%;height:100%}
+  .linhas{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-around;padding:6px 10px 4px}
+  .linha-j{display:flex;justify-content:space-around}
+  .linha-j.gol{justify-content:center;position:relative}
+  .linha-j.gol .tec{position:absolute;left:6px}
+  .selo-form{position:absolute;right:12px;bottom:12px;background:var(--tinta);color:#fff;font-size:12px;font-weight:700;border-radius:6px;padding:6px 8px}
+  .dica-cap{position:absolute;left:50%;top:-6px;transform:translate(-50%,-100%);background:var(--amarelo);color:var(--tinta);font-size:12px;font-weight:700;border-radius:999px;padding:6px 12px;white-space:nowrap;z-index:5;box-shadow:0 6px 14px -6px rgba(0,0,0,.4)}
+
+  /* card do jogador */
+  .jog{width:60px;display:flex;flex-direction:column;align-items:center;position:relative}
+  .jog .preco{background:var(--escuro);color:#fff;font-size:9px;font-weight:700;border-radius:4px;padding:1px 4px;line-height:1.3}
+  .jog .camisa{position:relative;margin-top:1px}
+  .jog .camisa svg{width:34px;display:block}
+  .jog .ok{position:absolute;left:-5px;bottom:-1px;width:12px;height:12px;border-radius:50%;background:var(--check);border:1.5px solid #fff;display:grid;place-items:center}
+  .jog .ok svg{width:7px}
+  .jog .nome{margin-top:1px;background:#fff;color:var(--tinta);font-size:9px;font-weight:600;border-radius:3px;padding:1px 4px;white-space:nowrap;box-shadow:0 1px 1px rgba(0,0,0,.15);max-width:64px;overflow:hidden;text-overflow:ellipsis}
+  .jog .cap{position:absolute;right:6px;top:12px;width:16px;height:16px;border-radius:50%;background:var(--amarelo);color:var(--tinta);font-size:10px;font-weight:900;display:grid;place-items:center;border:1.5px solid #fff}
+  .jog.vazio .mais{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.92);color:var(--azul);font-size:22px;font-weight:500;display:grid;place-items:center;line-height:1;margin-top:10px;box-shadow:0 3px 8px -3px rgba(0,0,0,.35)}
+  .jog.vazio .pos{margin-top:3px;font-size:8.5px;font-weight:700;color:#fff;background:rgba(15,23,42,.45);border-radius:3px;padding:1px 4px}
+  .jog.alvo-cap .camisa{animation:pulsa 1s ease-in-out infinite}
+  @keyframes pulsa{50%{transform:scale(1.1)}}
+  .jog.entra{animation:entra .45s cubic-bezier(.2,1.4,.4,1) both}
+  @keyframes entra{from{opacity:0;transform:translateY(-10px) scale(.6)}}
+  .banco .jog .nome{box-shadow:0 0 0 1px var(--linha)}
+  .banco .jog.vazio .mais{background:var(--azul-claro);box-shadow:none}
+  .banco .jog.vazio .pos{color:var(--texto);background:none}
+
+  /* banco de reservas */
+  .banco{padding:12px 12px 0;flex:none}
+  .rotulo-linha{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--texto)}
+  .rotulo-linha::before,.rotulo-linha::after{content:"";flex:1;height:1px;background:var(--linha)}
+  .banco .fila{display:flex;justify-content:space-around;margin-top:6px}
+
+  /* ações */
+  .acoes{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 10px;flex:none;gap:10px}
+  .acoes .icones{display:flex;gap:8px}
+  .acoes .icones button{width:38px;height:38px;border-radius:8px;border:1px solid var(--linha);background:#fff;display:grid;place-items:center;position:relative}
+  .acoes .icones button.on{background:var(--azul);border-color:var(--azul);color:#fff}
+  .acoes .icones svg{width:18px;height:18px}
+  .tag-pro{position:absolute;top:-7px;right:-8px;font-size:8px;font-weight:900;background:var(--amarelo);color:var(--tinta);border-radius:4px;padding:1px 4px;letter-spacing:.3px}
+  .btn-salvar{height:40px;border-radius:8px;background:var(--azul);color:#fff;font-weight:700;font-size:14px;padding:0 16px;flex:none}
+  .capitao{font-size:10px;color:var(--suave);text-align:right;line-height:1.2}
+  .capitao b{display:block;color:var(--tinta);font-size:14px}
+
+  /* lista da escalação */
+  .lista-esc{margin:10px 18px 0;background:#fff;border-radius:12px;border:1px solid var(--linha);height:350px;overflow-y:auto;flex:none}
+  .lista-esc::-webkit-scrollbar{width:0}
+  .lin{display:grid;grid-template-columns:30px 36px 1fr auto;gap:8px;align-items:center;padding:7px 12px;border-bottom:1px solid var(--linha);width:100%;text-align:left}
+  .lin .p{font-size:10px;font-weight:700;color:var(--texto)}
+  .lin svg{width:28px}
+  .lin b{font-size:13px;display:block}
+  .lin small{font-size:11px;color:var(--suave)}
+  .lin .v{font-size:13px;font-weight:700}
+  .lin.vaga b{color:var(--azul)}
+
+  /* navegação inferior (três destinos, como no app) */
+  .nav{flex:none;margin-top:auto;background:#fff;border-top:1px solid var(--linha);display:flex;justify-content:space-around;padding:8px 0 24px;position:relative}
+  .nav::after{content:"";position:absolute;bottom:8px;left:50%;width:120px;height:5px;margin-left:-60px;border-radius:3px;background:var(--tinta)}
+  .nav button{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:var(--suave);position:relative;min-width:80px}
+  .nav button svg{width:22px;height:22px}
+  .nav button.on{color:var(--azul);font-weight:700}
+  .badge{position:absolute;top:-4px;left:50%;margin-left:4px;min-width:17px;height:17px;border-radius:9px;background:var(--erro);color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center;padding:0 4px}
+
+  /* botões gerais */
+  .btn{height:48px;border-radius:10px;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;transition:transform .12s ease}
+  .btn:active,.btn-salvar:active{transform:scale(.97)}
+  .btn svg{width:20px;height:20px}
+  .btn-azul{background:var(--azul);color:#fff}
+  .btn-branco{background:#fff;color:var(--azul)}
+  .btn-contorno{border:1.5px solid var(--linha);background:#fff;color:var(--tinta)}
+  .btn-amarelo{background:var(--amarelo);color:var(--tinta)}
+  .btn-zap{background:var(--zap);color:#fff}
+  .duas{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+  /* toast */
+  .toast{position:absolute;left:18px;right:18px;bottom:96px;z-index:50;display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;background:var(--tinta);color:#fff;font-size:14px;font-weight:600;box-shadow:0 10px 24px -10px rgba(0,0,0,.6);opacity:0;transform:translateY(12px);transition:.25s;pointer-events:none}
+  .toast.on{opacity:1;transform:none;pointer-events:auto}
+  .toast i{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;flex:none;background:var(--check)}
+  .toast i.alerta{background:var(--amarelo);color:var(--tinta);font-style:normal;font-weight:900;font-size:13px}
+  .toast i svg{width:12px}
+  .toast button{margin-left:auto;color:#9fb4ff;font-weight:700;font-size:13px}
+
+  /* splash */
+  .splash{background:radial-gradient(120% 80% at 50% 45%,#3a5cff 0%,var(--azul) 45%,var(--azul-esc) 100%);color:#fff;align-items:center;justify-content:center}
+  .splash img{width:150px}
+  .splash h1{font-size:40px;font-weight:900;letter-spacing:.5px;line-height:1;margin-top:6px}
+  .splash p{font-size:14px;font-weight:700;letter-spacing:9px;margin:6px 0 0 9px}
+  .splash .carrega{position:absolute;bottom:90px;width:120px;height:4px;border-radius:2px;background:rgba(255,255,255,.25);overflow:hidden}
+  .splash .carrega::after{content:"";position:absolute;inset:0;width:40%;background:#fff;border-radius:2px;animation:carrega 1.2s ease-in-out infinite}
+  @keyframes carrega{from{transform:translateX(-100%)}to{transform:translateX(260%)}}
+
+  /* início (campeonatos) */
+  .ola{padding:4px 18px 18px;display:flex;align-items:center;justify-content:space-between}
+  .ola small{font-size:13px;opacity:.85}
+  .ola b{display:block;font-size:20px}
+  .avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;flex:none;font-weight:800;color:#fff;font-size:15px;border:2px solid rgba(255,255,255,.6);overflow:hidden}
+  .avatar img{width:62%;filter:none}
+  .avatar svg{width:55%}
+  .camps{display:flex;gap:10px;overflow-x:auto;padding:14px 16px 4px}
+  .camps::-webkit-scrollbar{height:0}
+  .camp{flex:none;width:76px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--texto);text-align:center}
+  .camp img{width:56px;height:56px;border-radius:14px;display:block;transition:transform .15s,box-shadow .15s}
+  .camp.on{color:var(--tinta);font-weight:800}
+  .camp.on img{box-shadow:0 0 0 3px #fff,0 0 0 5px var(--azul)}
+  .card{background:#fff;border-radius:14px;border:1px solid var(--linha);padding:14px;margin-top:12px;box-shadow:0 6px 18px -14px rgba(15,23,42,.35)}
+  .card-topo{display:flex;align-items:center;gap:10px}
+  .card-topo .esc svg{width:34px}
+  .card-topo b{font-size:16px;display:block}
+  .card-topo small{font-size:12px;color:var(--texto)}
+  .pill{font-size:10px;font-weight:800;border-radius:6px;padding:3px 7px;display:inline-block;letter-spacing:.3px}
+  .pill-pro{background:var(--azul-claro);color:var(--azul);border:1px solid var(--azul-linha)}
+  .pill-free{background:#f1f5f9;color:var(--texto)}
+  .pill-aberta{background:var(--azul-claro);color:var(--azul);margin-left:auto;border:1px solid var(--azul-linha)}
+  .tres{display:grid;grid-template-columns:repeat(3,1fr);text-align:center;margin-top:12px;border-top:1px solid var(--linha);padding-top:10px}
+  .tres span{font-size:10px;color:var(--suave);text-transform:uppercase;display:block}
+  .tres b{font-size:14px;display:block;margin-top:2px}
+  .tres > div+div{border-left:1px solid var(--linha)}
+  .rodada{display:flex;align-items:center;justify-content:space-between;margin-top:12px;gap:10px}
+  .rodada small{font-size:10px;color:var(--suave);text-transform:uppercase;display:block}
+  .rodada span{font-size:13px;font-weight:600}
+  .rodada .ok-txt{color:var(--check)}
+  .rodada .btn{width:auto;padding:0 20px;height:42px;font-size:14px}
+  .anuncio{margin-top:12px;border-radius:12px;background:repeating-linear-gradient(45deg,#eef2f7 0 10px,#e6ebf2 10px 20px);height:74px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11px;color:var(--suave);border:1px dashed #cbd5e1}
+  .anuncio button{font-size:12px;font-weight:700;color:var(--azul)}
+  .secao{font-size:15px;font-weight:800;margin-top:20px;display:flex;justify-content:space-between;align-items:center}
+  .secao button{font-size:13px;color:var(--azul);font-weight:700}
+  .banner-pro{display:flex;align-items:center;gap:12px;margin-top:12px;background:var(--azul);color:#fff;border-radius:14px;padding:14px;width:100%;text-align:left;overflow:hidden;position:relative}
+  .banner-pro b{font-size:15px;display:block}
+  .banner-pro small{font-size:12px;opacity:.85}
+  .banner-pro img{width:44px;flex:none}
+
+  /* mercado */
+  .busca{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--linha);border-radius:10px;height:42px;padding:0 12px;margin-top:12px;color:var(--suave);font-size:14px}
+  .busca svg{width:18px}
+  .chips{display:flex;gap:8px;overflow-x:auto;margin-top:10px;padding-bottom:2px}
+  .chips::-webkit-scrollbar{height:0}
+  .chip{flex:none;font-size:12px;font-weight:700;border:1px solid var(--linha);border-radius:999px;padding:7px 12px;background:#fff;color:var(--texto)}
+  .chip.on{background:var(--tinta);border-color:var(--tinta);color:#fff}
+  .chip.trava{color:var(--suave)}
+  .saldo{display:flex;justify-content:space-between;font-size:12px;color:var(--texto);margin-top:12px}
+  .saldo b{color:var(--tinta)}
+  .merc{display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:center;background:#fff;border:1px solid var(--linha);border-radius:12px;padding:10px;margin-top:8px;width:100%;text-align:left}
+  .merc .esc svg{width:36px}
+  .merc b{font-size:14px;display:block}
+  .merc small{font-size:11px;color:var(--texto);display:block}
+  .merc .num{display:flex;gap:12px;margin-top:5px}
+  .merc .num span{font-size:10px;color:var(--suave);line-height:1.2}
+  .merc .num span b{font-size:12px;color:var(--tinta)}
+  .merc .num .lock b{color:var(--suave);display:flex;align-items:center;gap:3px}
+  .merc .num .lock svg{width:10px}
+  .merc .dir{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+  .merc .dir > b{font-size:14px}
+  .bt-escalar{height:30px;border-radius:8px;background:var(--azul);color:#fff;font-size:12px;font-weight:700;padding:0 12px}
+  .bt-escalar.off{background:#e2e8f0;color:var(--suave);pointer-events:none}
+  .bt-escalar.ja{background:var(--azul-claro);color:var(--azul);pointer-events:none}
+
+  /* jogador */
+  .perfil{background:var(--azul);color:#fff;padding:6px 18px 18px;display:flex;align-items:center;gap:14px;flex:none}
+  .perfil .esc{width:72px;height:72px;border-radius:16px;background:rgba(255,255,255,.14);display:grid;place-items:center}
+  .perfil .esc svg{width:50px}
+  .perfil b{font-size:21px;display:block}
+  .perfil small{font-size:13px;opacity:.85}
+  .grade-num{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+  .grade-num div{background:#fff;border:1px solid var(--linha);border-radius:12px;padding:10px;text-align:center}
+  .grade-num span{font-size:10px;color:var(--suave);text-transform:uppercase;display:block}
+  .grade-num b{font-size:17px;display:block;margin-top:2px}
+  .grade-num .sobe{color:var(--check)}
+  .grafico{background:#fff;border:1px solid var(--linha);border-radius:12px;padding:12px 12px 8px;margin-top:10px}
+  .grafico h4,.scouts h4{font-size:12px;color:var(--texto);font-weight:700;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+  .barras{display:flex;align-items:flex-end;gap:8px;height:96px}
+  .barras div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;font-size:10px;color:var(--texto);gap:3px}
+  .barras i{display:block;width:100%;border-radius:5px 5px 2px 2px;background:var(--azul);min-height:3px}
+  .barras i.neg{background:var(--erro)}
+  .barras small{font-size:9px;color:var(--suave)}
+  .scouts{background:#fff;border:1px solid var(--linha);border-radius:12px;padding:12px;margin-top:10px}
+  .scouts .lin2{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--linha)}
+  .scouts .lin2:last-child{border:0}
+  .bloqueio{position:relative}
+  .bloqueio .borrado{filter:blur(4px);user-select:none}
+  .bloqueio .sobre{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;font-size:12px;color:var(--texto);font-weight:600}
+  .bloqueio .sobre button{background:var(--amarelo);color:var(--tinta);font-weight:800;border-radius:8px;padding:8px 14px;font-size:12px}
+
+  /* compartilhar */
+  .previa{background:linear-gradient(160deg,var(--azul),var(--azul-esc));border-radius:18px;padding:16px;color:#fff;margin-top:14px;box-shadow:0 14px 30px -14px rgba(20,59,238,.6)}
+  .previa header{display:flex;align-items:center;gap:8px;font-weight:900;font-size:14px}
+  .previa header img{height:20px}
+  .previa header span{margin-left:auto;font-size:11px;font-weight:600;opacity:.85}
+  .previa h3{font-size:20px;margin-top:10px}
+  .previa .mini{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:12px;margin-top:10px;background:rgba(255,255,255,.1);border-radius:10px;padding:10px}
+  .previa .mini b{opacity:.75;font-weight:700}
+  .previa footer{display:flex;justify-content:space-between;font-size:12px;margin-top:10px;opacity:.9}
+  .canais{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+  .canal{background:#fff;border:1px solid var(--linha);border-radius:12px;padding:12px 6px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;font-weight:700}
+  .canal svg{width:26px;height:26px}
+
+  /* notificações */
+  .notif{display:grid;grid-template-columns:40px 1fr auto;gap:10px;background:#fff;border:1px solid var(--linha);border-radius:12px;padding:12px;margin-top:8px;align-items:start}
+  .notif .ic{width:40px;height:40px;border-radius:10px;background:var(--azul-claro);color:var(--azul);display:grid;place-items:center}
+  .notif .ic svg{width:20px}
+  .notif .ic.alerta{background:#fff7e0;color:#b37f00}
+  .notif .ic.ok{background:#e7f8ee;color:var(--check)}
+  .notif b{font-size:14px;display:block}
+  .notif p{font-size:12.5px;color:var(--texto);margin-top:2px;line-height:1.35}
+  .notif small{font-size:11px;color:var(--suave);white-space:nowrap}
+  .notif .nova{display:block;width:8px;height:8px;border-radius:50%;background:var(--azul);margin:6px 0 0 auto}
+  .pref{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--linha);width:100%;text-align:left}
+  .pref b{font-size:14px;display:block}
+  .pref small{font-size:12px;color:var(--texto)}
+  .chave{width:44px;height:26px;border-radius:13px;background:#cbd5e1;position:relative;flex:none;transition:.2s}
+  .chave::after{content:"";position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+  .chave.on{background:var(--azul)}
+  .chave.on::after{left:21px}
+  .chave.trava{background:#e2e8f0}
+  .abas{display:flex;background:#eef2f7;border-radius:10px;padding:4px;margin-top:12px}
+  .abas button{flex:1;height:34px;border-radius:8px;font-size:13px;font-weight:700;color:var(--texto);text-align:center}
+  .abas button.on{background:#fff;color:var(--tinta);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+
+  /* ranking */
+  .liga-topo{background:var(--azul);color:#fff;padding:0 18px 16px;flex:none}
+  .liga-topo .info{display:flex;align-items:center;gap:12px}
+  .liga-topo .info img{width:44px;height:44px;border-radius:12px}
+  .liga-topo b{font-size:18px;display:block}
+  .liga-topo small{font-size:12px;opacity:.85}
+  .podio{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;align-items:end;margin-top:14px}
+  .podio div{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;text-align:center}
+  .podio .avatar{width:46px;height:46px}
+  .podio .p1 .avatar{width:58px;height:58px;border-color:var(--amarelo)}
+  .podio i{font-style:normal;font-weight:900;font-size:13px}
+  .podio span{opacity:.85}
+  .rank{display:grid;grid-template-columns:26px 38px 1fr auto;gap:10px;align-items:center;padding:10px 12px;background:#fff;border:1px solid var(--linha);border-radius:12px;margin-top:8px}
+  .rank .avatar{width:38px;height:38px;border-width:0;font-size:13px}
+  .rank .pos{font-weight:800;font-size:14px;text-align:center}
+  .rank b{font-size:14px;display:block}
+  .rank small{font-size:11px;color:var(--texto)}
+  .rank .pts{text-align:right;font-weight:800;font-size:14px}
+  .rank .pts small{display:block;font-weight:500;color:var(--suave);font-size:10px}
+  .rank.eu{border-color:var(--azul);background:var(--azul-claro)}
+  .rank .sobe{color:var(--check);font-size:10px;font-weight:700}
+  .rank .desce{color:var(--erro);font-size:10px;font-weight:700}
+  .rank .camisa-r svg{width:34px}
+
+  /* minha conta */
+  .conta-topo{background:var(--azul);color:#fff;padding:4px 18px 20px;display:flex;align-items:center;gap:14px;flex:none}
+  .conta-topo .avatar{width:64px;height:64px;font-size:20px}
+  .conta-topo b{font-size:19px;display:block}
+  .conta-topo small{font-size:13px;opacity:.85}
+  .avatares{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+  .avatares button{border-radius:50%;padding:2px;border:2px solid transparent}
+  .avatares button.on{border-color:var(--azul)}
+  .avatares .avatar{width:44px;height:44px;border:0}
+  .plano{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .plano b{font-size:15px}
+  .plano small{display:block;font-size:12px;color:var(--texto)}
+  .plano .btn{width:auto;height:38px;padding:0 14px;font-size:13px}
+
+  /* plano PRO */
+  .pro-hero{position:relative;background:var(--azul-esc);color:#fff;height:300px;flex:none;overflow:hidden}
+  .pro-hero img.foto{position:absolute;right:-40px;bottom:-40px;width:300px}
+  .pro-hero .txt{position:absolute;left:20px;top:96px;width:200px;z-index:2}
+  .pro-hero .txt .pill{background:var(--amarelo);color:var(--tinta);font-size:12px}
+  .pro-hero h2{font-size:28px;font-weight:900;line-height:1.08;margin-top:10px;text-shadow:0 2px 12px rgba(0,0,0,.25)}
+  .pro-hero .fechar{position:absolute;left:10px;top:44px;z-index:3;width:38px;height:38px;display:grid;place-items:center;border-radius:50%;background:rgba(255,255,255,.15)}
+  .pro-hero .fechar svg{width:20px}
+  .pro-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,var(--azul-esc) 30%,transparent 70%)}
+  .beneficios{background:#fff;border-radius:22px 22px 0 0;margin-top:-22px;position:relative;padding:20px 18px 18px;flex:1;display:flex;flex-direction:column}
+  .ben{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--linha);font-size:14px;font-weight:600}
+  .ben:last-of-type{border:0}
+  .ben i{width:34px;height:34px;border-radius:10px;background:var(--azul-claro);color:var(--azul);display:grid;place-items:center;flex:none}
+  .ben i svg{width:18px}
+  .nota-pro{font-size:11px;color:var(--suave);text-align:center;margin-top:10px}
+
+  /* sucesso PRO */
+  .sucesso{align-items:center;justify-content:center;text-align:center;padding:30px;background:radial-gradient(120% 70% at 50% 35%,#3a5cff 0%,var(--azul) 50%,var(--azul-esc) 100%);color:#fff}
+  .sucesso .selo{width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,.14);display:grid;place-items:center;box-shadow:0 0 0 14px rgba(255,255,255,.07)}
+  .sucesso .selo img{width:70px}
+  .sucesso h2{font-size:26px;font-weight:900;margin-top:28px}
+  .sucesso p{opacity:.9;margin-top:8px;font-size:15px;line-height:1.4}
+  .sucesso ul{list-style:none;margin-top:18px;text-align:left;display:grid;gap:8px;font-size:14px;font-weight:600}
+  .sucesso li{display:flex;gap:8px;align-items:center}
+  .sucesso li svg{width:18px;color:var(--amarelo)}
+  .sucesso .btn{margin-top:28px}
+
+  /* ---------- modo embutido (iframe do portfólio) ---------- */
+  body.modo-embed{background:transparent;padding:0;min-height:0;display:block}
+  body.modo-embed .topo{display:none}
+  body.modo-embed .celular{box-shadow:none}
+
+  /* ---------- modo telas ---------- */
+  body.modo-telas{display:block;padding:40px}
+  body.modo-telas .topo{text-align:left}
+  body.modo-telas .celular{display:none}
+  .quadro{display:none}
+  body.modo-telas .quadro{display:flex;flex-wrap:wrap;gap:48px}
+  .quadro figure{width:390px}
+  .quadro figcaption{color:#c6cff0;font-size:14px;font-weight:700;margin-bottom:12px}
+  .quadro .moldura{width:390px;height:844px;position:relative;overflow:hidden;border-radius:30px;background:var(--fundo)}
+  .quadro .tela{opacity:1;transform:none;pointer-events:none}
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <span class="selo-ficticio">Recriação ilustrativa · dados fictícios</span>
+  <h1>Premium League · Escalação redesenhada</h1>
+  <p>Telas do case com a identidade do Premium League. Jogadores, times, ligas e números são fictícios.
+    <span id="link-modo"></span></p>
+</header>
+
+<div class="celular"><div class="visor" id="visor"></div></div>
+<div class="quadro" id="quadro"></div>
+
+<template id="telas">
+
+<!-- 01 Splash -->
+<section class="tela splash" data-id="splash" data-nome="01 · Abertura">
+  <img src="img/aguia-branca.png" alt="">
+  <h1>PREMIUM</h1>
+  <p>LEAGUE</p>
+  <span class="carrega"></span>
+  <button style="position:absolute;inset:0" data-go="inicio" aria-label="Entrar"></button>
+</section>
+
+<!-- 02 Campeonatos -->
+<section class="tela" data-id="inicio" data-nome="02 · Campeonatos">
+  <div class="cab">
+    <div class="status js-status"></div>
+    <div class="ola">
+      <span class="marca"><img src="img/aguia-branca.png" alt=""><span>PREMIUM<small>LEAGUE</small></span></span>
+      <button class="avatar js-avatar" data-go="conta" aria-label="Minha conta"></button>
+    </div>
+  </div>
+  <div class="conteudo">
+    <div class="camps js-camps"></div>
+    <div class="pad">
+      <div class="card">
+        <div class="card-topo"><span class="esc js-camisa-time"></span><span><span class="js-plano-pill"></span><b>Esquadrão Azul</b><small class="js-camp-nome"></small></span></div>
+        <div class="tres"><div><span>Patrimônio</span><b class="js-patrimonio"></b></div><div><span>Última</span><b>71,40pts</b></div><div><span>Total</span><b>812,90pts</b></div></div>
+        <div class="rodada"><span><small>Rodada 12 · fecha em <span class="js-relogio"></span></small><span class="js-status-time"></span></span><button class="btn btn-azul" data-go="escalacao">Escalar</button></div>
+      </div>
+      <div class="js-anuncio"></div>
+      <div class="secao">Minhas ligas <button data-go="ranking">Ver ranking</button></div>
+      <button class="card" style="display:block;width:100%;text-align:left" data-go="ranking">
+        <div class="card-topo"><img src="img/camp-brasileirao.png" alt="" style="width:36px;height:36px;border-radius:10px"><span><b>Liga dos Amigos</b><small>Brasileirão · 12 times</small></span><span class="pill pill-aberta">Aberta</span></div>
+        <div class="tres"><div><span>Campeonato</span><b>Brasileirão</b></div><div><span>Sua posição</span><b class="js-minha-pos">3º</b></div><div><span>Pontuação</span><b>812,90pts</b></div></div>
+      </button>
+      <div class="js-banner-pro"></div>
+    </div>
+  </div>
+  <nav class="nav js-nav" data-on="inicio"></nav>
+</section>
+
+<!-- 03 Escalação -->
+<section class="tela" data-id="escalacao" data-nome="03 · Escalação">
+  <div class="cab">
+    <div class="status js-status"></div>
+    <div class="barra"><button class="esq" data-go="inicio" aria-label="Voltar">#voltar</button>Escalação</div>
+  </div>
+  <div class="metricas"><div><span>Preço do time</span><b class="js-preco-time"></b></div><div><span>Mercado fecha em</span><b class="js-relogio"></b></div><div><span>Patrimônio</span><b class="js-patrimonio"></b></div></div>
+  <div class="js-escalacao" style="display:flex;flex-direction:column;flex:1;min-height:0"></div>
+  <nav class="nav js-nav" data-on="inicio"></nav>
+</section>
+
+<!-- 04 Mercado -->
+<section class="tela" data-id="mercado" data-nome="04 · Escolher jogador (mercado)">
+  <div class="cab">
+    <div class="status js-status"></div>
+    <div class="barra"><button class="esq" data-go="escalacao" aria-label="Voltar">#voltar</button><span class="js-titulo-mercado">Escolher jogador</span></div>
+  </div>
+  <div class="conteudo"><div class="pad">
+    <div class="busca">#lupa Buscar jogador ou time</div>
+    <div class="chips js-chips-pos"></div>
+    <div class="chips js-chips-ordem"></div>
+    <div class="saldo"><span>Saldo disponível: <b class="js-saldo"></b></span><span class="js-qtd-merc"></span></div>
+    <div class="js-mercado"></div>
+  </div></div>
+</section>
+
+<!-- 05 Jogador -->
+<section class="tela" data-id="jogador" data-nome="05 · Estatísticas do jogador">
+  <div class="cab">
+    <div class="status js-status"></div>
+    <div class="barra"><button class="esq" data-go="back" aria-label="Voltar">#voltar</button>Jogador</div>
+  </div>
+  <div class="perfil js-perfil"></div>
+  <div class="conteudo"><div class="pad js-jogador"></div></div>
+</section>
+
+<!-- 06 Compartilhar -->
+<section class="tela" data-id="compartilhar" data-nome="06 · Compartilhar escalação">
+  <div class="cab">
+    <div class="status js-status"></div>
+    <div class="barra"><button class="esq" data-go="escalacao" aria-label="Voltar">#voltar</button>Compartilhar</div>
+  </div>
+  <div class="conteudo"><div class="pad">
+    <div class="js-previa"></div>
+    <div class="canais">
+      <button class="canal" data-acao="zap">#zap WhatsApp</button>
+      <button class="canal" data-acao="copiar">#link Copiar link</button>
+      <button class="canal" data-acao="imagem">#imagem Salvar imagem</button>
+    </div>
+    <button class="btn btn-zap" style="margin-top:16px" data-acao="zap">Enviar no grupo da liga</button>
+  </div></div>
+</section>
+
+<!-- 07 Notificações -->
+<section class="tela" data-id="notificacoes" data-nome="07 · Notificações">
+  <div class="cab">
+    <div class="status js-status"></div>
+    <div class="barra">Notificações</div>
+  </div>
+  <div class="conteudo"><div class="pad">
+    <div class="abas js-abas-notif"></div>
+    <div class="js-notif"></div>
+  </div></div>
+  <nav class="nav js-nav" data-on="notificacoes"></nav>
+</section>
+
+<!-- 08 Ranking da liga -->
+<section class="tela" data-id="ranking" data-nome="08 · Ranking da liga">
+  <div class="cab">
+    <div class="status js-status"></div>
+    <div class="barra"><button class="esq" data-go="inicio" aria-label="Voltar">#voltar</button>Liga dos Amigos</div>
+  </div>
+  <div class="liga-topo"><div class="podio js-podio"></div></div>
+  <div class="conteudo"><div class="pad">
+    <div class="abas js-abas-rank"></div>
+    <div class="js-ranking"></div>
+  </div></div>
+  <nav class="nav js-nav" data-on="inicio"></nav>
+</section>
+
+<!-- 09 Minha conta -->
+<section class="tela" data-id="conta" data-nome="09 · Minha conta e estatísticas">
+  <div class="cab">
+    <div class="status js-status"></div>
+    <div class="barra">Minha conta</div>
+  </div>
+  <div class="conta-topo"><span class="avatar js-avatar"></span><span><b>Esquadrão Azul</b><small class="js-plano-txt"></small></span></div>
+  <div class="conteudo"><div class="pad js-conta"></div></div>
+  <nav class="nav js-nav" data-on="conta"></nav>
+</section>
+
+<!-- 10 Plano PRO -->
+<section class="tela" data-id="pro" data-nome="10 · Plano PRO">
+  <div class="pro-hero">
+    <button class="fechar" data-go="back" aria-label="Fechar">#fechar</button>
+    <img class="foto" src="img/torcedor.webp" alt="">
+    <div class="txt"><span class="pill">PRO</span><h2>Seja PRO e tenha os jogos na mão</h2></div>
+  </div>
+  <div class="beneficios">
+    <div class="ben"><i>#semads</i>Sem propagandas e anúncios</div>
+    <div class="ben"><i>#raio</i>Escalação automática</div>
+    <div class="ben"><i>#grafico</i>Mínimo para valorizar</div>
+    <div class="ben"><i>#dados</i>Novos dados e estatísticas</div>
+    <div class="ben"><i>#sino</i>Todas as notificações do time liberadas</div>
+    <button class="btn btn-azul" style="margin-top:auto" data-acao="assinar">Quero ser PRO</button>
+    <p class="nota-pro">Recriação ilustrativa: nenhuma cobrança é feita.</p>
+  </div>
+</section>
+
+<!-- 11 PRO ativo -->
+<section class="tela sucesso" data-id="pro-ok" data-nome="11 · PRO ativado">
+  <div class="selo"><img src="img/aguia-branca.png" alt=""></div>
+  <h2>Agora você é PRO!</h2>
+  <p>Recursos liberados para o Esquadrão Azul.</p>
+  <ul>
+    <li>#okc Escalação automática</li>
+    <li>#okc Mínimo para valorizar no mercado</li>
+    <li>#okc Novos dados e estatísticas</li>
+    <li>#okc Todas as notificações do time</li>
+    <li>#okc Sem propagandas</li>
+  </ul>
+  <button class="btn btn-branco js-volta-pro" data-acao="voltapro">Voltar para a escalação</button>
+</section>
+
+</template>
+
+<script>
+const svg = (d, w=1.8) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const IC = {
+  voltar: svg('<path d="M15 5l-7 7 7 7"/>',2.4),
+  fechar: svg('<path d="M6 6l12 12M18 6L6 18"/>',2.4),
+  seta: svg('<path d="M6 9l6 6 6-6"/>',2.6),
+  pessoa: svg('<path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM5 20c1-4 4-6 7-6s6 2 7 6"/>'),
+  listar: svg('<path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/>',2.2),
+  lixo: svg('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>'),
+  share: svg('<circle cx="18" cy="6" r="2.2"/><circle cx="18" cy="18" r="2.2"/><circle cx="6" cy="12" r="2.2"/><path d="M8 11l8-4M8 13l8 4"/>'),
+  raio: svg('<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>'),
+  escudo: svg('<path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/>'),
+  trofeu: svg('<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/>'),
+  sino: svg('<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 20a2 2 0 0 0 4 0"/>'),
+  conta: svg('<path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM5 21c1-4 4-6 7-6s6 2 7 6"/>'),
+  lupa: svg('<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/>'),
+  cadeado: svg('<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',2.2),
+  link: svg('<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>'),
+  imagem: svg('<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/>'),
+  semads: svg('<circle cx="12" cy="12" r="9"/><path d="M6 6l12 12"/>'),
+  grafico: svg('<path d="M4 19h16M6 15l4-4 3 3 5-6M15 8h3v3"/>'),
+  dados: svg('<path d="M6 20V10M12 20V4M18 20v-7"/>',2.2),
+  relogio: svg('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+  okc: svg('<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>',2.2),
+  check: '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 5l2 2 4-4" fill="none" stroke="#fff" stroke-width="1.8"/></svg>',
+  medico: svg('<path d="M12 5v14M5 12h14"/>',2.6),
+  estrela: svg('<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>'),
+  zap: '<svg viewBox="0 0 24 24" fill="#25d366" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm5.3 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.8s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.7-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.3z"/></svg>',
+  sinal: '<svg viewBox="0 0 34 12" fill="currentColor" aria-hidden="true"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="4.5" y="5.5" width="3" height="6.5" rx="1"/><rect x="9" y="3" width="3" height="9" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/><rect x="21" y="1" width="12" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.4"/><rect x="23" y="3" width="8" height="6" rx="1.2"/></svg>',
+};
+
+/* ---------- dados fictícios ---------- */
+const CLUBES = {
+  FAL:{nome:'Falcões FC', corpo:'#d6262f', manga:'#1f1f24'},
+  SER:{nome:'Serrano EC', corpo:'#f4f4f4', manga:'#2f8f4e'},
+  POR:{nome:'Portuário', corpo:'#1b2a5c', manga:'#f4f4f4'},
+  EST:{nome:'Estrela do Norte', corpo:'#1f1f24', manga:'#f4f4f4', listra:'#f4f4f4'},
+  UNI:{nome:'União Azul', corpo:'#2147c9', manga:'#d6262f'},
+  COR:{nome:'Coral AC', corpo:'#f2b705', manga:'#1f6f3a'},
+};
+const POS = {GOL:'Goleiro', ZAG:'Zagueiro', LAT:'Lateral', MEI:'Meia', ATA:'Atacante', TEC:'Técnico'};
+// [id, nome, posição, clube, preço, média]
+const BASE = [
+  ['g1','R. Tavares','GOL','FAL',7.4,6.1],['g2','M. Braga','GOL','SER',4.9,4.8],['g3','J. Cunha','GOL','EST',6.2,5.6],['g4','D. Lacerda','GOL','UNI',3.1,3.4],
+  ['z1','A. Rossi','ZAG','FAL',6.8,5.2],['z2','R. Veiga','ZAG','SER',5.6,4.6],['z3','B. Lemos','ZAG','POR',4.2,3.9],['z4','C. Duarte','ZAG','EST',7.9,5.9],['z5','N. Prado','ZAG','COR',3.4,3.1],['z6','V. Assis','ZAG','UNI',5.1,4.4],
+  ['l1','P. Reis','LAT','SER',6.1,5.0],['l2','W. Silva','LAT','FAL',7.2,5.7],['l3','K. Matos','LAT','UNI',4.4,3.8],['l4','E. Farias','LAT','COR',3.6,3.3],['l5','T. Nunes','LAT','POR',5.3,4.5],
+  ['m1','G. Souza','MEI','FAL',11.6,7.4],['m2','L. Ortiz','MEI','UNI',8.9,6.2],['m3','G. Dias','MEI','SER',6.4,5.1],['m4','R. Lima','MEI','POR',5.2,4.3],['m5','F. Bruno','MEI','EST',9.8,6.6],['m6','H. Arruda','MEI','COR',3.8,3.5],['m7','S. Pacheco','MEI','FAL',4.6,4.0],
+  ['a1','Pedro S.','ATA','FAL',13.4,8.2],['a2','L. Moraes','ATA','EST',9.6,6.4],['a3','E. Costa','ATA','SER',8.1,5.9],['a4','Y. Pires','ATA','UNI',6.7,5.0],['a5','I. Jesus','ATA','POR',5.4,4.4],['a6','O. Quintana','ATA','COR',3.9,3.6],['a7','T. Almada','ATA','EST',4.8,4.1],
+  ['t1','A. Jorge','TEC','FAL',6.0,5.4],['t2','M. Falcão','TEC','SER',4.2,4.3],['t3','C. Herrera','TEC','UNI',3.3,3.6],
+];
+const semente = s => { let h = 0; for (const c of s) h = (h*31 + c.charCodeAt(0)) % 9973; return h; };
+const JOG = {};
+BASE.forEach(([id,nome,pos,clube,preco,media])=>{
+  const h = semente(id);
+  const ult = [0,1,2,3,4].map(i=>{ const v = media + ((h*(i+3)) % 70)/10 - 3.2; return Math.round(v*10)/10; });
+  JOG[id] = {id,nome,pos,clube,preco,media, jogos:8+h%4, ult,
+    minimo: Math.round((preco*0.55 + (h%9)/10)*10)/10,
+    valoriz: Math.round((((h%17)-6)/10)*100)/100,
+    escalacoes: 20000 + (h*137 % 80000),
+    previsao: Math.round((media + (h%15)/10)*10)/10,
+    scouts: pos==='GOL' ? [['Defesas difíceis',h%9+4],['Jogos sem sofrer gol',h%4+1],['Gols sofridos',h%7+3]]
+      : pos==='TEC' ? [['Vitórias',h%5+3],['Empates',h%3+1],['Derrotas',h%3]]
+      : [['Gols',(h%5)+(pos==='ATA'?3:0)],['Assistências',h%4+1],['Finalizações certas',h%11+4],['Desarmes',h%9+(pos==='ZAG'?8:2)]]};
+});
+const FORMACOES = {
+  '4-3-3':{ATA:3, MEI:3, DEF:['LAT','ZAG','ZAG','LAT']},
+  '4-4-2':{ATA:2, MEI:4, DEF:['LAT','ZAG','ZAG','LAT']},
+  '3-5-2':{ATA:2, MEI:5, DEF:['ZAG','ZAG','ZAG']},
+};
+const CAMPS = [
+  ['brasileirao','Brasileirão'],['libertadores','Libertadores'],['champions','Champions League'],
+  ['ingles','Inglês'],['espanhol','Espanhol'],['alemao','Alemão'],
+];
+const AVATARES = [
+  {cor:'#143bee', tipo:'aguia'}, {cor:'#0f172a', tipo:'bola'}, {cor:'#22b55a', tipo:'estrela'},
+  {cor:'#d6262f', tipo:'raio'}, {cor:'#f2b705', tipo:'coroa'}, {cor:'#7c3aed', tipo:'iniciais'},
+];
+const RIVAIS = [
+  {time:'Os Invictos', dono:'Rafa M.', cor:'#d6262f', pts:874.3, rod:82.1, var:'sobe'},
+  {time:'Tiki-Taka FC', dono:'Bia L.', cor:'#22b55a', pts:851.6, rod:64.0, var:'desce'},
+  {eu:true, pts:812.9, rod:71.4, var:'sobe'},
+  {time:'Real Várzea', dono:'Caio P.', cor:'#0f172a', pts:798.2, rod:58.7, var:'desce'},
+  {time:'Galáticos do Bairro', dono:'Duda S.', cor:'#7c3aed', pts:776.5, rod:69.9, var:'sobe'},
+  {time:'Chuta que é Gol', dono:'Léo A.', cor:'#f2b705', pts:741.0, rod:50.2, var:'desce'},
+  {time:'Pelada de Quinta', dono:'Nina R.', cor:'#0e7490', pts:702.8, rod:61.3, var:'sobe'},
+];
+
+/* ---------- estado ---------- */
+const PATRIMONIO = 120;
+const estado = {
+  pro:false, camp:'brasileirao', formacao:'4-3-3', vista:'campo', menuForm:false,
+  titulares:[], banco:{GOL:null, ZAG:null, LAT:null, MEI:null, ATA:null}, capitao:null,
+  modoCap:false, salvo:false, alvo:null, filtroPos:'ATA', ordem:'media', jogador:'a1', recem:new Set(),
+  abaNotif:'todas', abaRank:'geral', avatar:0, voltaPro:'escalacao',
+  prefs:{fecha:true, incompleta:true, ao_vivo:false, lesao:false, valoriza:false},
+  notifs:[
+    {tipo:'relogio', titulo:'Mercado fecha em 1 hora', texto:'Confira sua escalação da Rodada 12 antes do fechamento.', hora:'agora', lida:false},
+    {tipo:'alerta', titulo:'Escalação incompleta', texto:'Seu time ainda não está escalado no Brasileirão.', hora:'5 min', lida:false},
+    {tipo:'medico', titulo:'R. Veiga é dúvida', texto:'Zagueiro do Serrano EC sentiu dores no treino.', hora:'1 h', lida:true, pro:true},
+    {tipo:'trofeu', titulo:'Parcial da Liga dos Amigos', texto:'Você subiu para o 3º lugar na rodada passada.', hora:'ontem', lida:true},
+  ],
+};
+let tempo = 3600;
+const historico = [];
+
+function montarSlots(form, anterior){
+  const f = FORMACOES[form];
+  const ordem = [...Array(f.ATA).fill('ATA'), ...Array(f.MEI).fill('MEI'), ...f.DEF, 'GOL', 'TEC'];
+  const sobra = {}; (anterior||[]).forEach(s=>{ if (s.id) (sobra[s.pos] = sobra[s.pos]||[]).push(s.id); });
+  return ordem.map(pos=>({pos, id:(sobra[pos]||[]).shift()||null}));
+}
+estado.titulares = montarSlots('4-3-3');
+
+const dinheiro = v => '$' + v.toFixed(2).replace('.',',');
+const pts = v => v.toFixed(2).replace('.',',') + 'pts';
+const noTime = () => [...estado.titulares.map(s=>s.id), ...Object.values(estado.banco)].filter(Boolean);
+const precoTime = () => noTime().reduce((s,id)=>s+JOG[id].preco,0);
+const saldo = () => PATRIMONIO - precoTime();
+const faltam = () => estado.titulares.filter(s=>!s.id).length;
+const hhmmss = s => [Math.floor(s/3600), Math.floor(s%3600/60), s%60].map(n=>String(n).padStart(2,'0')).join(':') + 'h';
+
+function camisa(clube){
+  const k = CLUBES[clube];
+  return `<svg viewBox="0 0 40 36" aria-hidden="true"><path d="M13 1 3 7l4 9 5-2v21h16V14l5 2 4-9-10-6c-1 3-4 5-7 5s-6-2-7-5z" fill="${k.corpo}" stroke="rgba(0,0,0,.25)" stroke-width=".8"/>
+    <path d="M3 7l4 9 5-2V8zM37 7l-4 9-5-2V8z" fill="${k.manga}"/>${k.listra?`<path d="M16 6h2v29h-2zM22 6h2v29h-2z" fill="${k.listra}" fill-opacity=".85"/>`:''}
+    <text x="20" y="25" text-anchor="middle" font-size="6.4" font-weight="800" font-family="Roboto,sans-serif" fill="${k.corpo==='#f4f4f4'||k.corpo==='#f2b705'?'#1f1f24':'#fff'}">${clube}</text></svg>`;
+}
+function avatarHTML(i, iniciais='EA'){
+  const a = AVATARES[i];
+  const conteudo = a.tipo==='aguia' ? '<img src="img/aguia-branca.png" alt="">'
+    : a.tipo==='bola' ? '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7l4 3-1.5 5h-5L8 10z"/><path d="M12 3v4M21 10l-5 0M17.5 19l-3-4M6.5 19l3-4M3 10h5"/></svg>'
+    : a.tipo==='estrela' ? IC.estrela.replace('currentColor','#fff')
+    : a.tipo==='raio' ? IC.raio.replace('currentColor','#fff')
+    : a.tipo==='coroa' ? '<svg viewBox="0 0 24 24" fill="#fff"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 10H5z"/></svg>'
+    : iniciais;
+  return {cor:a.cor, conteudo};
+}
+function setAvatar(el, i){ const a = avatarHTML(i); el.style.background = a.cor; el.innerHTML = a.conteudo; }
+
+/* ---------- cartas e campo ---------- */
+function cardJog(slotRef, id, pos, idx){
+  const anima = id && estado.recem.has(id) ? ` entra" style="animation-delay:${idx*55}ms` : '';
+  if (!id) return `<button class="jog vazio" data-slot="${slotRef}" aria-label="Escolher ${POS[pos]}"><span class="mais">+</span><span class="pos">${pos}</span></button>`;
+  const j = JOG[id];
+  const cap = estado.capitao===id ? '<span class="cap">C</span>' : '';
+  const alvo = estado.modoCap && slotRef.startsWith('t') && pos!=='TEC' ? ' alvo-cap' : '';
+  return `<button class="jog${alvo}${anima}" data-slot="${slotRef}" aria-label="${j.nome}"><span class="preco">${dinheiro(j.preco)}</span>
+    <span class="camisa">${camisa(j.clube)}<span class="ok">${IC.check}</span></span>${cap}<span class="nome">${j.nome}</span></button>`;
+}
+function campoHTML(){
+  const t = estado.titulares.map((s,i)=>({...s,i}));
+  const linhas = ['ATA','MEI','DEF'].map(g=> t.filter(s=> g==='DEF' ? (s.pos==='ZAG'||s.pos==='LAT') : s.pos===g));
+  const gol = t.find(s=>s.pos==='GOL'), tec = t.find(s=>s.pos==='TEC');
+  const c = s => cardJog('t'+s.i, s.id, s.pos, s.i);
+  return `<div class="campo">
+    <div class="gramado"></div>
+    <svg viewBox="0 0 300 318" preserveAspectRatio="none" aria-hidden="true"><g fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="1.3">
+      <path d="M21 6h258l14 306H7z"/><path d="M14 159h272"/><ellipse cx="150" cy="159" rx="34" ry="26"/>
+      <path d="M104 6v34h92V6M98 312v-36h104v36"/></g></svg>
+    ${estado.modoCap ? '<span class="dica-cap">Toque no jogador que será o capitão</span>' : ''}
+    <div class="linhas">
+      ${linhas.map(l=>`<div class="linha-j">${l.map(c).join('')}</div>`).join('')}
+      <div class="linha-j gol"><span class="tec">${c(tec)}</span>${c(gol)}</div>
+    </div>
+    <span class="selo-form">${estado.formacao}</span>
+  </div>`;
+}
+function listaHTML(){
+  const lin = (ref, id, pos) => id
+    ? `<button class="lin" data-slot="${ref}"><span class="p">${pos}</span>${camisa(JOG[id].clube)}<span><b>${JOG[id].nome}${estado.capitao===id?' · (C)':''}</b><small>${CLUBES[JOG[id].clube].nome} · média ${JOG[id].media.toFixed(1).replace('.',',')}</small></span><span class="v">${dinheiro(JOG[id].preco)}</span></button>`
+    : `<button class="lin vaga" data-slot="${ref}"><span class="p">${pos}</span><span class="jog vazio" style="width:36px"><span class="mais" style="margin:0;width:28px;height:28px;font-size:18px;background:var(--azul-claro)">+</span></span><span><b>Escolher ${POS[pos].toLowerCase()}</b><small>Posição vazia</small></span><span></span></button>`;
+  return `<div class="lista-esc">${estado.titulares.map((s,i)=>lin('t'+i, s.id, s.pos)).join('')}
+    ${Object.entries(estado.banco).map(([p,id])=>lin('b'+p, id, p).replace('<span class="p">','<span class="p" title="Reserva">R·')).join('')}</div>`;
+}
+function escalacaoHTML(){
+  const nCap = estado.capitao ? 1 : 0;
+  return `<div class="ferramentas">
+      <button class="form-btn" data-acao="menuform">${estado.formacao} ${IC.seta}</button>
+      <div class="vistas"><button class="${estado.vista==='campo'?'on':''}" data-acao="vcampo" aria-label="Ver campo">${IC.pessoa}</button><button class="${estado.vista==='lista'?'on':''}" data-acao="vlista" aria-label="Ver lista">${IC.listar}</button></div>
+      ${estado.menuForm ? `<div class="menu-form">${Object.keys(FORMACOES).map(f=>`<button class="${f===estado.formacao?'on':''}" data-form="${f}">${f}${f===estado.formacao?' ✓':''}</button>`).join('')}</div>` : ''}
+    </div>
+    ${estado.vista==='campo' ? campoHTML() : listaHTML()}
+    <div class="banco"><div class="rotulo-linha">Banco de reservas</div>
+      <div class="fila">${Object.entries(estado.banco).map(([p,id],i)=>cardJog('b'+p, id, p, 12+i)).join('')}</div></div>
+    <div class="acoes">
+      <div class="icones">
+        <button data-acao="limpar" aria-label="Limpar escalação">${IC.lixo}</button>
+        <button data-acao="compartilhar" aria-label="Compartilhar escalação">${IC.share}</button>
+        <button data-acao="auto" aria-label="Escalação automática">${IC.raio}${estado.pro?'':'<span class="tag-pro">PRO</span>'}</button>
+        <button class="${estado.modoCap?'on':''}" data-acao="capitao" aria-label="Escolher capitão">${IC.escudo}</button>
+      </div>
+      <span class="capitao">Capitão escolhido:<b>${nCap} de 1</b></span>
+      <button class="btn-salvar" data-acao="salvar">Salvar time</button>
+    </div>`;
+}
+
+/* ---------- mercado ---------- */
+function posDoAlvo(){ if (!estado.alvo) return estado.filtroPos; return estado.alvo.pos; }
+function mercadoHTML(){
+  const pos = posDoAlvo();
+  const lista = Object.values(JOG).filter(j=>j.pos===pos);
+  const chave = estado.ordem==='preco' ? (a,b)=>b.preco-a.preco : estado.ordem==='minimo' ? (a,b)=>a.minimo-b.minimo : (a,b)=>b.media-a.media;
+  lista.sort(chave);
+  const credito = estado.alvo && estado.alvo.atual ? JOG[estado.alvo.atual].preco : 0;
+  const time = noTime();
+  return lista.map(j=>{
+    const ja = time.includes(j.id);
+    const cabe = j.preco <= saldo() + credito + 1e-9;
+    const bt = ja ? '<span class="bt-escalar ja">No time</span>' : cabe ? `<button class="bt-escalar" data-pick="${j.id}">Escalar</button>` : '<span class="bt-escalar off">Sem saldo</span>';
+    const min = estado.pro ? `<span>Mín. p/ valorizar<br><b>${j.minimo.toFixed(1).replace('.',',')}pts</b></span>`
+      : `<span class="lock">Mín. p/ valorizar<br><b>${IC.cadeado} PRO</b></span>`;
+    return `<div class="merc"><button class="esc" data-ver="${j.id}" aria-label="Ver ${j.nome}">${camisa(j.clube)}</button>
+      <button data-ver="${j.id}" style="text-align:left"><b>${j.nome}</b><small>${CLUBES[j.clube].nome} · ${POS[j.pos]}</small>
+        <span class="num"><span>Média<br><b>${j.media.toFixed(1).replace('.',',')}</b></span><span>Jogos<br><b>${j.jogos}</b></span>${min}</span></button>
+      <span class="dir"><b>${dinheiro(j.preco)}</b>${bt}</span></div>`;
+  }).join('');
+}
+
+/* ---------- jogador ---------- */
+function jogadorHTML(){
+  const j = JOG[estado.jogador];
+  const max = Math.max(...j.ult.map(Math.abs), 1);
+  const naEsc = estado.titulares.findIndex(s=>s.id===j.id);
+  const noBanco = Object.entries(estado.banco).find(([,id])=>id===j.id);
+  const noTimeJ = naEsc>=0 || noBanco;
+  const credito = estado.alvo && estado.alvo.atual ? JOG[estado.alvo.atual].preco : 0;
+  let botoes;
+  if (noTimeJ) {
+    botoes = `<div class="duas" style="margin-top:14px">
+      <button class="btn btn-contorno" data-acao="vender">Vender (${dinheiro(j.preco)})</button>
+      ${naEsc>=0 && j.pos!=='TEC' ? `<button class="btn btn-azul" data-acao="fazercap">${estado.capitao===j.id?'Já é o capitão':'Tornar capitão'}</button>` : '<button class="btn btn-azul" data-go="escalacao">Ver escalação</button>'}</div>`;
+  } else if (estado.alvo && estado.alvo.pos===j.pos) {
+    const cabe = j.preco <= saldo() + credito + 1e-9;
+    botoes = `<button class="btn ${cabe?'btn-azul':'btn-contorno'}" style="margin-top:14px${cabe?'':';pointer-events:none;color:var(--suave)'}" data-pick="${j.id}">${cabe?'Escalar por '+dinheiro(j.preco):'Saldo insuficiente'}</button>`;
+  } else botoes = '';
+  const avancado = `<div class="scouts"><h4>Novos dados <span class="pill pill-pro">PRO</span></h4>
+    <div class="lin2"><span>Mínimo para valorizar</span><b>${j.minimo.toFixed(1).replace('.',',')}pts</b></div>
+    <div class="lin2"><span>Previsão de pontuação</span><b>${j.previsao.toFixed(1).replace('.',',')}pts</b></div>
+    <div class="lin2"><span>Escalado por</span><b>${j.escalacoes.toLocaleString('pt-BR')} times</b></div></div>`;
+  return `<div class="grade-num"><div><span>Média</span><b>${j.media.toFixed(1).replace('.',',')}</b></div><div><span>Preço</span><b>${dinheiro(j.preco)}</b></div>
+      <div><span>Variação</span><b class="${j.valoriz>=0?'sobe':''}" style="${j.valoriz<0?'color:var(--erro)':''}">${j.valoriz>=0?'+':''}${dinheiro(j.valoriz).replace('$-','−$')}</b></div></div>
+    <div class="grafico"><h4>Últimas 5 rodadas <span style="font-weight:500;color:var(--suave)">pontos</span></h4>
+      <div class="barras">${j.ult.map((v,i)=>`<div>${v.toFixed(1).replace('.',',')}<i class="${v<0?'neg':''}" style="height:${Math.abs(v)/max*70}%"></i><small>R${7+i}</small></div>`).join('')}</div></div>
+    <div class="scouts"><h4>Scouts na temporada <span style="font-weight:500;color:var(--suave)">${j.jogos} jogos</span></h4>${j.scouts.map(([k,v])=>`<div class="lin2"><span>${k}</span><b>${v}</b></div>`).join('')}</div>
+    ${estado.pro ? avancado : `<div class="bloqueio"><div class="borrado">${avancado}</div><div class="sobre">${IC.cadeado.replace('<svg','<svg width="22" height="22"')}Mínimo para valorizar e previsão de pontuação<button data-acao="irpro">Liberar com o PRO</button></div></div>`}
+    ${botoes}`;
+}
+
+/* ---------- outras telas ---------- */
+function previaHTML(){
+  const nomes = g => estado.titulares.filter(s=>s.id && (g==='DEF' ? ['ZAG','LAT'].includes(s.pos) : s.pos===g)).map(s=>JOG[s.id].nome + (estado.capitao===s.id?' (C)':'')).join(', ') || '—';
+  return `<div class="previa"><header><img src="img/aguia-branca.png" alt="">PREMIUM LEAGUE<span>Rodada 12 · Brasileirão</span></header>
+    <h3>Esquadrão Azul · ${estado.formacao}</h3>
+    <div class="mini"><b>ATA</b><span>${nomes('ATA')}</span><b>MEI</b><span>${nomes('MEI')}</span><b>DEF</b><span>${nomes('DEF')}</span><b>GOL</b><span>${nomes('GOL')}</span><b>TEC</b><span>${nomes('TEC')}</span></div>
+    <footer><span>Preço do time ${dinheiro(precoTime())}</span><span>${12-faltam()} de 12 escalados</span></footer></div>`;
+}
+const PREFS = [
+  ['fecha','Mercado fechando','Lembrete antes do fechamento da rodada',false],
+  ['incompleta','Escalação incompleta','Aviso quando faltar jogador ou capitão',false],
+  ['ao_vivo','Pontuação em tempo real','Gols e pontos dos seus jogadores ao vivo',true],
+  ['lesao','Lesões e suspensões','Quando um escalado vira dúvida',true],
+  ['valoriza','Valorização','Quando um jogador seu valoriza ou desvaloriza',true],
+];
+function notifHTML(){
+  if (estado.abaNotif==='config') return `<div class="card" style="padding:4px 14px">${PREFS.map(([k,t,d,pro])=>{
+      const trava = pro && !estado.pro;
+      return `<button class="pref" data-pref="${k}"><span><b>${t} ${pro?'<span class="pill pill-pro">PRO</span>':''}</b><small>${d}</small></span><span class="chave ${trava?'trava':estado.prefs[k]?'on':''}">${trava?'':''}</span></button>`;}).join('')}</div>
+    ${estado.pro ? '' : `<button class="banner-pro" data-acao="irpro"><img src="img/aguia-branca.png" alt=""><span><b>Todas as notificações do time</b><small>Liberadas no plano PRO</small></span></button>`}`;
+  return estado.notifs.map(n=>{
+    const ic = {relogio:IC.relogio, alerta:'!', medico:IC.medico, trofeu:IC.trofeu, ok:IC.okc}[n.tipo];
+    const cls = n.tipo==='alerta'||n.tipo==='medico' ? 'alerta' : n.tipo==='ok' ? 'ok' : '';
+    return `<div class="notif"><span class="ic ${cls}">${n.tipo==='alerta'?'<b style="font-size:18px">!</b>':ic}</span><span><b>${n.titulo}</b><p>${n.texto}</p></span><span><small>${n.hora}</small>${n.lida?'':'<i class="nova"></i>'}</span></div>`;
+  }).join('') + (estado.pro ? '' : `<div class="notif" style="opacity:.75"><span class="ic">${IC.cadeado}</span><span><b>Pontuação em tempo real</b><p>Gols e pontos dos seus jogadores ao vivo, só no PRO.</p></span><span></span></div>`);
+}
+function rankingLista(){
+  const eu = {time:'Esquadrão Azul', dono:'Você', av:estado.avatar};
+  if (estado.abaRank==='escalados') {
+    return Object.values(JOG).sort((a,b)=>b.escalacoes-a.escalacoes).slice(0,6).map((j,i)=>`<button class="rank" style="width:100%;text-align:left" data-ver="${j.id}"><span class="pos">${i+1}º</span><span class="camisa-r">${camisa(j.clube)}</span><span><b>${j.nome}</b><small>${j.pos} · ${CLUBES[j.clube].nome}</small></span><span class="pts">${j.escalacoes.toLocaleString('pt-BR')}<small>escalações</small></span></button>`).join('');
+  }
+  const campo = estado.abaRank==='rodada' ? 'rod' : 'pts';
+  const lista = [...RIVAIS].sort((a,b)=>b[campo]-a[campo]);
+  return lista.map((r,i)=>{
+    const d = r.eu ? eu : r;
+    const a = r.eu ? avatarHTML(estado.avatar) : {cor:r.cor, conteudo:r.dono.split(' ').map(x=>x[0]).join('')};
+    return `<div class="rank ${r.eu?'eu':''}"><span class="pos">${i+1}º</span><span class="avatar" style="background:${a.cor}">${a.conteudo}</span>
+      <span><b>${d.time}</b><small>${d.dono} <span class="${r.var}">${r.var==='sobe'?'▲':'▼'}</span></small></span><span class="pts">${pts(r[campo])}<small>${campo==='rod'?'na rodada':'no total'}</small></span></div>`;
+  }).join('');
+}
+function podioHTML(){
+  const campo = estado.abaRank==='rodada' ? 'rod' : 'pts';
+  const top = [...RIVAIS].sort((a,b)=>b[campo]-a[campo]).slice(0,3);
+  const item = (r,cls,n) => { const a = r.eu ? avatarHTML(estado.avatar) : {cor:r.cor, conteudo:r.dono.split(' ').map(x=>x[0]).join('')};
+    return `<div class="${cls}"><span class="avatar" style="background:${a.cor}">${a.conteudo}</span><i>${n}º</i><b style="font-size:12px">${r.eu?'Esquadrão Azul':r.time}</b><span>${pts(r[campo])}</span></div>`; };
+  return item(top[1],'p2',2) + item(top[0],'p1',1) + item(top[2],'p3',3);
+}
+function contaHTML(){
+  const rod = [54.2,61.8,47.5,80.3,66.1,58.9,77.0,71.4];
+  const max = Math.max(...rod);
+  return `<div class="card plano"><span><b>Plano ${estado.pro?'PRO':'gratuito'}</b><small>${estado.pro?'Todos os recursos liberados':'Com anúncios e recursos básicos'}</small></span>
+      ${estado.pro?'<span class="pill pill-pro">PRO ativo</span>':'<button class="btn btn-amarelo" data-acao="irpro">Seja PRO</button>'}</div>
+    <div class="secao">Avatar nas ligas</div>
+    <div class="avatares">${AVATARES.map((_,i)=>{const a=avatarHTML(i);return `<button class="${i===estado.avatar?'on':''}" data-avatar="${i}" aria-label="Avatar ${i+1}"><span class="avatar" style="background:${a.cor}">${a.conteudo}</span></button>`;}).join('')}</div>
+    <div class="secao">Estatísticas da temporada</div>
+    <div class="grade-num"><div><span>Média</span><b>67,15</b></div><div><span>Melhor</span><b>80,30</b></div><div><span>Liga</span><b class="js-minha-pos">3º</b></div></div>
+    <div class="grafico"><h4>Pontos por rodada <span style="font-weight:500;color:var(--suave)">Brasileirão</span></h4>
+      <div class="barras">${rod.map((v,i)=>`<div>${Math.round(v)}<i style="height:${v/max*72}%"></i><small>R${4+i}</small></div>`).join('')}</div></div>
+    ${estado.pro ? `<div class="scouts"><h4>Novos dados <span class="pill pill-pro">PRO</span></h4><div class="lin2"><span>Previsão para a Rodada 12</span><b>74,60pts</b></div><div class="lin2"><span>Valorização do elenco</span><b style="color:var(--check)">+$6,40</b></div></div>`
+      : `<div class="bloqueio"><div class="borrado"><div class="scouts"><h4>Novos dados</h4><div class="lin2"><span>Previsão para a Rodada 12</span><b>74,60pts</b></div><div class="lin2"><span>Valorização do elenco</span><b>+$6,40</b></div></div></div><div class="sobre">${IC.cadeado.replace('<svg','<svg width="22" height="22"')}Previsão e valorização do elenco<button data-acao="irpro">Liberar com o PRO</button></div></div>`}`;
+}
+
+/* ---------- render ---------- */
+function preparar(raiz){
+  raiz.innerHTML = raiz.innerHTML.replace(/#([a-z]+)\b/g, (m,k)=> IC[k] || m);
+  render(raiz);
+}
+function render(raiz){
+  const naoLidas = estado.notifs.filter(n=>!n.lida).length;
+  raiz.querySelectorAll('.js-status').forEach(s=>s.innerHTML=`<span>9:41</span><i>${IC.sinal.replace('viewBox="0 0 34 12"','viewBox="0 0 34 12" style="width:34px;height:12px"')}</i>`);
+  raiz.querySelectorAll('.js-nav').forEach(n=>{
+    const on = n.dataset.on;
+    const b = (id, ic, rot, extra='') => `<button class="${on===id?'on':''}" data-go="${id}">${ic}<span>${rot}</span>${extra}</button>`;
+    n.innerHTML = b('inicio',IC.trofeu,'Campeonatos') + b('notificacoes',IC.sino,'Notificações', naoLidas?`<span class="badge">${naoLidas}</span>`:'') + b('conta',IC.conta,'Minha conta');
+  });
+  raiz.querySelectorAll('.js-relogio').forEach(r=>r.textContent=hhmmss(tempo));
+  raiz.querySelectorAll('.js-patrimonio').forEach(r=>r.textContent=dinheiro(PATRIMONIO));
+  raiz.querySelectorAll('.js-preco-time').forEach(r=>r.textContent=dinheiro(precoTime()));
+  raiz.querySelectorAll('.js-saldo').forEach(r=>{ const c = estado.alvo && estado.alvo.atual ? JOG[estado.alvo.atual].preco : 0; r.textContent=dinheiro(saldo()+c); });
+  raiz.querySelectorAll('.js-avatar').forEach(a=>setAvatar(a, estado.avatar));
+  raiz.querySelectorAll('.js-camps').forEach(c=>c.innerHTML=CAMPS.map(([k,n])=>`<button class="camp ${k===estado.camp?'on':''}" data-camp="${k}"><img src="img/camp-${k}.png" alt="">${n}</button>`).join(''));
+  raiz.querySelectorAll('.js-camp-nome').forEach(c=>c.textContent=CAMPS.find(x=>x[0]===estado.camp)[1] + ' · Rodada 12');
+  raiz.querySelectorAll('.js-camisa-time').forEach(c=>c.innerHTML=camisa('UNI'));
+  raiz.querySelectorAll('.js-plano-pill').forEach(c=>c.innerHTML=estado.pro?'<span class="pill pill-pro">PRO</span>':'<span class="pill pill-free">GRATUITO</span>');
+  raiz.querySelectorAll('.js-plano-txt').forEach(c=>c.textContent=estado.pro?'Plano PRO · Liga dos Amigos':'Plano gratuito · Liga dos Amigos');
+  raiz.querySelectorAll('.js-status-time').forEach(c=>{ c.className='js-status-time'+(estado.salvo?' ok-txt':''); c.textContent = estado.salvo ? '✓ Time escalado' : 'Seu time não está escalado'; });
+  raiz.querySelectorAll('.js-anuncio').forEach(c=>c.innerHTML = estado.pro ? '' : '<div class="anuncio"><span>Publicidade</span><button data-acao="irpro">Remover anúncios com o PRO</button></div>');
+  raiz.querySelectorAll('.js-banner-pro').forEach(c=>c.innerHTML = estado.pro ? '' : `<button class="banner-pro" data-acao="irpro"><img src="img/aguia-branca.png" alt=""><span><b>Seja PRO e tenha os jogos na mão</b><small>Escalação automática, estatísticas e mais</small></span></button>`);
+  raiz.querySelectorAll('.js-escalacao').forEach(c=>c.innerHTML=escalacaoHTML());
+  raiz.querySelectorAll('.js-titulo-mercado').forEach(c=>c.textContent='Escolher ' + POS[posDoAlvo()].toLowerCase() + (estado.alvo && estado.alvo.banco ? ' (reserva)' : ''));
+  raiz.querySelectorAll('.js-chips-pos').forEach(c=>c.innerHTML=['GOL','ZAG','LAT','MEI','ATA','TEC'].map(p=>`<span class="chip ${p===posDoAlvo()?'on':''}">${p}</span>`).join(''));
+  raiz.querySelectorAll('.js-chips-ordem').forEach(c=>c.innerHTML=[['media','Maior média'],['preco','Mais caros'],['minimo','Mínimo p/ valorizar']].map(([k,n])=>`<button class="chip ${k===estado.ordem?'on':''} ${k==='minimo'&&!estado.pro?'trava':''}" data-ordem="${k}">${n}${k==='minimo'&&!estado.pro?' · PRO':''}</button>`).join(''));
+  raiz.querySelectorAll('.js-mercado').forEach(c=>c.innerHTML=mercadoHTML());
+  raiz.querySelectorAll('.js-qtd-merc').forEach(c=>c.textContent=Object.values(JOG).filter(j=>j.pos===posDoAlvo()).length + ' jogadores');
+  const j = JOG[estado.jogador];
+  raiz.querySelectorAll('.js-perfil').forEach(c=>c.innerHTML=`<span class="esc">${camisa(j.clube)}</span><span><b>${j.nome}</b><small>${POS[j.pos]} · ${CLUBES[j.clube].nome}</small></span>`);
+  raiz.querySelectorAll('.js-jogador').forEach(c=>c.innerHTML=jogadorHTML());
+  raiz.querySelectorAll('.js-previa').forEach(c=>c.innerHTML=previaHTML());
+  raiz.querySelectorAll('.js-abas-notif').forEach(c=>c.innerHTML=`<button class="${estado.abaNotif==='todas'?'on':''}" data-aba-notif="todas">Recentes</button><button class="${estado.abaNotif==='config'?'on':''}" data-aba-notif="config">Configurar</button>`);
+  raiz.querySelectorAll('.js-notif').forEach(c=>c.innerHTML=notifHTML());
+  raiz.querySelectorAll('.js-abas-rank').forEach(c=>c.innerHTML=[['geral','Geral'],['rodada','Rodada'],['escalados','Mais escalados']].map(([k,n])=>`<button class="${estado.abaRank===k?'on':''}" data-aba-rank="${k}">${n}</button>`).join(''));
+  raiz.querySelectorAll('.js-ranking').forEach(c=>c.innerHTML=rankingLista());
+  raiz.querySelectorAll('.js-podio').forEach(c=>c.innerHTML=podioHTML());
+  raiz.querySelectorAll('.js-conta').forEach(c=>c.innerHTML=contaHTML());
+  raiz.querySelectorAll('.js-volta-pro').forEach(b=>b.textContent = estado.voltaPro==='escalacao' ? 'Voltar para a escalação' : 'Continuar');
+}
+
+/* ---------- modos ---------- */
+const params = new URLSearchParams(location.search);
+const modoTelas = params.has('telas');
+document.body.classList.toggle('modo-telas', modoTelas);
+document.body.classList.toggle('modo-embed', params.has('embed'));
+document.getElementById('link-modo').innerHTML = modoTelas
+  ? '· <a href="?">abrir o protótipo clicável</a>'
+  : '· <a href="?telas">ver todas as telas lado a lado</a>';
+const molde = document.getElementById('telas').content;
+
+if (modoTelas) {
+  // escalação já montada para mostrar o layout final
+  const fixos = {ATA:['a2','a1','a3'], MEI:['m3','m1','m2'], LAT:['l1','l2'], ZAG:['z2','z1'], GOL:['g1'], TEC:['t1']};
+  const usar = {}; estado.titulares.forEach(s=>{ usar[s.pos]=usar[s.pos]||0; s.id = fixos[s.pos][usar[s.pos]++]; });
+  estado.titulares[3].id = 'm3'; estado.titulares[5].id = 'm2';
+  estado.banco = {GOL:'g4', ZAG:'z5', LAT:'l4', MEI:'m6', ATA:'a6'};
+  estado.capitao = 'm1'; estado.alvo = {pos:'ATA'}; estado.jogador = 'm1';
+  const quadro = document.getElementById('quadro');
+  [...molde.querySelectorAll('.tela')].forEach(t=>{
+    const fig = document.createElement('figure');
+    fig.innerHTML = `<figcaption>${t.dataset.nome}</figcaption><div class="moldura"></div>`;
+    const c = t.cloneNode(true); c.classList.add('ativa');
+    fig.querySelector('.moldura').appendChild(c);
+    quadro.appendChild(fig);
+  });
+  preparar(quadro);
+} else {
+  const visor = document.getElementById('visor');
+  visor.appendChild(molde.cloneNode(true));
+  preparar(visor);
+  const toastEl = document.createElement('div'); toastEl.className = 'toast'; visor.appendChild(toastEl);
+  let toastT, desfazer = null;
+  const toast = (msg, alerta=false, acao=null) => {
+    desfazer = acao;
+    toastEl.innerHTML = `<i class="${alerta?'alerta':''}">${alerta?'!':IC.check}</i><span>${msg}</span>${acao?'<button data-acao="desfazer">Desfazer</button>':''}`;
+    toastEl.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(()=>toastEl.classList.remove('on'), 2600);
+  };
+  const atual = () => visor.querySelector('.tela.ativa')?.dataset.id;
+  const ir = (id, semHistorico) => {
+    if (id==='back') id = historico.pop() || 'escalacao';
+    else if (!semHistorico && atual() && atual()!==id) historico.push(atual());
+    if (historico.length > 30) historico.shift();
+    if (id!=='escalacao') { estado.modoCap = false; estado.menuForm = false; }
+    visor.querySelectorAll('.tela').forEach(t=>t.classList.toggle('ativa', t.dataset.id===id));
+    const c = visor.querySelector('.tela.ativa .conteudo'); if (c) c.scrollTop = 0;
+    render(visor);
+    if (id==='notificacoes') estado.notifs.forEach(n=>n.lida=true);
+  };
+  ir('splash', true);
+  setTimeout(()=>{ if (atual()==='splash') ir('inicio', true); }, 2000);
+  setInterval(()=>{ if (tempo>0) tempo--; visor.querySelectorAll('.js-relogio').forEach(r=>r.textContent=hhmmss(tempo)); }, 1000);
+
+  const escalar = id => {
+    const a = estado.alvo; if (!a) return;
+    const j = JOG[id];
+    if (noTime().includes(id)) return;
+    if (a.banco) estado.banco[a.pos] = id; else estado.titulares[a.i].id = id;
+    if (a.atual && estado.capitao===a.atual) estado.capitao = null;
+    estado.salvo = false; estado.recem = new Set([id]);
+    estado.alvo = null;
+    ir('escalacao', true); historico.length = 0;
+    toast(`${j.nome} escalado por ${dinheiro(j.preco)}`);
+    setTimeout(()=>estado.recem.clear(), 600);
+  };
+  const autoEscalar = () => {
+    const vagas = [...estado.titulares.map((s,i)=>({pos:s.pos, i, banco:false, vazio:!s.id})).filter(v=>v.vazio),
+      ...Object.entries(estado.banco).filter(([,id])=>!id).map(([pos])=>({pos, banco:true}))];
+    if (!vagas.length) { toast('Seu time já está completo'); return; }
+    const novos = new Set();
+    vagas.forEach((v,k)=>{
+      const restantes = vagas.slice(k+1);
+      const reserva = restantes.reduce((s,r)=>s+Math.min(...Object.values(JOG).filter(j=>j.pos===r.pos && !noTime().includes(j.id)).map(j=>j.preco)),0);
+      const op = Object.values(JOG).filter(j=>j.pos===v.pos && !noTime().includes(j.id) && j.preco <= saldo() - reserva + 1e-9)
+        .sort((a,b)=> v.banco ? a.preco-b.preco : b.media-a.media)[0];
+      if (!op) return;
+      if (v.banco) estado.banco[v.pos] = op.id; else estado.titulares[v.i].id = op.id;
+      novos.add(op.id);
+    });
+    if (!estado.capitao) {
+      const melhor = estado.titulares.filter(s=>s.id && s.pos!=='TEC').sort((a,b)=>JOG[b.id].media-JOG[a.id].media)[0];
+      if (melhor) estado.capitao = melhor.id;
+    }
+    estado.recem = novos; estado.salvo = false; estado.vista = 'campo';
+    render(visor);
+    toast(`Escalação automática: ${novos.size} jogadores e capitão definidos`);
+    setTimeout(()=>estado.recem.clear(), 1200);
+  };
+  const irPro = origem => { estado.voltaPro = origem; ir('pro'); };
+
+  visor.addEventListener('click', e=>{
+    const el = e.target.closest('button'); if (!el) {
+      if (estado.menuForm && !e.target.closest('.menu-form')) { estado.menuForm = false; render(visor); }
+      return; }
+    const d = el.dataset;
+    if (d.acao==='desfazer') { if (desfazer) desfazer(); toastEl.classList.remove('on'); return; }
+    if (d.form) {
+      estado.titulares = montarSlots(d.form, estado.titulares); estado.formacao = d.form; estado.menuForm = false;
+      if (estado.capitao && !estado.titulares.some(s=>s.id===estado.capitao)) estado.capitao = null;
+      estado.salvo = false; render(visor); toast(`Formação ${d.form}`); return;
+    }
+    if (d.acao==='menuform') { estado.menuForm = !estado.menuForm; render(visor); return; }
+    if (estado.menuForm) { estado.menuForm = false; }
+    if (d.slot) {
+      const banco = d.slot[0]==='b';
+      const pos = banco ? d.slot.slice(1) : estado.titulares[+d.slot.slice(1)].pos;
+      const id = banco ? estado.banco[pos] : estado.titulares[+d.slot.slice(1)].id;
+      if (estado.modoCap && !banco && id) {
+        if (pos==='TEC') { toast('O técnico não pode ser capitão', true); return; }
+        estado.capitao = id; estado.modoCap = false; estado.salvo = false; render(visor); toast(`${JOG[id].nome} é o capitão`); return;
+      }
+      estado.alvo = {pos, banco, i: banco ? null : +d.slot.slice(1), atual:id};
+      estado.modoCap = false;
+      if (id) { estado.jogador = id; ir('jogador'); } else { estado.ordem = estado.ordem==='minimo' && !estado.pro ? 'media' : estado.ordem; ir('mercado'); }
+      return;
+    }
+    if (d.pick) { escalar(d.pick); return; }
+    if (d.ver) { estado.jogador = d.ver; ir('jogador'); return; }
+    if (d.ordem) { if (d.ordem==='minimo' && !estado.pro) { irPro('mercado'); return; } estado.ordem = d.ordem; render(visor); return; }
+    if (d.camp) { estado.camp = d.camp; render(visor); return; }
+    if (d.avatar) { estado.avatar = +d.avatar; render(visor); toast('Avatar atualizado nas ligas'); return; }
+    if (d.abaNotif) { estado.abaNotif = d.abaNotif; render(visor); return; }
+    if (d.abaRank) { estado.abaRank = d.abaRank; render(visor); return; }
+    if (d.pref) {
+      const pro = PREFS.find(p=>p[0]===d.pref)[3];
+      if (pro && !estado.pro) { irPro('notificacoes'); return; }
+      estado.prefs[d.pref] = !estado.prefs[d.pref]; render(visor); return;
+    }
+    switch (d.acao) {
+      case 'vcampo': estado.vista = 'campo'; render(visor); return;
+      case 'vlista': estado.vista = 'lista'; estado.modoCap = false; render(visor); return;
+      case 'limpar': {
+        if (!noTime().length) { toast('A escalação já está vazia', true); return; }
+        const copia = JSON.parse(JSON.stringify({t:estado.titulares, b:estado.banco, c:estado.capitao}));
+        estado.titulares = montarSlots(estado.formacao); estado.banco = {GOL:null, ZAG:null, LAT:null, MEI:null, ATA:null}; estado.capitao = null; estado.salvo = false;
+        render(visor);
+        toast('Escalação limpa', false, ()=>{ estado.titulares = copia.t; estado.banco = copia.b; estado.capitao = copia.c; render(visor); });
+        return; }
+      case 'compartilhar': ir('compartilhar'); return;
+      case 'zap': toast('Escalação enviada no WhatsApp (simulação)'); return;
+      case 'copiar': toast('Link da escalação copiado'); return;
+      case 'imagem': toast('Imagem salva na galeria (simulação)'); return;
+      case 'auto': if (!estado.pro) { irPro('escalacao'); return; } autoEscalar(); return;
+      case 'capitao':
+        if (!estado.titulares.some(s=>s.id && s.pos!=='TEC')) { toast('Escale jogadores antes de escolher o capitão', true); return; }
+        estado.vista = 'campo'; estado.modoCap = !estado.modoCap; render(visor); return;
+      case 'salvar': {
+        const f = faltam();
+        if (f) { toast(`Faltam ${f} ${f===1?'jogador':'jogadores'} na escalação`, true); return; }
+        if (!estado.capitao) { toast('Escolha o capitão antes de salvar', true); estado.modoCap = true; render(visor); return; }
+        estado.salvo = true;
+        estado.notifs.unshift({tipo:'ok', titulo:'Escalação salva', texto:`Esquadrão Azul escalado para a Rodada 12 (${estado.formacao}).`, hora:'agora', lida:false});
+        render(visor); toast('Escalação salva'); return; }
+      case 'vender': {
+        const id = estado.jogador; const j = JOG[id];
+        const i = estado.titulares.findIndex(s=>s.id===id);
+        if (i>=0) estado.titulares[i].id = null; else { const p = Object.keys(estado.banco).find(k=>estado.banco[k]===id); if (p) estado.banco[p] = null; }
+        if (estado.capitao===id) estado.capitao = null;
+        estado.salvo = false; estado.alvo = null; ir('escalacao', true); historico.length = 0; toast(`${j.nome} vendido por ${dinheiro(j.preco)}`); return; }
+      case 'fazercap': estado.capitao = estado.jogador; estado.salvo = false; ir('escalacao', true); historico.length = 0; toast(`${JOG[estado.jogador].nome} é o capitão`); return;
+      case 'irpro': irPro(atual()); return;
+      case 'assinar': estado.pro = true; ir('pro-ok'); return;
+      case 'voltapro': {
+        const destino = estado.voltaPro==='pro' ? 'inicio' : estado.voltaPro;
+        historico.length = 0; ir(destino, true);
+        if (destino==='escalacao') toast('Toque no raio para a escalação automática');
+        return; }
+    }
+    if (d.go) ir(d.go);
+  });
+}
+</script>
+</body>
+</html>

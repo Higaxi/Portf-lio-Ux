@@ -1,0 +1,821 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Akamai · Mobile Control Center (protótipo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  /* Layout das telas do case (portfólio). Branding de akamai.com:
+     logo oficial (akamai-logo-v5.svg), azul #00A4EB e marinho #00146C tirados do próprio logo,
+     Roboto (fonte primária do guia de marca da Akamai). Dados e contratos fictícios. */
+  :root{
+    --marinho:#00146C; --marinho-2:#0a2a8f; --marinho-3:#000a3d;
+    --azul:#00A4EB; --azul-esc:#0083c2; --azul-claro:#e3f4fc;
+    --fundo:#eef1f5; --borda:#c9d2df; --linha:#e5e9f0; --texto:#1f2937; --suave:#6b7280; --branco:#fff;
+    --erro:#e5484d; --ok:#16a34a;
+    --g1:#1e6fff; --g2:#f97316; --g3:#a855f7; --g4:#5eead4; --g5:#ef4444; --g6:#a3e635; --g7:#94a3b8;
+    --t1:#7dd3c8; --t2:#f97316; --t3:#7ac943; --t4:#2f74d0;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Roboto,system-ui,"Segoe UI",Arial,sans-serif;background:#060d2b;color:var(--texto);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:28px 16px}
+  button{font:inherit;border:0;background:none;cursor:pointer;color:inherit;text-align:inherit}
+  input{font:inherit}
+
+  .topo{color:#dde3f5;text-align:center;margin-bottom:18px}
+  .topo h1{font-size:18px;font-weight:700}
+  .topo .selo-ficticio{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;background:rgba(0,164,235,.16);color:#7fd3f7;border:1px solid rgba(0,164,235,.4);border-radius:999px;padding:3px 10px;margin-bottom:8px}
+  .topo p{font-size:13px;color:#98a3c4;margin-top:4px}
+  .topo a{color:#7fd3f7;font-weight:600}
+  .celular{width:390px;height:844px;border-radius:50px;background:#05081a;padding:11px;box-shadow:0 30px 80px -20px rgba(0,0,0,.8),inset 0 0 0 2px #1d2547}
+  .visor{width:100%;height:100%;border-radius:40px;overflow:clip;position:relative;background:var(--fundo)}
+
+  /* ---------- tela ---------- */
+  .tela{position:absolute;inset:0;display:flex;flex-direction:column;overflow:clip;background:var(--fundo);opacity:0;pointer-events:none;transform:translateX(18px);transition:opacity .28s ease,transform .28s ease}
+  .tela.ativa{opacity:1;pointer-events:auto;transform:none}
+  .status{height:44px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 26px 0 30px;font-size:14px;font-weight:700;color:#fff}
+  .status svg{width:52px;height:14px}
+  .conteudo{flex:1;overflow-y:auto;padding:0 0 14px}
+  .conteudo::-webkit-scrollbar{width:0}
+
+  /* top bar (marinho) */
+  .cab{background:var(--marinho);color:#fff;flex:none}
+  .cab-linha{display:flex;align-items:center;justify-content:space-between;padding:4px 12px 12px}
+  .cab-linha h2{font-size:16px;font-weight:500;text-align:center;flex:1}
+  .ic-btn{width:36px;height:36px;display:grid;place-items:center;border-radius:8px}
+  .ic-btn svg{width:22px;height:22px}
+  .ic-btn:active{background:rgba(255,255,255,.12)}
+
+  /* filtros: contrato e período */
+  .filtros{padding:14px 14px 4px}
+  .rot{font-size:13.5px;font-weight:700;color:var(--texto)}
+  .seletor{display:flex;align-items:stretch;margin-top:6px;width:100%;height:38px}
+  .seletor .valor{flex:1;background:#fff;border:1px solid var(--borda);border-right:0;border-radius:4px 0 0 4px;font-weight:700;font-size:14px;display:flex;align-items:center;padding:0 10px;letter-spacing:.3px}
+  .quad{width:38px;flex:none;background:var(--marinho);border-radius:0 4px 4px 0;display:grid;place-items:center;color:#fff}
+  .quad svg{width:16px;height:16px}
+  .periodo{display:flex;align-items:center;gap:8px;margin-top:10px}
+  .periodo .rot{font-size:12.5px;white-space:nowrap}
+  .periodo .datas{flex:1;height:32px;background:#fff;border:1px solid var(--borda);border-radius:4px;font-size:12px;color:var(--suave);display:flex;align-items:center;padding:0 9px;white-space:nowrap}
+  .periodo .quad{width:32px;height:32px;border-radius:4px}
+
+  .sec{padding:14px 14px 0;font-size:14px;font-weight:700;color:var(--texto)}
+  .card{background:#fff;border-radius:6px;box-shadow:0 1px 2px rgba(0,20,108,.12);margin:8px 14px 0;overflow:hidden}
+  .pad{padding:12px}
+
+  /* barras (gráfico do mini design system) */
+  .barra{padding:10px 12px 9px;border-top:1px solid var(--linha)}
+  .barra:first-child{border-top:0}
+  .barra header{display:flex;justify-content:space-between;font-size:11.5px;font-weight:700;color:var(--texto)}
+  .barra header span{color:var(--suave);font-weight:400}
+  .barra .trilho{margin-top:6px;height:20px}
+  .barra .encher{height:100%;border-radius:3px;box-shadow:inset 0 -3px 0 rgba(0,0,0,.14),inset 0 2px 0 rgba(255,255,255,.28);transition:width .6s cubic-bezier(.2,.8,.2,1);min-width:12px}
+  .barra small{display:block;margin-top:5px;font-size:11px;color:var(--suave)}
+
+  /* pizza */
+  .pizza{display:flex;align-items:center;gap:12px;padding:12px}
+  .pizza svg.p{width:136px;height:136px;flex:none;transform:rotate(-90deg)}
+  .legenda{list-style:none;display:flex;flex-direction:column;gap:6px;font-size:11.5px;flex:1;min-width:0}
+  .legenda li{display:flex;gap:6px;align-items:flex-start;line-height:1.2}
+  .legenda i{width:10px;height:10px;border-radius:50%;flex:none;margin-top:2px}
+  .legenda small{display:block;color:var(--suave);font-size:10.5px}
+  .paginas{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--suave);margin-top:2px}
+  .paginas button{width:22px;height:22px;display:grid;place-items:center;color:var(--marinho-2)}
+  .paginas button[disabled]{opacity:.3;cursor:default}
+  .paginas svg{width:12px;height:12px}
+  .nota{font-size:10.5px;color:var(--suave);text-align:right;padding:0 12px 10px}
+
+  /* campos de exibição */
+  .exib{display:grid;grid-template-columns:1fr 1fr;gap:12px 10px;padding:12px 14px}
+  .exib div{font-size:12.5px;color:var(--texto);line-height:1.25}
+  .exib b{display:block;font-size:17px;font-weight:500;margin-top:1px}
+  .exib .grande b{font-size:22px}
+
+  /* listas */
+  .lista{list-style:none}
+  .lista li{padding:11px 14px;border-top:1px solid var(--linha);font-size:12.5px}
+  .lista li:nth-child(even){background:#f6f8fb}
+  .lista li:first-child{border-top:0}
+  .acao{display:inline-flex;align-items:center;gap:5px;margin-top:3px;font-size:12px;color:var(--suave)}
+  .acao svg{width:13px;height:13px}
+  .acao.deny{color:var(--erro)} .acao.alert{color:#c2410c}
+
+  /* atalhos (Tráfego) */
+  .atalhos{background:#fff;margin:10px 0 0;box-shadow:0 1px 2px rgba(0,20,108,.1)}
+  .atalho{display:flex;align-items:center;justify-content:space-between;width:100%;padding:16px 16px;border-top:1px solid var(--linha);font-size:14px;font-weight:500}
+  .atalho:first-child{border-top:0}
+  .atalho svg{width:16px;height:16px}
+  .atalho:active{background:#f3f6fa}
+  .atalho small{display:block;font-size:11px;color:var(--suave);font-weight:400;margin-top:2px}
+
+  /* busca */
+  .busca{display:flex;gap:6px;padding:8px 14px 2px}
+  .busca input{flex:1;height:34px;border:1px solid var(--borda);border-radius:4px;padding:0 10px;font-size:13px;background:#fff;outline:none;color:var(--texto)}
+  .busca input:focus{border-color:var(--azul)}
+  .busca button{width:34px;height:34px;border-radius:4px;background:var(--marinho);color:#fff;display:grid;place-items:center}
+  .busca svg{width:16px;height:16px}
+
+  .host{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .host b{font-weight:700}
+  .host .nome{display:block;color:var(--azul-esc);font-weight:700;font-size:12px;margin-bottom:3px}
+  .info{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:var(--texto);flex:none}
+  .info svg{width:18px;height:18px}
+  .info.on{background:var(--azul-claro);color:var(--azul-esc)}
+  .det{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;margin-top:8px;padding-top:8px;border-top:1px dashed var(--borda);font-size:11.5px;color:var(--suave)}
+  .det b{display:block;color:var(--texto);font-size:13px;font-weight:500}
+  .vazio{text-align:center;color:var(--suave);font-size:13px;padding:24px 14px}
+
+  /* top urls */
+  .chips{display:flex;gap:8px;padding:10px 14px 0}
+  .chip{font-size:12px;font-weight:700;border:1px solid var(--borda);border-radius:999px;padding:6px 12px;background:#fff;color:var(--texto)}
+  .chip.on{background:var(--marinho);border-color:var(--marinho);color:#fff}
+  .url{display:grid;grid-template-columns:22px 1fr auto;gap:8px;align-items:center}
+  .url .pos{font-weight:700;color:var(--suave);font-size:12px}
+  .url code{font-family:"Roboto Mono",ui-monospace,Consolas,monospace;font-size:12px;color:var(--texto);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+  .url .mini{height:5px;border-radius:3px;background:var(--azul);margin-top:5px}
+  .url .num{font-weight:700;font-size:12.5px;text-align:right}
+  .url .num small{display:block;font-weight:400;color:var(--suave);font-size:10.5px}
+
+  /* colunas (ataques por dia) */
+  .colunas{padding:10px 12px 8px}
+  .colunas svg{width:100%;height:110px;display:block}
+  .colunas .eixo{display:flex;justify-content:space-between;font-size:10px;color:var(--suave);margin-top:4px}
+
+  /* barra de navegação */
+  .nav{flex:none;height:74px;background:#fff;border-top:1px solid var(--linha);display:flex;align-items:flex-start;justify-content:space-around;padding:8px 4px 0}
+  .nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:500;color:#8a94a6;padding-top:2px;position:relative}
+  .nav button svg{width:22px;height:22px}
+  .nav button.on{color:var(--marinho)}
+  .nav button.on::before{content:"";position:absolute;top:-9px;width:28px;height:3px;border-radius:0 0 3px 3px;background:var(--azul)}
+
+  /* botões */
+  .btn{height:44px;border-radius:4px;font-weight:700;font-size:14.5px;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;transition:transform .12s ease,background .15s}
+  .btn:active{transform:scale(.98)}
+  .btn svg{width:18px;height:18px;flex:none}
+  .btn-azul{background:var(--azul);color:var(--marinho)}
+  .btn-azul:hover{background:#19b2f3}
+  .btn-marinho{background:var(--marinho);color:#fff}
+  .btn-contorno{border:1.5px solid var(--marinho);color:var(--marinho);background:#fff}
+  .duas{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+  /* login */
+  .login{background:linear-gradient(170deg,#0f43b0 0%,var(--marinho) 58%,var(--marinho-3) 100%);color:#fff}
+  .login .rede{position:absolute;inset:0;width:100%;height:100%}
+  .login .conteudo{position:relative;padding:0 24px 20px}
+  .idioma-wrap{display:flex;justify-content:flex-end;position:relative;padding:8px 0 0;z-index:3}
+  .idioma{display:flex;align-items:center;gap:7px;white-space:nowrap;border:1px solid rgba(255,255,255,.5);border-radius:5px;padding:6px 9px;font-size:13px;font-weight:700;background:rgba(0,10,61,.25)}
+  .idioma svg.flag{width:22px;height:15px;border-radius:2px}
+  .idioma svg.seta{width:12px;height:12px;transition:transform .2s}
+  .idioma.aberto svg.seta{transform:rotate(180deg)}
+  .idiomas{position:absolute;right:0;top:46px;background:#fff;color:var(--texto);border-radius:6px;box-shadow:0 10px 28px -8px rgba(0,0,0,.5);overflow:hidden;min-width:170px;visibility:hidden;opacity:0;transform:translateY(-4px);transition:opacity .15s,transform .15s,visibility 0s .15s}
+  .idiomas.aberto{visibility:visible;opacity:1;transform:none;transition:opacity .15s,transform .15s}
+  .idiomas button{display:flex;align-items:center;gap:9px;width:100%;padding:11px 12px;font-size:13px;font-weight:500}
+  .idiomas button.on{background:var(--azul-claro);font-weight:700}
+  .idiomas svg{width:22px;height:15px;border-radius:2px}
+  .caixa-login{margin-top:72px;padding:32px 22px 26px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:8px;backdrop-filter:none}
+  .caixa-login .logo{display:block;width:170px;margin:0 auto}
+  .caixa-login .app{text-align:center;font-size:16px;margin-top:10px;color:rgba(255,255,255,.92)}
+  .entrada{display:block;margin-top:14px;position:relative}
+  .entrada span{display:block;font-size:11px;font-weight:700;letter-spacing:.3px;color:rgba(255,255,255,.75);margin-bottom:5px}
+  .entrada input{width:100%;height:42px;background:rgba(0,10,61,.55);border:1px solid rgba(255,255,255,.38);border-radius:4px;padding:0 42px 0 12px;font-size:14px;color:#fff;outline:none}
+  .entrada input:focus{border-color:var(--azul);box-shadow:0 0 0 3px rgba(0,164,235,.25)}
+  .entrada.erro input{border-color:#ff8a8d}
+  .entrada em{display:block;font-style:normal;font-size:11.5px;color:#ffb3b5;margin-top:4px;min-height:0}
+  .olho{position:absolute;right:6px;bottom:4px;width:34px;height:34px;display:grid;place-items:center;color:rgba(255,255,255,.88)}
+  .entrada em:not(:empty) ~ .olho{bottom:22px}
+  .olho svg{width:20px;height:20px}
+  .caixa-login .btn{margin-top:26px}
+  .esqueci{display:block;margin:24px auto 0;font-size:13px;text-decoration:underline;color:#fff;text-align:center}
+  .rodape-login{text-align:center;font-size:11px;color:rgba(255,255,255,.5);margin-top:26px}
+  .girando{width:18px;height:18px;border-radius:50%;border:2.5px solid rgba(0,20,108,.3);border-top-color:var(--marinho);animation:gira .8s linear infinite}
+  @keyframes gira{to{transform:rotate(360deg)}}
+
+  /* seletor de contrato (dropdown aberto sobre o painel) */
+  .ola{padding:14px 14px 0;font-size:13px;color:var(--suave)}
+  .ola b{display:block;font-size:19px;color:var(--texto);font-weight:700;margin-top:2px}
+  .dropdown{position:relative;z-index:2}
+  .dropdown .seletor{margin-top:6px}
+  .dropdown .seletor .valor{border-color:var(--azul);border-bottom-left-radius:0}
+  .dropdown .quad svg{transform:rotate(180deg)}
+  .opcoes{background:#fff;border:1px solid var(--borda);border-top:0;border-radius:0 0 6px 6px;box-shadow:0 14px 28px -10px rgba(0,20,108,.35);list-style:none}
+  .opcoes button{display:flex;align-items:center;justify-content:space-between;width:100%;padding:11px 12px;border-top:1px solid var(--linha);text-align:left}
+  .opcoes li:first-child button{border-top:0}
+  .opcoes b{font-size:14px;letter-spacing:.3px;display:block}
+  .opcoes small{font-size:11.5px;color:var(--suave)}
+  .opcoes button.on{background:var(--azul-claro)}
+  .opcoes .marca{width:20px;height:20px;border-radius:50%;border:2px solid var(--borda);display:grid;place-items:center;flex:none}
+  .opcoes button.on .marca{border-color:var(--azul);background:var(--azul)}
+  .opcoes button.on .marca::after{content:"";width:5px;height:9px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg) translate(-1px,-1px)}
+  .vela{position:relative;margin-top:-6px;filter:blur(1.5px);opacity:.45;pointer-events:none}
+  .vela .sk{height:12px;border-radius:3px;background:#cfd6e2;margin:8px 0}
+
+  /* calendário */
+  .cal-presets{display:flex;gap:6px;flex-wrap:wrap;padding:12px 14px 0}
+  .cal{background:#fff;border-radius:6px;box-shadow:0 1px 2px rgba(0,20,108,.12);margin:12px 14px 0;padding:10px 10px 12px}
+  .cal-topo{display:flex;align-items:center;justify-content:space-between;padding:2px 2px 8px}
+  .cal-topo b{font-size:15px;font-weight:700;text-transform:capitalize}
+  .cal-topo button{width:32px;height:32px;border-radius:4px;background:var(--marinho);color:#fff;display:grid;place-items:center}
+  .cal-topo button[disabled]{opacity:.3;cursor:default}
+  .cal-topo svg{width:14px;height:14px}
+  .cal-grade{display:grid;grid-template-columns:repeat(7,1fr);row-gap:3px;text-align:center}
+  .cal-grade .sem{font-size:11px;font-weight:700;color:var(--suave);padding:4px 0}
+  .dia{height:38px;font-size:13.5px;display:grid;place-items:center;position:relative}
+  .dia span{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;position:relative;z-index:1}
+  .dia.fora{color:#c1c7d2;cursor:default}
+  .dia.hoje span{box-shadow:inset 0 0 0 1.5px var(--azul)}
+  .dia.meio{background:var(--azul-claro)}
+  .dia.ini{background:linear-gradient(90deg,transparent 50%,var(--azul-claro) 50%)}
+  .dia.fim{background:linear-gradient(90deg,var(--azul-claro) 50%,transparent 50%)}
+  .dia.ini.fim{background:none}
+  .dia.ini span,.dia.fim span{background:var(--marinho);color:#fff;font-weight:700}
+  .cal-resumo{display:flex;justify-content:space-between;align-items:center;margin:12px 14px 0;font-size:12.5px;color:var(--suave)}
+  .cal-resumo b{color:var(--texto);font-size:14px}
+  .cal-acoes{padding:14px 14px 0}
+
+  /* menu */
+  .menu{background:linear-gradient(180deg,var(--marinho) 0%,var(--marinho-3) 100%);color:#fff}
+  .menu .conteudo{padding:0 18px 18px}
+  .menu-topo{display:flex;align-items:center;justify-content:space-between;padding:6px 0 0}
+  .menu-topo img{height:34px}
+  .perfil{display:flex;align-items:center;gap:12px;margin-top:22px;padding:14px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:8px}
+  .avatar{width:46px;height:46px;border-radius:50%;background:var(--azul);color:var(--marinho);display:grid;place-items:center;font-weight:900;font-size:16px;flex:none}
+  .perfil b{display:block;font-size:15px}
+  .perfil small{font-size:12px;color:rgba(255,255,255,.7)}
+  .perfil .contrato-tag{display:inline-block;margin-top:5px;font-size:11px;font-weight:700;background:rgba(0,164,235,.22);color:#9ee0fb;border-radius:999px;padding:2px 8px}
+  .menu-lista{list-style:none;margin-top:16px}
+  .menu-lista button{display:flex;align-items:center;gap:14px;width:100%;padding:13px 4px;border-bottom:1px solid rgba(255,255,255,.1);font-size:15px}
+  .menu-lista button svg{width:20px;height:20px;color:#7fd3f7;flex:none}
+  .menu-lista button .vai{margin-left:auto;width:14px;height:14px;color:rgba(255,255,255,.5)}
+  .menu-lista button.on{color:#7fd3f7;font-weight:700}
+  .seg{display:flex;background:rgba(0,0,0,.25);border-radius:6px;padding:3px;margin-top:8px}
+  .seg button{flex:1;text-align:center;height:34px;border-radius:4px;font-size:13px;font-weight:700;color:rgba(255,255,255,.7)}
+  .seg button.on{background:#fff;color:var(--marinho)}
+  .menu .rot{color:rgba(255,255,255,.7);font-size:11px;letter-spacing:.5px;text-transform:uppercase;margin-top:18px;font-weight:700}
+  .sair{margin-top:20px;border:1.5px solid rgba(255,255,255,.4);color:#fff}
+  .versao{text-align:center;font-size:11px;color:rgba(255,255,255,.45);margin-top:14px}
+
+  /* aviso pelo topo (toast) — escondido por completo quando inativo */
+  .toast{position:absolute;left:14px;right:14px;top:50px;z-index:20;background:var(--marinho);color:#fff;border-left:4px solid var(--azul);border-radius:6px;padding:11px 14px;font-size:13px;font-weight:500;box-shadow:0 10px 26px -8px rgba(0,0,0,.5);visibility:hidden;opacity:0;transform:translateY(-10px);transition:opacity .2s,transform .2s,visibility 0s .2s;pointer-events:none}
+  .toast.on{visibility:visible;opacity:1;transform:none;transition:opacity .2s,transform .2s}
+
+  /* ---------- modo embutido (iframe do portfólio) ---------- */
+  body.modo-embed{background:transparent;padding:0;min-height:0;display:block;overflow:hidden}
+  body.modo-embed .topo{display:none}
+  body.modo-embed .celular{box-shadow:none}
+  /* ---------- modo telas ---------- */
+  body.modo-telas{display:block;padding:40px}
+  body.modo-telas .topo{text-align:left}
+  body.modo-telas .celular{display:none}
+  .quadro{display:none}
+  body.modo-telas .quadro{display:flex;flex-wrap:wrap;gap:48px}
+  .quadro figure{width:390px}
+  .quadro figcaption{color:#ccd3ea;font-size:14px;font-weight:700;margin-bottom:12px}
+  .quadro .moldura{width:390px;height:844px;position:relative;overflow:hidden;border-radius:30px;background:var(--fundo)}
+  .quadro .tela{opacity:1;transform:none;pointer-events:none}
+</style>
+</head>
+<body>
+<header class="topo">
+  <span class="selo-ficticio">Recriação ilustrativa · dados fictícios</span>
+  <h1>Akamai · Mobile Control Center</h1>
+  <p>Telas do case com a identidade de akamai.com. Contratos, domínios e números fictícios.
+    <span id="link-modo"></span></p>
+</header>
+<div class="celular"><div class="visor" id="visor"></div></div>
+<div class="quadro" id="quadro"></div>
+
+<template id="telas">
+<!-- 01 Login -->
+<section class="tela login" data-id="login" data-nome="01 · Login">
+  #rede
+  <div class="status" style="position:relative"><span>19:02</span>#sinal</div>
+  <div class="conteudo">
+    <div class="idioma-wrap">
+      <button class="idioma js-idioma" aria-haspopup="listbox"><span class="js-flag"></span><span class="js-lang-rot">PT-BR</span>#seta</button>
+      <div class="idiomas js-idiomas" role="listbox">
+        <button data-lang="pt">#flagbr Português (Brasil)</button>
+        <button data-lang="en">#flagus English (US)</button>
+      </div>
+    </div>
+    <div class="caixa-login">
+      <img class="logo" src="img/akamai-logo-branco.svg" alt="Akamai">
+      <p class="app">Mobile Control Center</p>
+      <label class="entrada js-campo-email"><span data-t="email">E-mail</span><input class="js-email" type="email" value="analista@empresa-demo.com.br" autocomplete="off"><em></em></label>
+      <label class="entrada js-campo-senha"><span data-t="senha">Senha</span><input class="js-senha" type="password" value="demo-2026" autocomplete="off"><em></em>
+        <button type="button" class="olho js-olho" data-ta="mostrar">#olho</button></label>
+      <button class="btn btn-azul js-entrar" data-t="entrar">Fazer Login</button>
+      <button class="esqueci js-esqueci" data-t="esqueci">Esqueci minha senha</button>
+    </div>
+    <p class="rodape-login" data-t="demo">Protótipo · e-mail e senha fictícios</p>
+  </div>
+</section>
+
+<!-- 02 Bem-vindo · seletor de contrato -->
+<section class="tela" data-id="contrato" data-nome="02 · Bem-vindo · seletor de contrato">
+  <div class="js-cab" data-titulo="bemvindo" data-sem-voltar></div>
+  <div class="conteudo">
+    <p class="ola"><span data-t="ola">Olá,</span><b>Analista Demo</b></p>
+    <div class="filtros">
+      <p class="rot" data-t="contrato">Número do contrato</p>
+      <div class="dropdown">
+        <div class="seletor"><span class="valor js-contrato-id"></span><span class="quad">#baixo</span></div>
+        <ul class="opcoes js-opcoes"></ul>
+      </div>
+    </div>
+    <div class="vela">
+      <p class="sec" data-t="resumo">Resumo do tráfego de ataques WAF</p>
+      <div class="card pad"><div class="sk" style="width:70%"></div><div class="sk" style="width:30%;height:18px;background:#9cc1f7"></div><div class="sk" style="width:45%"></div><div class="sk" style="width:80%;height:18px;background:#f6b98f"></div></div>
+    </div>
+    <p class="sub-dica" style="padding:14px;font-size:12px;color:var(--suave);text-align:center" data-t="dicacontrato">Escolha o contrato para ver os dados de segurança e tráfego.</p>
+  </div>
+</section>
+
+<!-- 03 Resumo do WAF -->
+<section class="tela" data-id="waf" data-nome="03 · Web Application Firewall (resumo)">
+  <div class="js-cab" data-titulo="t_waf"></div>
+  <div class="conteudo">
+    <div class="js-filtros"></div>
+    <p class="sec" data-t="resumo">Resumo do tráfego de ataques WAF</p>
+    <div class="card js-resumo-waf"></div>
+    <p class="sec" data-t="grupos">Grupos de ataque detectados</p>
+    <div class="card js-pizza" data-pag="5"></div>
+    <p class="sec" data-t="acao">Ação aplicada aos ataques WAF</p>
+    <div class="card exib grande js-acao"></div>
+    <p class="sec" data-t="detectado">Ataques WAF detectados</p>
+    <div class="card exib js-detectados"></div>
+    <p class="sec">Web Application Firewall</p>
+    <div class="card"><ul class="lista js-regras"></ul></div>
+  </div>
+  <nav class="nav js-nav" data-on="waf"></nav>
+</section>
+
+<!-- 04 Seletor de período -->
+<section class="tela" data-id="periodo" data-nome="04 · Buscar período (calendário)">
+  <div class="js-cab" data-titulo="t_periodo"></div>
+  <div class="conteudo">
+    <div class="cal-presets js-presets"></div>
+    <div class="cal">
+      <div class="cal-topo"><button class="js-mes-ant" data-ta="mesant">#esq</button><b class="js-mes"></b><button class="js-mes-prox" data-ta="mesprox">#dir</button></div>
+      <div class="cal-grade js-grade"></div>
+    </div>
+    <div class="cal-resumo"><span data-t="selecionado">Período selecionado</span><b class="js-sel"></b></div>
+    <div class="cal-acoes duas">
+      <button class="btn btn-contorno" data-go="voltar" data-t="cancelar">Cancelar</button>
+      <button class="btn btn-marinho js-aplicar" data-t="aplicar">Aplicar</button>
+    </div>
+  </div>
+</section>
+
+<!-- 05 Tráfego Geral -->
+<section class="tela" data-id="trafego" data-nome="05 · Tráfego Geral">
+  <div class="js-cab" data-titulo="t_trafego"></div>
+  <div class="conteudo">
+    <div class="js-filtros"></div>
+    <div class="card js-trafego" style="margin-top:12px"></div>
+    <div class="atalhos">
+      <button class="atalho" data-go="ataques"><span>WAF Attack Geral</span>#dir</button>
+      <button class="atalho" data-go="hostname"><span>Hostname</span>#dir</button>
+      <button class="atalho" data-go="urls"><span>Top URL's</span>#dir</button>
+    </div>
+  </div>
+  <nav class="nav js-nav" data-on="trafego"></nav>
+</section>
+
+<!-- 06 WAF Attack Geral -->
+<section class="tela" data-id="ataques" data-nome="06 · WAF Attack Geral">
+  <div class="js-cab" data-titulo="t_ataques"></div>
+  <div class="conteudo">
+    <div class="js-filtros"></div>
+    <div class="card js-resumo-waf" style="margin-top:12px"></div>
+    <p class="sec" data-t="grupos">Grupos de ataque detectados</p>
+    <div class="card js-pizza" data-pag="4" data-ordem="inv"></div>
+    <p class="sec" data-t="pordia">Ataques por dia</p>
+    <div class="card js-colunas"></div>
+  </div>
+  <nav class="nav js-nav" data-on="ataques"></nav>
+</section>
+
+<!-- 07 Hostname -->
+<section class="tela" data-id="hostname" data-nome="07 · Hostname">
+  <div class="js-cab" data-titulo="t_host"></div>
+  <div class="conteudo">
+    <div class="js-filtros" data-sem-contrato></div>
+    <form class="busca js-busca"><input class="js-q" type="search" data-tp="buscar" placeholder="Buscar..."><button type="submit" data-ta="buscarbtn">#lupa</button></form>
+    <div class="card" style="margin-top:10px"><ul class="lista js-hosts"></ul></div>
+  </div>
+  <nav class="nav js-nav" data-on="hostname"></nav>
+</section>
+
+<!-- 08 Top URLs -->
+<section class="tela" data-id="urls" data-nome="08 · Top URLs">
+  <div class="js-cab" data-titulo="t_urls"></div>
+  <div class="conteudo">
+    <div class="js-filtros"></div>
+    <div class="chips js-chips"><button class="chip" data-ordem-url="hits">Edge Hits</button><button class="chip" data-ordem-url="bw">Bandwidth</button></div>
+    <div class="card" style="margin-top:10px"><ul class="lista js-urls"></ul></div>
+  </div>
+  <nav class="nav js-nav" data-on="urls"></nav>
+</section>
+
+<!-- 09 Menu -->
+<section class="tela menu" data-id="menu" data-nome="09 · Menu">
+  <div class="status"><span>19:02</span>#sinal</div>
+  <div class="conteudo">
+    <div class="menu-topo"><img src="img/akamai-logo-branco.svg" alt="Akamai"><button class="ic-btn" data-go="voltar" data-ta="fechar">#fechar</button></div>
+    <div class="perfil"><span class="avatar">AD</span><span><b>Analista Demo</b><small>analista@empresa-demo.com.br</small><br><span class="contrato-tag js-contrato-tag"></span></span></div>
+    <ul class="menu-lista">
+      <li><button data-go="waf" data-menu="waf">#escudo<span data-t="t_waf">Web Application Firewall</span>#vai</button></li>
+      <li><button data-go="trafego" data-menu="trafego">#grafico<span data-t="t_trafego">Tráfego Geral</span>#vai</button></li>
+      <li><button data-go="ataques" data-menu="ataques">#alvo<span>WAF Attack Geral</span>#vai</button></li>
+      <li><button data-go="hostname" data-menu="hostname">#globo<span>Hostname</span>#vai</button></li>
+      <li><button data-go="urls" data-menu="urls">#link<span>Top URL's</span>#vai</button></li>
+      <li><button data-go="contrato" data-menu="contrato">#pasta<span data-t="trocar">Trocar contrato</span>#vai</button></li>
+    </ul>
+    <p class="rot" data-t="idioma">Idioma</p>
+    <div class="seg"><button data-lang="pt">PT-BR</button><button data-lang="en">EN</button></div>
+    <button class="btn sair js-sair">#sair<span data-t="sair">Sair</span></button>
+    <p class="versao">Mobile Control Center · v1.0 (protótipo)</p>
+  </div>
+</section>
+</template>
+
+<script>
+const svg = (d, w=2) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const IC = {
+  voltar: svg('<path d="M20 12H5M11 6l-6 6 6 6"/>',2.2),
+  menu: svg('<path d="M4 6h16M4 12h16M4 18h16"/>',2.4),
+  baixo: svg('<path d="M6 9l6 6 6-6"/>',3),
+  seta: svg('<path d="M6 9l6 6 6-6"/>',3).replace('<svg','<svg class="seta"'),
+  dir: svg('<path d="M9 5l7 7-7 7"/>',2.4),
+  esq: svg('<path d="M15 5l-7 7 7 7"/>',2.4),
+  vai: svg('<path d="M9 5l7 7-7 7"/>',2.4).replace('<svg','<svg class="vai"'),
+  cal: svg('<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M7.5 14h2M11 14h2M14.5 14h2M7.5 17.5h2M11 17.5h2"/>',2),
+  olho: svg('<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'),
+  olhoX: svg('<path d="M3 3l18 18M10.6 5.1A9.8 9.8 0 0112 5c6.4 0 10 7 10 7a17 17 0 01-3.2 4.1M6.6 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7a9.7 9.7 0 005.4-1.6M9.9 9.9a3 3 0 004.2 4.2"/>'),
+  lupa: svg('<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',2.4),
+  info: svg('<circle cx="12" cy="12" r="9.5"/><path d="M12 11v6M12 7.5v.01"/>',2),
+  bloq: svg('<circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/>',2.4),
+  menos: svg('<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>',2.2),
+  sino: svg('<path d="M6 16V11a6 6 0 0112 0v5l2 2H4zM10 21h4"/>',2),
+  escudo: svg('<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>'),
+  grafico: svg('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'),
+  alvo: svg('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>'),
+  globo: svg('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18M12 3a14 14 0 000 18"/>'),
+  link: svg('<path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1"/>'),
+  pasta: svg('<path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>'),
+  sair: svg('<path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h11"/>'),
+  fechar: svg('<path d="M6 6l12 12M18 6L6 18"/>',2.4),
+  sinal: '<svg viewBox="0 0 52 14" aria-hidden="true"><g fill="currentColor"><rect x="0" y="9" width="3" height="5" rx=".8"/><rect x="5" y="6.5" width="3" height="7.5" rx=".8"/><rect x="10" y="4" width="3" height="10" rx=".8"/><rect x="15" y="1" width="3" height="13" rx=".8"/><path d="M25 5.5a8.5 8.5 0 0111.5 0l-1.4 1.5a6.4 6.4 0 00-8.7 0zM27.8 8.6a4.4 4.4 0 015.9 0l-1.4 1.5a2.3 2.3 0 00-3.1 0zM30.75 12.4l1.3-1.4 1.3 1.4-1.3 1.3z"/><rect x="40" y="2.5" width="11" height="9" rx="2.4" fill-opacity=".4"/><rect x="41.3" y="3.8" width="8" height="6.4" rx="1.4"/></g></svg>',
+  flagbr: '<svg class="flag" viewBox="0 0 20 14" aria-hidden="true"><rect width="20" height="14" rx="1.5" fill="#1f9a46"/><path d="M10 2 18 7 10 12 2 7z" fill="#fedf00"/><circle cx="10" cy="7" r="3" fill="#1d3f8f"/></svg>',
+  flagus: '<svg class="flag" viewBox="0 0 20 14" aria-hidden="true"><rect width="20" height="14" rx="1.5" fill="#fff"/><g fill="#c8102e"><rect y="0" width="20" height="2"/><rect y="4" width="20" height="2"/><rect y="8" width="20" height="2"/><rect y="12" width="20" height="2"/></g><rect width="9" height="8" fill="#0a3161"/></svg>',
+};
+IC.rede = (()=>{ // fundo de rede do login (como no case)
+  const p=[[20,80],[90,40],[160,110],[250,60],[280,180],[200,230],[60,210],[120,300],[240,340],[30,420],[150,470],[270,500],[80,560],[200,610],[290,630]];
+  const l=[[0,1],[1,2],[2,3],[3,4],[4,5],[5,2],[5,6],[6,0],[6,7],[7,8],[8,4],[7,9],[9,10],[10,11],[11,8],[10,12],[12,13],[13,14],[13,11]];
+  return `<svg class="rede" viewBox="0 0 300 650" preserveAspectRatio="none" aria-hidden="true">${l.map(([a,b])=>`<line x1="${p[a][0]}" y1="${p[a][1]}" x2="${p[b][0]}" y2="${p[b][1]}" stroke="#fff" stroke-opacity=".09" stroke-width=".8"/>`).join('')}${p.map(([x,y])=>`<circle cx="${x}" cy="${y}" r="2" fill="#fff" fill-opacity=".22"/>`).join('')}</svg>`;
+})();
+
+/* ---------- textos (PT-BR / EN) ---------- */
+const T = {
+  pt:{email:'E-mail',senha:'Senha',entrar:'Fazer Login',esqueci:'Esqueci minha senha',demo:'Protótipo · e-mail e senha fictícios',mostrar:'Mostrar senha',ocultar:'Ocultar senha',
+    bemvindo:'Bem-vindo',ola:'Olá,',contrato:'Número do contrato',periodoRot:'Buscar Período:',dicacontrato:'Escolha o contrato para ver os dados de segurança e tráfego.',
+    t_waf:'Web Application Firewall',t_trafego:'Tráfego Geral',t_ataques:'WAF Attack Geral',t_host:'Hostname',t_urls:"Top URL's",t_periodo:'Buscar período',
+    resumo:'Resumo do tráfego de ataques WAF',grupos:'Grupos de ataque detectados',acao:'Ação aplicada aos ataques WAF',detectado:'Ataques WAF detectados',pordia:'Ataques por dia',
+    regras:'regras disparadas',total:'Total',max:'Máx.',maximo:'Máximo',buscar:'Buscar...',buscarbtn:'Buscar',semhost:'Nenhum hostname encontrado.',
+    selecionado:'Período selecionado',cancelar:'Cancelar',aplicar:'Aplicar',mesant:'Mês anterior',mesprox:'Próximo mês',p7:'Últimos 7 dias',p30:'Últimos 30 dias',pmes:'Este mês',pant:'Mês passado',
+    escolhafim:'toque no dia final',idioma:'Idioma',sair:'Sair',trocar:'Trocar contrato',fechar:'Fechar',voltar:'Voltar',menu:'Menu',
+    nav_waf:'WAF',nav_trafego:'Tráfego',nav_ataques:'Ataques',nav_host:'Hosts',nav_urls:'URLs',
+    e_email:'Informe um e-mail válido.',e_senha:'A senha precisa ter pelo menos 6 caracteres.',
+    toast_esqueci:'Enviamos um link de redefinição para o e-mail informado (simulação).',toast_contrato:'Contrato {c} selecionado.',toast_periodo:'Período atualizado: {p}.',toast_sair:'Sessão encerrada.',toast_lang:'Idioma: Português (Brasil).',
+    a:'a',dias:'dias',dia:'dia',sem:['D','S','T','Q','Q','S','S'],
+    hits:'Edge Hits',bw:'Bandwidth',midgress:'Midgress bytes',offload:'Off Load',bwhost:'Edge Bandwidth',reqs:'Requisições'},
+  en:{email:'E-mail',senha:'Password',entrar:'Log in',esqueci:'Forgot my password',demo:'Prototype · fictitious e-mail and password',mostrar:'Show password',ocultar:'Hide password',
+    bemvindo:'Welcome',ola:'Hello,',contrato:'Contract number',periodoRot:'Search Period:',dicacontrato:'Choose a contract to see its security and traffic data.',
+    t_waf:'Web Application Firewall',t_trafego:'General Traffic',t_ataques:'WAF Attack Overview',t_host:'Hostname',t_urls:"Top URL's",t_periodo:'Search period',
+    resumo:'WAF Attack Traffic Summary',grupos:'WAF Attack Groups Detected',acao:'Action Applied to WAF Attacks',detectado:'WAF Attacks Detected',pordia:'Attacks per day',
+    regras:'rules triggered',total:'Total',max:'Max',maximo:'Maximum',buscar:'Search...',buscarbtn:'Search',semhost:'No hostname found.',
+    selecionado:'Selected period',cancelar:'Cancel',aplicar:'Apply',mesant:'Previous month',mesprox:'Next month',p7:'Last 7 days',p30:'Last 30 days',pmes:'This month',pant:'Last month',
+    escolhafim:'tap the end date',idioma:'Language',sair:'Log out',trocar:'Change contract',fechar:'Close',voltar:'Back',menu:'Menu',
+    nav_waf:'WAF',nav_trafego:'Traffic',nav_ataques:'Attacks',nav_host:'Hosts',nav_urls:'URLs',
+    e_email:'Enter a valid e-mail.',e_senha:'Password must have at least 6 characters.',
+    toast_esqueci:'We sent a reset link to the e-mail above (simulation).',toast_contrato:'Contract {c} selected.',toast_periodo:'Period updated: {p}.',toast_sair:'You have been logged out.',toast_lang:'Language: English (US).',
+    a:'to',dias:'days',dia:'day',sem:['S','M','T','W','T','F','S'],
+    hits:'Edge Hits',bw:'Bandwidth',midgress:'Midgress bytes',offload:'Off Load',bwhost:'Edge Bandwidth',reqs:'Requests'},
+};
+
+/* ---------- dados fictícios ---------- */
+const CONTRATOS = [
+  {id:'0526-000318', cliente:'Varejo Exemplo S.A.', dom:'varejoexemplo.com.br', f:1},
+  {id:'0526-000447', cliente:'Banco Digital Fictício', dom:'bancoficticio.com.br', f:1.7},
+  {id:'0526-000452', cliente:'Portal de Notícias Demo', dom:'noticiasdemo.com.br', f:.62},
+  {id:'0526-001320', cliente:'Streaming Ilustrativo', dom:'streamilustra.tv', f:2.6},
+  {id:'0526-001563', cliente:'Clínica Modelo Online', dom:'clinicamodelo.med.br', f:.28},
+];
+const GRUPOS = [
+  ['Web Policy Violation','var(--g1)',56],['Penalty','var(--g2)',22],['Command Injection','var(--g3)',8],['Custom Rules','var(--g4)',6],
+  ['Local File Inclusion','var(--g5)',4],['Cross Site Scripting (XSS)','var(--g6)',2.5],['SQL Injection','var(--g7)',1.5],
+];
+const REGRAS = [['Command Injection',37,37,'deny'],['Cross Site Scripting Injection (XSS)',26,26,'deny'],['Total Outbound',12,12,'none'],['SQL Injection',44,44,'deny'],['Local File Inclusion',18,18,'alert'],['Web Protocol Attack',21,21,'deny']];
+const SUBS = ['www','api','m','static','checkout','img','cdn','blog','auth','busca'];
+const CAMINHOS = ['/','/produtos','/api/v2/carrinho','/static/js/app.9f3c.js','/img/banner-home.webp','/login','/busca?q=promocao','/checkout/pagamento','/api/v2/frete','/favicon.ico'];
+
+const HOJE = new Date(2026,10,18);
+const estado = {
+  lang:'pt', logado:false, contrato:0, destinoContrato:'waf',
+  ini:new Date(2026,9,1), fim:new Date(2026,9,31),
+  cal:{mes:new Date(2026,9,1), a:null, b:null},
+  legPag:{}, hostAberto:-1, q:'', ordemUrl:'hits', verSenha:false, erros:{}, carregando:false, langAberto:false,
+};
+const t = k => T[estado.lang][k] ?? k;
+
+function hash(s){let h=2166136261; for(const c of s){h^=c.charCodeAt(0); h=Math.imul(h,16777619);} return h>>>0;}
+function rng(seed){return ()=>{seed|=0; seed=seed+0x6D2B79F5|0; let x=Math.imul(seed^seed>>>15,1|seed); x=x+Math.imul(x^x>>>7,61|x)^x; return ((x^x>>>14)>>>0)/4294967296;};}
+const DIA = 864e5;
+const dias = () => Math.round((estado.fim-estado.ini)/DIA)+1;
+const dd = d => String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();
+const periodoTxt = () => `${dd(estado.ini)} ${t('a')} ${dd(estado.fim)}`;
+
+function num(v, casas=1){ // 57,8 (pt) / 57.8 (en)
+  const s = v.toLocaleString(estado.lang==='pt'?'pt-BR':'en-US',{minimumFractionDigits:casas,maximumFractionDigits:casas});
+  return s;
+}
+const inteiro = v => Math.round(v).toLocaleString(estado.lang==='pt'?'pt-BR':'en-US');
+function curto(v){ if(v>=1e9) return num(v/1e9)+' B'; if(v>=1e6) return num(v/1e6)+' M'; if(v>=1e3) return num(v/1e3)+' K'; return inteiro(v); }
+function bytes(gb){ if(gb>=1000) return num(gb/1000,2)+' TB'; if(gb>=1) return num(gb,gb>=100?0:1)+' GB'; return num(gb*1000,1)+' MB'; }
+
+let cache = {k:'', d:null};
+function dados(){
+  const c = CONTRATOS[estado.contrato];
+  const k = c.id+'|'+estado.ini.toDateString()+'|'+estado.fim.toDateString();
+  if (cache.k===k) return cache.d;
+  const r = rng(hash(k)); const n = dias(); const f = c.f*n/30*(.88+.24*r());
+  const hitsT = 57.8e6*f, pageT = hitsT*(.9+.06*r()), bwT = 772*f*(.85+.3*r());
+  const sh = .0012+.0016*r();
+  const aHits = hitsT*sh, aPage = pageT*sh*(.95+.1*r()), aBwGB = bwT*sh*(3.6+2.2*r());
+  const shares = [aHits/hitsT, aPage/pageT, aBwGB/bwT]; const mx = Math.max(...shares);
+  const resumo = [
+    {rot:'Edge Hits', tot:curto(hitsT)+' '+t('total'), val:curto(aHits), w:shares[0]/mx*82, cor:'var(--g1)'},
+    {rot:'Edge Page Requests', tot:curto(pageT)+' '+t('total'), val:curto(aPage), w:shares[1]/mx*82, cor:'var(--g2)'},
+    {rot:'Edge Bandwidth', tot:bytes(bwT)+' '+t('total'), val:bytes(aBwGB), w:82, cor:'var(--g3)'},
+  ];
+  let pesos = GRUPOS.map(g=>g[2]*(.6+.8*r())); const sp = pesos.reduce((a,b)=>a+b,0);
+  const grupos = GRUPOS.map((g,i)=>({nome:g[0], cor:g[1], pct:pesos[i]/sp*100, qtd:aHits*pesos[i]/sp}));
+  const deny = 58+r()*20;
+  const offT = 12+r()*14;
+  const edge = 1490*f*(.9+.2*r()), mid = edge*(.82+.1*r()), ebw = edge*(.74+.1*r());
+  const taxa = gb => gb*8e3/(n*86400)*(2.4+.6*r()); // GB -> Mb/s médios × pico
+  const trafego = [
+    {rot:'Edge vs. Origin (Offload)', tot:num(offT,2)+'% '+t('total'), sub:num(Math.min(offT*(2.4+r()*.8),99),2)+'% '+t('maximo'), w:offT+3, cor:'var(--t1)'},
+    {rot:'Edge', tot:bytes(edge)+' '+t('total'), sub:num(taxa(edge),2)+' Mb/s '+t('max'), w:96, cor:'var(--t2)'},
+    {rot:'Midgress', tot:bytes(mid)+' '+t('total'), sub:num(taxa(mid),2)+' Mb/s '+t('max'), w:96*mid/edge, cor:'var(--t3)'},
+    {rot:'Edge Bandwidth', tot:bytes(ebw)+' '+t('total'), sub:num(taxa(ebw),2)+' Mb/s '+t('max'), w:96*ebw/edge, cor:'var(--t4)'},
+  ];
+  const hosts = SUBS.map(s=>{const p=r(); return {nome:`${s}.${c.dom}`, off:1.5+r()*30, mid:mid*(.02+p*.25), hits:hitsT*(.01+p*.3), bw:ebw*(.02+p*.2)};}).sort((a,b)=>b.hits-a.hits);
+  const urls = CAMINHOS.map((u,i)=>({u, hits:hitsT*(.2/(i+1))*(.7+.6*r()), bw:bwT*(.12/(i+1.5))*(.4+1.2*r())}));
+  const serie = Array.from({length:n},()=>aHits/n*(.45+r()*.9)*(r()>.93?2.4:1));
+  const d = {resumo, grupos, deny, totalAtaques:aHits, trafego, hosts, urls, serie, regras:REGRAS.map(([nm,a,b,ac])=>[nm,Math.max(1,Math.round(a*(.6+.4*r()))),b,ac])};
+  cache = {k, d}; return d;
+}
+
+/* ---------- peças de tela ---------- */
+function barra(b){ return `<div class="barra"><header>${b.rot}<span>${b.tot}</span></header><div class="trilho"><div class="encher" style="width:${b.w.toFixed(1)}%;background:linear-gradient(180deg,color-mix(in srgb,${b.cor} 80%,#fff),${b.cor})"></div></div><small>${b.val ?? b.sub}</small></div>`; }
+function pizzaSVG(gs){
+  let acc = 0; const C = 65.973;
+  return `<svg class="p" viewBox="0 0 42 42">${gs.map(g=>{const s=`<circle cx="21" cy="21" r="10.5" fill="none" stroke="${g.cor}" stroke-width="21" stroke-dasharray="${(g.pct*C/100).toFixed(3)} ${C}" stroke-dashoffset="${(-acc*C/100).toFixed(3)}"/>`; acc+=g.pct; return s;}).join('')}<circle cx="21" cy="21" r="2.2" fill="#fff"/></svg>`;
+}
+
+function cab(el){
+  const k = el.dataset.titulo, semVoltar = el.hasAttribute('data-sem-voltar');
+  el.className = 'cab';
+  el.innerHTML = `<div class="status"><span>19:02</span>${IC.sinal}</div><div class="cab-linha">
+    <button class="ic-btn" ${semVoltar?'style="visibility:hidden"':''} data-go="voltar" data-ta="voltar">${IC.voltar}</button>
+    <h2 data-t="${k}"></h2><button class="ic-btn" data-go="menu" data-ta="menu">${IC.menu}</button></div>`;
+}
+function filtros(el){
+  const semC = el.hasAttribute('data-sem-contrato');
+  el.className = 'filtros';
+  el.innerHTML = (semC?'':`<p class="rot" data-t="contrato"></p>
+    <button class="seletor" data-go="contrato" data-dest="voltar"><span class="valor js-contrato-id"></span><span class="quad">${IC.baixo}</span></button>`)
+    + `<div class="periodo" ${semC?'style="margin-top:0"':''}><span class="rot" data-t="periodoRot"></span><button class="datas js-periodo" data-go="periodo"></button><button class="quad" data-go="periodo" aria-label="Calendário">${IC.cal}</button></div>`;
+}
+function nav(el){
+  const on = el.dataset.on;
+  const b = (id, ic, k) => `<button class="${on===id?'on':''}" data-go="${id}"><span>${ic}</span><span data-t="${k}"></span></button>`;
+  el.innerHTML = b('waf',IC.escudo,'nav_waf')+b('trafego',IC.grafico,'nav_trafego')+b('ataques',IC.alvo,'nav_ataques')+b('hostname',IC.globo,'nav_host')+b('urls',IC.link,'nav_urls');
+}
+
+function preparar(raiz){
+  raiz.innerHTML = raiz.innerHTML.replace(/#([a-zA-Z]+)\b/g, (m,k)=> typeof IC[k]==='string' ? IC[k] : m);
+  raiz.querySelectorAll('.js-cab').forEach(cab);
+  raiz.querySelectorAll('.js-filtros').forEach(filtros);
+  raiz.querySelectorAll('.js-nav').forEach(nav);
+  render(raiz);
+}
+
+/* ---------- calendário ---------- */
+const MESES = {pt:['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'],en:['January','February','March','April','May','June','July','August','September','October','November','December']};
+function calHTML(){
+  const {mes,a,b} = estado.cal; const y = mes.getFullYear(), m = mes.getMonth();
+  const prim = new Date(y,m,1).getDay(), ult = new Date(y,m+1,0).getDate();
+  let h = t('sem').map(s=>`<span class="sem">${s}</span>`).join('');
+  for (let i=0;i<prim;i++) h += '<span></span>';
+  for (let dnum=1; dnum<=ult; dnum++){
+    const d = new Date(y,m,dnum), tm = d.getTime(); const fora = d>HOJE;
+    const cls = ['dia']; if (fora) cls.push('fora');
+    if (tm===HOJE.getTime()) cls.push('hoje');
+    if (a && tm===a.getTime()) cls.push('ini');
+    const fimSel = b || a; if (fimSel && tm===fimSel.getTime()) cls.push('fim');
+    if (a && b && tm>a.getTime() && tm<b.getTime()) cls.push('meio');
+    h += `<button class="${cls.join(' ')}" ${fora?'disabled':''} data-dia="${tm}"><span>${dnum}</span></button>`;
+  }
+  return h;
+}
+function presetDatas(p){
+  const h = new Date(HOJE);
+  if (p==='p7') return [new Date(h.getTime()-6*DIA), h];
+  if (p==='p30') return [new Date(h.getTime()-29*DIA), h];
+  if (p==='pmes') return [new Date(h.getFullYear(),h.getMonth(),1), h];
+  return [new Date(h.getFullYear(),h.getMonth()-1,1), new Date(h.getFullYear(),h.getMonth(),0)];
+}
+
+/* ---------- render ---------- */
+function render(raiz){
+  const L = estado.lang, c = CONTRATOS[estado.contrato], D = dados();
+  document.documentElement.lang = L==='pt'?'pt-BR':'en';
+  raiz.querySelectorAll('[data-t]').forEach(e=>{ const v=T[L][e.dataset.t]; if (typeof v==='string') e.textContent=v; });
+  raiz.querySelectorAll('[data-tp]').forEach(e=>e.placeholder=t(e.dataset.tp));
+  raiz.querySelectorAll('[data-ta]').forEach(e=>e.setAttribute('aria-label',t(e.dataset.ta)));
+  raiz.querySelectorAll('.js-flag').forEach(e=>e.innerHTML=L==='pt'?IC.flagbr:IC.flagus);
+  raiz.querySelectorAll('.js-lang-rot').forEach(e=>e.textContent=L==='pt'?'PT-BR':'EN');
+  raiz.querySelectorAll('[data-lang]').forEach(e=>e.classList.toggle('on', e.dataset.lang===L));
+  raiz.querySelectorAll('.js-idioma').forEach(e=>e.classList.toggle('aberto', estado.langAberto));
+  raiz.querySelectorAll('.js-idiomas').forEach(e=>e.classList.toggle('aberto', estado.langAberto));
+
+  // login
+  raiz.querySelectorAll('.js-senha').forEach(i=>i.type = estado.verSenha?'text':'password');
+  raiz.querySelectorAll('.js-olho').forEach(o=>{o.innerHTML = estado.verSenha?IC.olhoX:IC.olho; o.setAttribute('aria-label', t(estado.verSenha?'ocultar':'mostrar'));});
+  [['email','.js-campo-email'],['senha','.js-campo-senha']].forEach(([k,s])=>raiz.querySelectorAll(s).forEach(l=>{l.classList.toggle('erro',!!estado.erros[k]); l.querySelector('em').textContent = estado.erros[k]?t(estado.erros[k]):'';}));
+  raiz.querySelectorAll('.js-entrar').forEach(b=>b.innerHTML = estado.carregando?'<span class="girando"></span>':t('entrar'));
+
+  // filtros
+  raiz.querySelectorAll('.js-contrato-id').forEach(e=>e.textContent=c.id);
+  raiz.querySelectorAll('.js-contrato-tag').forEach(e=>e.textContent=`${c.id} · ${c.cliente}`);
+  raiz.querySelectorAll('.js-periodo').forEach(e=>e.textContent=periodoTxt());
+  raiz.querySelectorAll('.js-opcoes').forEach(u=>u.innerHTML = CONTRATOS.map((k,i)=>`<li><button class="${i===estado.contrato?'on':''}" data-contrato="${i}"><span><b>${k.id}</b><small>${k.cliente}</small></span><span class="marca"></span></button></li>`).join(''));
+
+  // WAF
+  raiz.querySelectorAll('.js-resumo-waf').forEach(e=>e.innerHTML = D.resumo.map(barra).join(''));
+  raiz.querySelectorAll('.js-pizza').forEach(e=>{
+    const porPag = +e.dataset.pag; const gs = e.dataset.ordem==='inv' ? [...D.grupos].sort((a,b)=>b.pct-a.pct).slice(1).concat(D.grupos[0]) : D.grupos;
+    const id = e.closest('.tela')?.dataset.id || 'x'; const tot = Math.ceil(gs.length/porPag); const pg = Math.min(estado.legPag[id]||0, tot-1);
+    e.innerHTML = `<div class="pizza">${pizzaSVG(gs)}<div style="flex:1;min-width:0"><ul class="legenda">${gs.slice(pg*porPag,pg*porPag+porPag).map(g=>`<li><i style="background:${g.cor}"></i><span>${g.nome}<small>(${inteiro(g.qtd)}) ${num(g.pct,2)}%</small></span></li>`).join('')}</ul>
+      <div class="paginas"><button data-leg="-1" data-tela="${id}" ${pg===0?'disabled':''} aria-label="Anterior">${IC.esq}</button>${pg+1}/${tot}<button data-leg="1" data-tela="${id}" ${pg>=tot-1?'disabled':''} aria-label="Próxima">${IC.dir}</button></div></div></div>
+      <p class="nota">(${inteiro(D.totalAtaques)} ${t('regras')})</p>`;
+  });
+  raiz.querySelectorAll('.js-acao').forEach(e=>e.innerHTML = `<div>Deny<b>(${inteiro(D.totalAtaques*D.deny/100)}) ${num(D.deny,0)}%</b></div><div>Alert<b>(${inteiro(D.totalAtaques*(100-D.deny)/100)}) ${num(100-D.deny,0)}%</b></div>`);
+  raiz.querySelectorAll('.js-detectados').forEach(e=>e.innerHTML = D.grupos.slice(0,5).map(g=>`<div>${g.nome}<b>(${curto(g.qtd)}) ${num(g.pct,2)}%</b></div>`).join(''));
+  raiz.querySelectorAll('.js-regras').forEach(e=>e.innerHTML = D.regras.map(([nm,a,b,ac])=>`<li><b>Attack Group:</b> ${nm} (${a}/${b})<br><span class="acao ${ac}">${ac==='deny'?IC.bloq+'Deny':ac==='alert'?IC.sino+'Alert':IC.menos+'Not Used'}</span></li>`).join(''));
+
+  // tráfego
+  raiz.querySelectorAll('.js-trafego').forEach(e=>e.innerHTML = D.trafego.map(barra).join(''));
+
+  // ataques por dia
+  raiz.querySelectorAll('.js-colunas').forEach(e=>{
+    const s = D.serie, mx = Math.max(...s), n = s.length, w = 300/n;
+    const cols = s.map((v,i)=>`<rect x="${(i*w+w*.15).toFixed(2)}" y="${(100-v/mx*92).toFixed(2)}" width="${(w*.7).toFixed(2)}" height="${(v/mx*92).toFixed(2)}" rx="${Math.min(2,w*.2).toFixed(2)}" fill="${v===mx?'var(--g2)':'var(--azul)'}"/>`).join('');
+    const meio = new Date(estado.ini.getTime()+Math.floor(n/2)*DIA);
+    e.innerHTML = `<div class="colunas"><svg viewBox="0 0 300 100" preserveAspectRatio="none" aria-label="${t('pordia')}"><line x1="0" y1="100" x2="300" y2="100" stroke="#e5e9f0"/>${cols}</svg>
+      <div class="eixo"><span>${dd(estado.ini).slice(0,5)}</span><span>${dd(meio).slice(0,5)}</span><span>${dd(estado.fim).slice(0,5)}</span></div></div>
+      <p class="nota">${t('max')}: ${inteiro(mx)} / ${t('dia')} · ${n} ${t(n===1?'dia':'dias')}</p>`;
+  });
+
+  // hostnames
+  raiz.querySelectorAll('.js-q').forEach(i=>{ if (i.value!==estado.q) i.value = estado.q; });
+  raiz.querySelectorAll('.js-hosts').forEach(e=>{
+    const q = estado.q.trim().toLowerCase(); const hs = D.hosts.map((h,i)=>({...h,i})).filter(h=>!q || h.nome.includes(q));
+    e.innerHTML = hs.length ? hs.map(h=>`<li><div class="host"><span><span class="nome">${h.nome}</span><b>${t('offload')}:</b> ${num(h.off,2)}%<br><b>${t('midgress')}:</b> ${bytes(h.mid)}</span>
+      <button class="info ${estado.hostAberto===h.i?'on':''}" data-host="${h.i}" aria-label="Detalhes">${IC.info}</button></div>
+      ${estado.hostAberto===h.i?`<div class="det"><span>Edge Hits<b>${curto(h.hits)}</b></span><span>${t('bwhost')}<b>${bytes(h.bw)}</b></span><span>${t('contrato')}<b>${c.id}</b></span><span>${t('periodoRot').replace(':','')}<b>${dias()} ${t('dias')}</b></span></div>`:''}</li>`).join('')
+      : `<li class="vazio">${t('semhost')}</li>`;
+  });
+
+  // top urls
+  raiz.querySelectorAll('[data-ordem-url]').forEach(b=>b.classList.toggle('on', b.dataset.ordemUrl===estado.ordemUrl));
+  raiz.querySelectorAll('.js-urls').forEach(e=>{
+    const k = estado.ordemUrl; const us = [...D.urls].sort((a,b)=>b[k]-a[k]); const mx = us[0][k];
+    e.innerHTML = us.map((u,i)=>`<li><div class="url"><span class="pos">${i+1}</span><span style="min-width:0"><code>${u.u}</code><div class="mini" style="width:${(u[k]/mx*100).toFixed(1)}%;${k==='bw'?'background:var(--g3)':''}"></div></span>
+      <span class="num">${k==='hits'?curto(u.hits):bytes(u.bw)}<small>${k==='hits'?bytes(u.bw):curto(u.hits)+' hits'}</small></span></div></li>`).join('');
+  });
+
+  // calendário
+  raiz.querySelectorAll('.js-presets').forEach(e=>e.innerHTML = ['p7','p30','pmes','pant'].map(p=>{const [a,b]=presetDatas(p); const on = estado.cal.a && estado.cal.b && a.toDateString()===estado.cal.a.toDateString() && b.toDateString()===estado.cal.b.toDateString(); return `<button class="chip ${on?'on':''}" data-preset="${p}">${t(p)}</button>`;}).join(''));
+  raiz.querySelectorAll('.js-mes').forEach(e=>e.textContent = `${MESES[L][estado.cal.mes.getMonth()]} ${estado.cal.mes.getFullYear()}`);
+  raiz.querySelectorAll('.js-mes-prox').forEach(b=>b.disabled = estado.cal.mes.getFullYear()===HOJE.getFullYear() && estado.cal.mes.getMonth()>=HOJE.getMonth());
+  raiz.querySelectorAll('.js-grade').forEach(e=>e.innerHTML = calHTML());
+  raiz.querySelectorAll('.js-sel').forEach(e=>{const {a,b}=estado.cal; e.textContent = a&&b ? `${dd(a)} ${t('a')} ${dd(b)}` : a ? `${dd(a)} · ${t('escolhafim')}` : '—';});
+  raiz.querySelectorAll('.js-aplicar').forEach(b=>{const ok = estado.cal.a && estado.cal.b; b.style.opacity = ok?1:.45; b.style.pointerEvents = ok?'auto':'none';});
+}
+
+/* ---------- modos ---------- */
+const prm = new URLSearchParams(location.search);
+const modoTelas = prm.has('telas');
+document.body.classList.toggle('modo-telas', modoTelas);
+document.body.classList.toggle('modo-embed', prm.has('embed'));
+document.getElementById('link-modo').innerHTML = modoTelas
+  ? '· <a href="?">abrir o protótipo clicável</a>'
+  : '· <a href="?telas">ver todas as telas lado a lado</a>';
+const molde = document.getElementById('telas').content;
+
+if (modoTelas) {
+  estado.cal.a = estado.ini; estado.cal.b = estado.fim;
+  const quadro = document.getElementById('quadro');
+  [...molde.querySelectorAll('.tela')].forEach(tl=>{
+    const fig = document.createElement('figure');
+    fig.innerHTML = `<figcaption>${tl.dataset.nome}</figcaption><div class="moldura"></div>`;
+    const c = tl.cloneNode(true); c.classList.add('ativa');
+    fig.querySelector('.moldura').appendChild(c);
+    quadro.appendChild(fig);
+  });
+  preparar(quadro);
+} else {
+  const visor = document.getElementById('visor');
+  visor.appendChild(molde.cloneNode(true));
+  preparar(visor);
+  const toastEl = document.createElement('div'); toastEl.className = 'toast'; toastEl.setAttribute('role','status'); visor.appendChild(toastEl);
+  let atual = 'login', hist = [], tmToast;
+  const toast = msg => { toastEl.textContent = msg; toastEl.classList.add('on'); clearTimeout(tmToast); tmToast = setTimeout(()=>toastEl.classList.remove('on'), 2600); };
+  const ir = (id, empilhar=true) => {
+    if (id==='voltar') { id = hist.pop() || (estado.logado?'waf':'login'); empilhar = false; }
+    else if (empilhar && id!==atual) { if (atual!=='menu') hist.push(atual); if (hist[hist.length-1]===id) hist.pop(); }
+    if (id==='periodo') estado.cal = {mes:new Date(estado.fim.getFullYear(), estado.fim.getMonth(), 1), a:estado.ini, b:estado.fim};
+    atual = id; estado.langAberto = false;
+    visor.querySelectorAll('.tela').forEach(tl=>tl.classList.toggle('ativa', tl.dataset.id===id));
+    const c = visor.querySelector('.tela.ativa .conteudo'); if (c) c.scrollTop = 0;
+    visor.querySelectorAll('.tela.ativa [data-menu]').forEach(b=>b.classList.toggle('on', b.dataset.menu===hist[hist.length-1]));
+    render(visor);
+  };
+  ir('login', false);
+
+  visor.addEventListener('submit', e=>{ e.preventDefault(); estado.q = visor.querySelector('.tela.ativa .js-q')?.value || ''; estado.hostAberto = -1; render(visor); });
+  visor.addEventListener('input', e=>{
+    if (e.target.matches('.js-q')) { estado.q = e.target.value; estado.hostAberto = -1; const lst = visor.querySelector('.tela.ativa .js-hosts'); render(lst.closest('.tela')); e.target.focus(); }
+    if (e.target.matches('.js-email')) { delete estado.erros.email; }
+    if (e.target.matches('.js-senha')) { delete estado.erros.senha; }
+  });
+  visor.addEventListener('click', e=>{
+    const el = e.target.closest('button');
+    if (!el) { if (estado.langAberto) { estado.langAberto=false; render(visor); } return; }
+    const d = el.dataset;
+    if (el.classList.contains('js-idioma')) { estado.langAberto = !estado.langAberto; render(visor); return; }
+    if (d.lang) { const mudou = estado.lang!==d.lang; estado.lang = d.lang; estado.langAberto = false; cache.k=''; render(visor); if (mudou) toast(t('toast_lang')); return; }
+    if (estado.langAberto) { estado.langAberto = false; render(visor); }
+    if (el.classList.contains('js-olho')) { e.preventDefault(); estado.verSenha = !estado.verSenha; render(visor); return; }
+    if (el.classList.contains('js-esqueci')) {
+      const em = visor.querySelector('.js-email').value.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)) { estado.erros = {email:'e_email'}; render(visor); return; }
+      estado.erros = {}; render(visor); toast(t('toast_esqueci')); return; }
+    if (el.classList.contains('js-entrar')) {
+      if (estado.carregando) return;
+      const em = visor.querySelector('.js-email').value.trim(), se = visor.querySelector('.js-senha').value;
+      estado.erros = {};
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)) estado.erros.email = 'e_email';
+      if (se.length < 6) estado.erros.senha = 'e_senha';
+      if (Object.keys(estado.erros).length) { render(visor); return; }
+      estado.carregando = true; render(visor);
+      setTimeout(()=>{ estado.carregando = false; estado.logado = true; estado.verSenha = false; hist = []; estado.destinoContrato = 'waf'; ir('contrato', false); }, 800);
+      return;
+    }
+    if (d.contrato !== undefined) {
+      estado.contrato = +d.contrato; estado.hostAberto = -1; estado.legPag = {};
+      const dest = estado.destinoContrato; toast(t('toast_contrato').replace('{c}', CONTRATOS[estado.contrato].id));
+      if (dest==='voltar') ir('voltar'); else { hist = []; ir('waf', false); }
+      return;
+    }
+    if (d.leg) { estado.legPag[d.tela] = (estado.legPag[d.tela]||0) + (+d.leg); render(visor); return; }
+    if (d.host !== undefined) { estado.hostAberto = estado.hostAberto===+d.host ? -1 : +d.host; render(visor); return; }
+    if (d.ordemUrl) { estado.ordemUrl = d.ordemUrl; render(visor); return; }
+    if (d.preset) { const [a,b] = presetDatas(d.preset); estado.cal = {mes:new Date(b.getFullYear(),b.getMonth(),1), a, b}; render(visor); return; }
+    if (d.dia) {
+      const dt = new Date(+d.dia); const c = estado.cal;
+      if (!c.a || c.b) { c.a = dt; c.b = null; } else if (dt < c.a) { c.b = c.a; c.a = dt; } else c.b = dt;
+      render(visor); return;
+    }
+    if (el.classList.contains('js-mes-ant')) { const m = estado.cal.mes; estado.cal.mes = new Date(m.getFullYear(), m.getMonth()-1, 1); render(visor); return; }
+    if (el.classList.contains('js-mes-prox')) { const m = estado.cal.mes; estado.cal.mes = new Date(m.getFullYear(), m.getMonth()+1, 1); render(visor); return; }
+    if (el.classList.contains('js-aplicar')) {
+      estado.ini = estado.cal.a; estado.fim = estado.cal.b; estado.hostAberto = -1;
+      ir('voltar'); toast(t('toast_periodo').replace('{p}', periodoTxt())); return;
+    }
+    if (el.classList.contains('js-sair')) {
+      estado.logado = false; hist = []; estado.erros = {}; estado.q = ''; ir('login', false); toast(t('toast_sair')); return;
+    }
+    if (d.go) {
+      if (d.go==='contrato') estado.destinoContrato = (d.dest==='voltar' || atual==='menu') ? 'voltar' : 'waf';
+      ir(d.go);
+    }
+  });
+}
+</script>
+</body>
+</html>

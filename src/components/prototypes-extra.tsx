@@ -2,14 +2,9 @@
 
 import type { ReactNode } from "react";
 import type { PrototypeId } from "@/content/projects";
+import { NavigablePrototype } from "./navigable-prototype";
 import { PrototypePlayer, type ProtoStep } from "./prototype-player";
 import { RecreatedScreen, type ScreenId } from "./recreated-screens";
-import {
-  AkamaiPrototype,
-  AngelInvestorPrototype,
-  PormadePrototype,
-  PremiumLeaguePrototype,
-} from "./prototypes";
 
 /*
  * Protótipos ilustrativos recriados dos cases Pode Regularizar e Hora do Lar.
@@ -200,18 +195,18 @@ export function HoraDoLarEmpregadorPrototype() {
 export function CasePrototype({ id }: { id: PrototypeId }) {
   switch (id) {
     case "premium-league":
-      return <PremiumLeaguePrototype />;
+      return <NavigablePrototype id="premium-league" title="Protótipo navegável da escalação do Premium League" />;
     case "pormade":
-      return <PormadePrototype />;
+      return <NavigablePrototype id="pormade" title="Protótipo navegável do Gerador de Propostas da Pormade" />;
     case "pode-regularizar":
-      return <PodeRegularizarPrototype />;
+      return <NavigablePrototype id="pode-regularizar" title="Protótipo navegável do app do vendedor do Pode Regularizar" />;
     case "hora-do-lar-funcionario":
-      return <HoraDoLarFuncionarioPrototype />;
+      return <NavigablePrototype id="hora-do-lar-funcionario" title="Protótipo navegável do app de ponto do funcionário da Hora do Lar" />;
     case "hora-do-lar-empregador":
-      return <HoraDoLarEmpregadorPrototype />;
+      return <NavigablePrototype id="hora-do-lar-empregador" title="Protótipo navegável do app do empregador da Hora do Lar" />;
     case "akamai":
-      return <AkamaiPrototype />;
+      return <NavigablePrototype id="akamai" title="Protótipo navegável do Mobile Control Center da Akamai" />;
     case "angel-investor":
-      return <AngelInvestorPrototype />;
+      return <NavigablePrototype id="angel-investor" title="Protótipo navegável do app do Angel Investor Club" />;
   }
 }
