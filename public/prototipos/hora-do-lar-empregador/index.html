@@ -241,6 +241,7 @@
   .toast svg{width:18px;height:18px;color:#7be0a5;flex:none}
 
   /* ---------- modo embutido (iframe do portfólio) ---------- */
+  html:has(body.modo-embed){background:transparent}
   body.modo-embed{background:transparent;padding:0;min-height:0;display:block}
   body.modo-embed .topo{display:none}
   body.modo-embed .celular{box-shadow:none}
@@ -797,6 +798,10 @@ if (modoTelas) {
     if (d.go) ir(d.go);
   });
 }
+</script>
+<script>
+/* Embutido no portfólio: Esc dentro do protótipo fecha a janela de tela cheia. */
+if (window.parent !== window) addEventListener('keydown', e => { if (e.key === 'Escape') parent.postMessage('fechar-prototipo', location.origin); });
 </script>
 </body>
 </html>
