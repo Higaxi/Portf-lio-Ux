@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Fulfillment Ops · Desktop</title>
+<style>
+  :root{
+    --nav:#232F3E; --nav2:#37475A; --orange:#FF9900; --orange-d:#E47911; --bg:#EAEDED; --card:#fff;
+    --ink:#0F1111; --muted:#565959; --line:#D5D9D9; --link:#007185;
+    --crit:#B12704; --crit-bg:#FDECEA; --high:#C45500; --high-bg:#FFF0DC; --med:#7A6A00; --med-bg:#FFF8D6; --low:#565959; --low-bg:#F0F2F2; --ok:#067D62;
+    --idle:#146EB4; --idle-bg:#E8F2FB;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font:14px/1.45 "Amazon Ember",Arial,Helvetica,sans-serif;color:var(--ink);background:var(--bg)}
+  button,select,input{font:inherit}
+  .hidden{display:none!important}
+  svg.ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+  #login{min-height:100vh;display:grid;place-items:center;padding:24px}
+  .lbox{width:400px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:26px}
+  .lbox h1{font-size:22px;margin:0 0 4px}
+  .lbox p{margin:0 0 16px;color:var(--muted)}
+  .lbox label{display:block;font-weight:700;font-size:13px;margin:12px 0 4px}
+  .lbox input{width:100%;padding:8px 10px;border:1px solid #888;border-radius:4px}
+  .lbox input:focus,.search:focus{outline:2px solid var(--orange);border-color:var(--orange-d)}
+  .btn{background:var(--orange);border:1px solid var(--orange-d);border-radius:20px;padding:7px 16px;cursor:pointer;font-weight:600}
+  .btn:hover{background:#F3A847}
+  .btn.ghost{background:#fff;border-color:#888}
+  .btn.ghost:hover{background:#F7FAFA}
+  .btn.small{padding:4px 12px;font-size:13px}
+  .lbox .btn{width:100%;margin-top:18px;padding:9px}
+  .demo{margin-top:16px;padding:10px 12px;background:#F7FAFA;border:1px solid var(--line);border-radius:6px;font-size:12.5px;color:var(--muted)}
+  .demo b{color:var(--ink)}
+  #lerr{color:var(--crit);font-size:13px;margin-top:10px;min-height:18px}
+
+  .top{background:var(--nav);color:#fff;display:flex;align-items:center;gap:16px;padding:0 20px;height:56px;position:relative}
+  .logo{display:flex;align-items:center;height:56px}
+  .logo img{height:26px;display:none;filter:brightness(0) invert(1)}
+  #logoFb{font-weight:700;font-size:22px;letter-spacing:-.5px}
+  .vdiv{width:1px;height:26px;background:#566377}
+  .me{display:flex;align-items:center;gap:10px}
+  .av{width:32px;height:32px;border-radius:50%;background:var(--orange);color:var(--nav);display:grid;place-items:center;font-weight:700;font-size:13px}
+  .me b{display:block;line-height:1.1}
+  .me small{opacity:.75;font-size:12px}
+  .top .sp{flex:1}
+  .top .plain{background:transparent;color:#fff;border:1px solid #6b7a8c;border-radius:4px;padding:4px 10px;cursor:pointer}
+  .top .plain:hover{border-color:var(--orange);color:var(--orange)}
+  .bell{position:relative;background:transparent;border:0;color:#fff;cursor:pointer;padding:6px;border-radius:50%}
+  .bell:hover{background:var(--nav2)}
+  .bell svg.ic{width:24px;height:24px}
+  .badge{position:absolute;top:0;right:-2px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:#E31B23;color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center}
+  .pulse{animation:pulse 2.4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(227,27,35,.55)}50%{box-shadow:0 0 0 6px rgba(227,27,35,0)}}
+  .rdot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#E31B23;vertical-align:middle;margin-left:6px}
+  @media (prefers-reduced-motion:reduce){.pulse{animation:none}}
+  #panel{position:absolute;right:20px;top:54px;width:390px;max-height:70vh;overflow:auto;background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:20}
+  #panel .ph{padding:12px 14px;border-bottom:1px solid var(--line);font-weight:700;display:flex;justify-content:space-between}
+  #panel .pi{display:flex;gap:10px;padding:10px 14px;border-top:1px solid #EEF0F0;font-size:13.5px;align-items:flex-start}
+  #panel .pi:first-of-type{border-top:0}
+  .sub{background:var(--nav2);color:#fff;padding:8px 20px;font-size:13px;display:flex;gap:22px;align-items:center}
+  .sub .live{margin-left:auto;opacity:.8;font-size:12px}
+
+  main{max-width:1360px;margin:0 auto;padding:18px 20px 40px}
+  .grid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:18px;align-items:start}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:8px}
+  .card h2{font-size:16px;margin:0}
+  .card .hd{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:14px 16px 10px}
+  .card .hd small{color:var(--muted)}
+
+  .chip{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:10px;white-space:nowrap}
+  .crit{color:var(--crit);background:var(--crit-bg)} .high{color:var(--high);background:var(--high-bg)}
+  .med{color:var(--med);background:var(--med-bg)} .low{color:var(--low);background:var(--low-bg)}
+  .bar4{border-left:5px solid transparent}
+  .bar4.crit{border-left-color:var(--crit)} .bar4.high{border-left-color:var(--high)} .bar4.med{border-left-color:#C9B100} .bar4.low{border-left-color:#B8BCBC}
+
+  /* atendimento */
+  .next{padding:16px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center}
+  .eyebrow{font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:700;margin-bottom:4px}
+  .next .t{font-size:20px;font-weight:700;margin:2px 0 4px}
+  .why{color:var(--muted)} .why b{color:var(--crit)}
+  .row{display:grid;grid-template-columns:auto 1fr auto auto;gap:14px;align-items:center;padding:11px 16px;border-top:1px solid #EEF0F0;cursor:pointer}
+  .row:hover{background:#F7FAFA}
+  .row.sel{background:#F1F7FB}
+  .row .t{font-weight:600}
+  .row .s{color:var(--muted);font-size:13px}
+  .due{font-variant-numeric:tabular-nums;font-weight:700;text-align:right;min-width:104px}
+  .due.crit{color:var(--crit)}
+  .doing{background:#F1FBF7;border:1px solid #BFE5D8;border-radius:8px;margin:12px 16px 4px;padding:12px 14px;display:flex;justify-content:space-between;gap:12px;align-items:center}
+  .empty{padding:26px 16px;text-align:center;color:var(--muted)}
+  .side .card{margin-bottom:14px}
+  .side .item{padding:9px 16px;border-top:1px solid #EEF0F0;font-size:13px}
+  .side .item:first-of-type{border-top:0}
+  .side .item small{display:block;color:var(--muted)}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--link);margin-right:6px}
+  .kv{display:grid;grid-template-columns:96px 1fr;gap:4px 10px;padding:0 16px 14px;font-size:13.5px}
+  .kv dt{color:var(--muted)} .kv dd{margin:0}
+  .stat{display:inline-block;padding:1px 9px;border-radius:10px;font-size:12px;font-weight:700}
+  .stat.go{background:#E6F5F0;color:var(--ok)} .stat.wait{background:var(--low-bg);color:var(--low)} .stat.bad{background:var(--crit-bg);color:var(--crit)}
+
+  /* gestor */
+  .areas{display:flex;gap:0;margin-bottom:14px;border:1px solid #B8BCBC;border-radius:8px;overflow:hidden;width:max-content;background:#fff}
+  .areas button{border:0;background:#fff;padding:8px 18px;cursor:pointer;border-right:1px solid #D5D9D9;font-weight:600}
+  .areas button:last-child{border-right:0}
+  .areas button.on{background:var(--nav);color:#fff}
+  .areas small{opacity:.7;font-weight:400;margin-left:4px}
+  .sit{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px}
+  .scard{display:flex;align-items:center;gap:14px;padding:14px 16px;cursor:pointer;text-align:left;width:100%;border:1px solid var(--line);background:#fff;border-radius:8px;position:relative}
+  .scard:hover{border-color:#999}
+  .scard.on{outline:2px solid var(--nav)}
+  .scard .n{font-size:30px;font-weight:700;line-height:1}
+  .scard small{display:block;color:var(--muted);font-size:12.5px}
+  .scard .bubble{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;flex:none}
+  .scard .bubble svg.ic{width:24px;height:24px}
+  .scard .rdot{position:absolute;top:10px;right:10px;margin:0}
+  .t-idle{color:var(--idle);background:var(--idle-bg)} .t-over{color:var(--high);background:var(--high-bg)}
+  .t-stalled{color:var(--crit);background:var(--crit-bg)} .t-slow{color:var(--med);background:var(--med-bg)} .t-ok{color:var(--ok);background:#E6F5F0}
+  .avgs{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px}
+  .avg{padding:10px 16px}
+  .avg .n{font-size:22px;font-weight:700}
+  .avg small{color:var(--muted)}
+  .filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:0 16px 12px}
+  .fchip{display:inline-flex;align-items:center;gap:6px;border:1px solid #B8BCBC;background:#fff;border-radius:16px;padding:4px 12px 4px 8px;cursor:pointer;font-size:13px}
+  .fchip svg.ic{width:16px;height:16px}
+  .fchip:hover{background:#F7FAFA}
+  .fchip.on{background:var(--nav);color:#fff;border-color:var(--nav)}
+  .search{margin-left:auto;padding:6px 10px;border:1px solid #888;border-radius:6px;min-width:190px}
+  table{width:100%;border-collapse:collapse}
+  th{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:left;padding:8px 16px;border-bottom:1px solid var(--line)}
+  td{padding:10px 16px;border-top:1px solid #EEF0F0;vertical-align:middle}
+  tr.wk{cursor:pointer} tr.wk:hover td{background:#F7FAFA}
+  .pname{display:flex;align-items:center;gap:10px}
+  .pname .av{width:30px;height:30px;font-size:12px;background:#D5D9D9;color:var(--ink)}
+  .tag{display:inline-block;font-size:11px;color:var(--muted);border:1px solid #CFD3D3;border-radius:8px;padding:0 7px;margin-top:2px}
+  .ics{display:flex;gap:6px}
+  .ics .b{width:30px;height:30px;border-radius:50%;display:grid;place-items:center}
+  .ics .b svg.ic{width:18px;height:18px}
+  .load{height:8px;background:#E3E6E6;border-radius:4px;overflow:hidden;width:120px}
+  .load i{display:block;height:100%;background:var(--ok)}
+  .load.hot i{background:var(--crit)}
+  .up{color:var(--crit);font-weight:700} .down{color:var(--ok);font-weight:700}
+  select{padding:5px 8px;border:1px solid #888;border-radius:4px;background:#fff}
+  tr.avgrow td{background:#F7FAFA;font-weight:700;border-top:2px solid var(--line)}
+  .ctl td{background:#FAFBFB;padding:10px 16px 10px 56px}
+  .ctl .tk{display:flex;gap:12px;align-items:center;padding:5px 0;font-size:13px}
+  .ctl .tk .grow{flex:1}
+  .legend{display:flex;flex-wrap:wrap;gap:16px;padding:10px 16px 14px;color:var(--muted);font-size:12.5px;border-top:1px solid #EEF0F0}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .legend svg.ic{width:16px;height:16px}
+  .pick{margin-top:8px;border:1px solid var(--line);border-radius:8px;background:#fff;overflow:hidden}
+  .pick .ph{padding:6px 10px;font-size:11.5px;color:var(--muted);background:#F7FAFA;border-bottom:1px solid var(--line)}
+  .prow{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;border-top:1px solid #EEF0F0;background:#fff;padding:8px 10px;cursor:pointer}
+  .prow:first-of-type{border-top:0}
+  .prow:hover{background:#F1F7FB}
+  .prow .bb{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;flex:none}
+  .prow .bb svg.ic{width:16px;height:16px}
+  .prow .nm{flex:1;line-height:1.25}
+  .prow .nm small{display:block;color:var(--muted);font-size:12px}
+  .sug{font-size:11px;font-weight:700;color:var(--ok);background:#E6F5F0;border-radius:8px;padding:1px 8px}
+  .foot{margin-top:14px;font-size:12px;color:var(--muted);display:flex;gap:12px;align-items:center}
+  .foot a{color:var(--link);cursor:pointer}
+</style>
+</head>
+<body>
+
+<section id="login">
+  <form class="lbox" id="lform" autocomplete="off">
+    <h1>Fulfillment Ops · Desktop</h1>
+    <p>Sistema para gestão e atendimento ao cliente.</p>
+    <label for="u">Usuário</label>
+    <input id="u" required autofocus>
+    <label for="p">Senha</label>
+    <input id="p" type="password" required>
+    <div id="lerr" role="alert"></div>
+    <button class="btn" type="submit">Entrar</button>
+    <div class="demo">
+      <b>Protótipo, dados fictícios.</b><br>
+      Gestor: <b>gestor</b> / <b>gestor123</b><br>
+      Atendimento: <b>ana.silva</b> / <b>func123</b><br>
+      O operacional usa o app (arquivo separado).
+    </div>
+  </form>
+</section>
+
+<div id="app" class="hidden">
+  <header class="top">
+    <span class="logo"><img id="logoImg" alt="Amazon" src="assets/amazon-logo.svg"><span id="logoFb">amazon</span></span>
+    <span class="vdiv"></span>
+    <span class="me"><span class="av" id="av"></span><span><b id="who"></b><small id="roleTag"></small></span></span>
+    <span class="sp"></span>
+    <button class="bell hidden" id="bell" aria-label="Itens de atenção" aria-haspopup="true"></button>
+    <button class="plain" id="logout">Sair</button>
+    <div id="panel" class="hidden" role="region" aria-label="Itens de atenção"></div>
+  </header>
+  <div class="sub"><span id="subtitle"></span><span class="live" id="live"></span></div>
+  <main id="view"></main>
+</div>
+
+<script src="dados.js"></script>
+<script>
+setupLogo(document.getElementById("logoImg"), document.getElementById("logoFb"));
+
+/* ---------- Sessão ---------- */
+let session = null;
+try{ session = JSON.parse(sessionStorage.getItem("ops-session")); }catch(e){}
+
+document.getElementById("lform").addEventListener("submit", e => {
+  e.preventDefault();
+  const u = document.getElementById("u").value.trim().toLowerCase(), p = document.getElementById("p").value;
+  const acc = USERS[u];
+  if(!acc || acc.pass !== p){ document.getElementById("lerr").textContent = "Usuário ou senha incorretos."; return; }
+  if(acc.role === "operacional"){ document.getElementById("lerr").textContent = "O operacional usa o app, não o sistema desktop."; return; }
+  session = { user:u, role:acc.role, name:acc.name };
+  try{ sessionStorage.setItem("ops-session", JSON.stringify(session)); }catch(e){}
+  start();
+});
+document.getElementById("logout").onclick = () => {
+  session = null; try{ sessionStorage.removeItem("ops-session"); }catch(e){}
+  document.getElementById("app").classList.add("hidden"); document.getElementById("login").classList.remove("hidden");
+  document.getElementById("p").value = ""; document.getElementById("lerr").textContent = ""; closePanel();
+};
+
+/* ---------- Visão do atendimento (SAC) ---------- */
+let focusId = null;
+function deliveryOf(t){
+  const d = S.tasks.find(x => x.area === "operacional" && x.type === "Entrega" && x.order && x.order === t.order);
+  if(!d) return { txt:"Sem registro de entrega neste protótipo", cls:"wait", who:null, addr:null };
+  const who = d.assignee ? nameOf(d.assignee) : "Sem entregador atribuído";
+  if(d.status === "done")  return { txt:"Entregue", cls:"go", who, addr:d.detail };
+  if(d.blocked)            return { txt:"Falha: " + (d.blockedReason || "bloqueada"), cls:"bad", who, addr:d.detail };
+  if(d.status === "doing") return { txt:"Em rota", cls:"go", who, addr:d.detail };
+  return { txt:d.assignee ? "Aguardando saída" : "Sem entregador", cls:d.assignee ? "wait" : "bad", who, addr:d.detail };
+}
+function atendimentoView(){
+  const mine = S.tasks.filter(t => t.assignee === session.user && t.status !== "done").sort(sorter);
+  const doing = mine.find(t => t.status === "doing"), queue = mine.filter(t => t.status === "open"), next = queue[0];
+  const crit = mine.filter(t => level(t) === "crit").length;
+  const focus = mine.find(t => t.id === focusId) || doing || next;
+
+  const head = doing ? `<div class="doing"><div><div class="eyebrow">Em atendimento</div><div style="font-weight:700">${doing.title} · ${doing.type}</div><div class="why">${doing.detail}</div></div>
+      <button class="btn" data-done="${doing.id}">Resolver</button></div>` : "";
+  const nextBlock = next ? `
+    <div class="next bar4 ${level(next)}" data-focus="${next.id}">
+      <div><div class="eyebrow">Próximo atendimento</div>
+        <div class="t">${next.title} · ${next.type}</div>
+        <div class="why">${next.detail} · pedido ${next.order}</div>
+        <div class="why" style="margin-top:2px">${why(next)}</div></div>
+      <div style="text-align:right">${chip(next)}<div style="margin-top:10px"><button class="btn" data-start="${next.id}">Iniciar atendimento</button></div></div>
+    </div>` : (doing ? "" : `<div class="empty">Nenhum atendimento pendente para você agora.</div>`);
+  const rest = queue.slice(1).map(t => `
+    <div class="row bar4 ${level(t)} ${focus && focus.id === t.id ? "sel" : ""}" data-focus="${t.id}">
+      ${chip(t)}
+      <div><div class="t">${t.title} · ${t.type}</div><div class="s">${t.detail}${t.prime ? " · Prime" : ""}${t.blocked ? " · Escalado" : ""}</div></div>
+      <div class="due ${level(t)==="crit" ? "crit" : ""}">${dueText(t)}</div>
+      <button class="btn ghost small" data-start="${t.id}">Iniciar</button>
+    </div>`).join("");
+
+  let detail = "";
+  if(focus){
+    const d = deliveryOf(focus);
+    detail = `<section class="card"><div class="hd"><h2>Pedido do cliente</h2><small>${focus.order}</small></div>
+      <dl class="kv">
+        <dt>Cliente</dt><dd>${focus.title}</dd>
+        <dt>Canal</dt><dd>${focus.type}${focus.prime ? " · Prime" : ""}</dd>
+        <dt>Assunto</dt><dd>${focus.detail}</dd>
+        <dt>Entrega</dt><dd><span class="stat ${d.cls}">${d.txt}</span></dd>
+        <dt>Entregador</dt><dd>${d.who || "—"}</dd>
+        <dt>Endereço</dt><dd>${d.addr || "—"}</dd>
+        <dt>Prazo</dt><dd>${why(focus)}</dd>
+      </dl></section>`;
+  }
+  return `
+  <div class="grid">
+    <section class="card">
+      <div class="hd"><h2>Seus atendimentos, do mais crítico ao menos urgente</h2><small>${mine.length} aberto(s) · ${crit} crítico(s)</small></div>
+      ${head}${nextBlock}${rest ? `<div>${rest}</div>` : ""}
+    </section>
+    <aside class="side">
+      ${detail}
+      <section class="card"><div class="hd"><h2>Notificações</h2><small>${S.notifications.filter(n=>n.unread).length} novas</small></div>
+        ${S.notifications.map(n => `<div class="item">${n.unread ? '<span class="dot"></span>' : ""}${n.text}<small>${ago(n.when)}</small></div>`).join("")}
+      </section>
+      <section class="card"><div class="hd"><h2>Atualizações do time</h2></div>
+        ${S.updates.map(u => `<div class="item"><b>${u.who}</b>: ${u.text}<small>${ago(u.when)}</small></div>`).join("")}
+      </section>
+    </aside>
+  </div>`;
+}
+
+/* ---------- Visão do gestor (atendimento + operacional, separados por filtro de área) ---------- */
+let openWorker = null, flt = "all", area = "all", q = "", pick = null; // pick = "assign:ID" | "move:ID"
+
+/* Lista para distribuir uma tarefa: mostra se cada pessoa está ociosa, sobrecarregada ou normal.
+   Ociosos primeiro, sobrecarregados por último; dentro do grupo, quem tem menos tarefas abertas. */
+const pState = m => m.f.idle ? "idle" : m.f.over ? "over" : "ok";
+const pRank = m => ({ idle:0, ok:1, over:2 })[pState(m)];
+function picker(t, mode){
+  const c = WORKERS.filter(w => w.area === t.area && w.id !== t.assignee).map(wm)
+    .sort((a,b) => pRank(a) - pRank(b) || a.ts.length - b.ts.length);
+  if(!c.length) return `<div class="pick"><div class="ph">Ninguém mais nesta área.</div></div>`;
+  const label = { idle:"Ocioso", over:"Sobrecarregado", ok:"Normal" };
+  return `<div class="pick"><div class="ph">${mode === "move" ? "Mover" : "Atribuir"} a quem? Ociosos primeiro.</div>` + c.map((m,i) => {
+    const s = pState(m);
+    const sub = `${m.ts.length} abertas${m.crit ? ` · ${m.crit} crítica(s)` : ""}${s === "idle" && m.ts.length ? ` · parado ${fmt(m.idleMin)}` : ""}`;
+    return `<button class="prow" data-do="${mode}:${t.id}:${m.w.id}"><span class="bb t-${s}">${ic(s)}</span>
+      <span class="nm"><b>${m.w.name}</b> <span style="color:var(--muted)">· ${label[s]}</span><small>${sub}</small></span>
+      ${i === 0 && s !== "over" ? '<span class="sug">Sugerido</span>' : ""}</button>`;
+  }).join("") + `</div>`;
+}
+
+function summary(group, open){
+  const T = teamAvg(group), n = Math.max(1, group.length);
+  if(area === "operacional"){
+    const ops = open.filter(t => t.area === "operacional");
+    return [
+      [group.reduce((s,w) => s + S.stats[w.id].resolved, 0), "concluídas hoje (entregas e recepção)"],
+      [ops.filter(t => t.status === "doing").length, "em andamento agora"],
+      [ops.filter(t => t.blocked || mins(t) < 0).length, "atrasadas ou com falha"],
+      [ops.filter(t => t.type === "Recepção").length, "recepções pendentes"]
+    ];
+  }
+  if(area === "atendimento"){
+    const at = open.filter(t => t.area === "atendimento");
+    return [
+      [at.length, "atendimentos abertos"],
+      [at.filter(t => mins(t) < 0).length, "com SLA estourado"],
+      [at.filter(t => t.blocked).length, "escalados ao supervisor"],
+      [(T.avg ? Math.round(T.avg) : "—") + " min", "tempo médio de resolução"]
+    ];
+  }
+  const onTime = open.length ? Math.round(100 * open.filter(t => !t.blocked && mins(t) >= 0).length / open.length) : 100;
+  return [
+    [(T.avg ? Math.round(T.avg) : "—") + " min", "tempo médio de resolução"],
+    [(T.resolved / n).toFixed(1), "resolvidas por pessoa"],
+    [(open.filter(t => t.assignee).length / n).toFixed(1), "tarefas abertas por pessoa"],
+    [onTime + "%", "das abertas dentro do prazo"]
+  ];
+}
+
+function managerView(){
+  const group = WORKERS.filter(w => area === "all" || w.area === area);
+  const open = S.tasks.filter(t => t.status !== "done" && (area === "all" || t.area === area));
+  const unassigned = open.filter(t => !t.assignee).sort(sorter);
+  const all = group.map(wm), T = teamAvg(group), n = Math.max(1, group.length);
+  const count = k => all.filter(m => m.f[k]).length;
+  const cnt = a => WORKERS.filter(w => a === "all" || w.area === a).length;
+
+  const areas = `<div class="areas" role="tablist" aria-label="Área">` +
+    [["all","Todos"],["atendimento","Atendimento"],["operacional","Operacional"]].map(([k,l]) => `<button role="tab" aria-selected="${area===k}" class="${area===k ? "on" : ""}" data-area="${k}">${l}<small>${cnt(k)}</small></button>`).join("") + `</div>`;
+
+  const cards = FLAGS.map(f => `
+    <button class="scard ${flt === f.k ? "on" : ""}" data-flt="${f.k}" title="${f.desc}">
+      <span class="bubble t-${f.k}">${ic(f.k)}</span>
+      <span><span class="n">${count(f.k)}</span><small>${f.label}</small></span>
+      ${count(f.k) ? '<span class="rdot pulse"></span>' : ""}
+    </button>`).join("");
+
+  const avgs = `<div class="avgs">${summary(group, S.tasks.filter(t => t.status !== "done")).map(([v,l]) => `<div class="card avg"><div class="n">${v}</div><small>${l}</small></div>`).join("")}</div>`;
+
+  const chips = `<button class="fchip ${flt==="all" ? "on" : ""}" data-flt="all">Todas as situações</button>` +
+    FLAGS.map(f => `<button class="fchip ${flt===f.k ? "on" : ""}" data-flt="${f.k}">${ic(f.k)}${f.one}</button>`).join("") +
+    `<input class="search" id="q" type="search" placeholder="Buscar pessoa" value="${q.replace(/"/g,"&quot;")}" aria-label="Buscar pessoa">`;
+
+  const rowsData = all.filter(m => (flt === "all" || m.f[flt]) && m.w.name.toLowerCase().includes(q.toLowerCase()))
+    .sort((a,b) => b.n - a.n || a.w.name.localeCompare(b.w.name));
+
+  const rows = rowsData.map(m => {
+    const icons = m.n ? FLAGS.filter(f => m.f[f.k]).map(f => `<span class="b t-${f.k}" title="${f.one}: ${f.desc}">${ic(f.k)}</span>`).join("") : `<span class="b t-ok" title="Sem alertas">${ic("ok")}</span>`;
+    const trend = m.avg ? (m.avg > m.T*1.15 ? ' <span class="up" title="acima da média da área">▲</span>' : m.avg < m.T*0.85 ? ' <span class="down" title="abaixo da média da área">▼</span>' : "") : "";
+    const pct = Math.min(100, m.ts.length * 16);
+    const agora = m.doing ? `${m.doing.title}<div style="color:var(--muted);font-size:12.5px">${m.doing.type}</div>`
+      : `<span style="color:var(--muted)">Sem tarefa em andamento<br>${ago(m.st.lastActive)}</span>`;
+    let ctl = "";
+    if(openWorker === m.w.id){
+      ctl = `<tr class="ctl"><td colspan="6">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b>Fila de ${m.w.name}</b><button class="btn ghost small" data-nudge="${m.w.id}">Cobrar andamento</button></div>
+        ${m.ts.map(t => `<div class="tk">${chip(t)}<span class="grow">${t.title} · ${t.type} <span style="color:var(--muted)">— ${t.detail}, ${dueText(t).toLowerCase()}${t.status==="doing" ? " · em andamento" : ""}</span></span>
+          <button class="btn ghost small" data-pick="move:${t.id}">${pick === "move:" + t.id ? "Fechar" : "Mover…"}</button></div>${pick === "move:" + t.id ? picker(t, "move") : ""}`).join("") || "Sem tarefas abertas."}
+      </td></tr>`;
+    }
+    return `<tr class="wk" data-w="${m.w.id}">
+      <td><div class="pname"><span class="av">${initials(m.w.name)}</span><div><b>${m.w.name}</b>${m.n ? '<span class="rdot pulse"></span>' : ""}<br><span class="tag">${AREA[m.w.area]}</span></div></div></td>
+      <td><div class="ics">${icons}</div></td>
+      <td>${agora}</td>
+      <td><div class="load ${m.crit ? "hot" : ""}"><i style="width:${pct}%"></i></div><small style="color:var(--muted)">${m.ts.length} abertas${m.crit ? ` · <b style="color:var(--crit)">${m.crit} crítica(s)</b>` : ""}</small></td>
+      <td>${m.st.resolved}</td>
+      <td>${m.avg ? Math.round(m.avg) + " min" : "—"}${trend}</td></tr>${ctl}`;
+  }).join("") || `<tr><td colspan="6" class="empty">Ninguém corresponde ao filtro.</td></tr>`;
+
+  const legend = FLAGS.map(f => `<span class="t-${f.k}" style="background:none">${ic(f.k)}<span style="color:var(--muted)"><b style="color:var(--ink)">${f.one}</b>: ${f.desc}</span></span>`).join("");
+
+  return `
+  ${areas}
+  <div class="sit">${cards}</div>
+  ${avgs}
+  <div class="grid">
+    <section class="card">
+      <div class="hd"><h2>${area === "all" ? "Equipe" : "Equipe · " + AREA[area]}</h2><small>clique numa pessoa para ver a fila e redistribuir</small></div>
+      <div class="filters">${chips}</div>
+      <table><thead><tr><th>Pessoa</th><th>Situação</th><th>Agora</th><th>Carga</th><th>Resolvidas</th><th>Tempo médio</th></tr></thead>
+        <tbody>${rows}</tbody>
+        <tfoot><tr class="avgrow"><td>Média ${area === "all" ? "da equipe" : "da área"}</td><td></td><td></td><td>${(open.filter(t => t.assignee).length / n).toFixed(1)} abertas</td><td>${(T.resolved / n).toFixed(1)}</td><td>${T.avg ? Math.round(T.avg) + " min" : "—"}</td></tr></tfoot></table>
+      <div class="legend">${legend}</div>
+    </section>
+    <aside class="side">
+      <section class="card"><div class="hd"><h2>Precisa de decisão${unassigned.length ? '<span class="rdot pulse"></span>' : ""}</h2><small>${unassigned.length} sem responsável</small></div>
+        ${unassigned.length ? unassigned.map(t => `<div class="item bar4 ${level(t)}">${chip(t)} <span class="tag">${AREA[t.area]}</span> <b>${t.title}</b><br>${t.type} · ${t.detail}<br>${dueText(t)}<div style="margin-top:6px"><button class="btn ghost small" data-pick="assign:${t.id}">${pick === "assign:" + t.id ? "Fechar" : "Atribuir…"}</button></div>${pick === "assign:" + t.id ? picker(t, "assign") : ""}</div>`).join("") : '<div class="empty">Tudo atribuído.</div>'}
+      </section>
+      <section class="card"><div class="hd"><h2>Atividade recente</h2></div>
+        ${S.activity.slice(0,6).map(a => `<div class="item"><b>${a.who}</b> ${a.text}<small>${ago(a.when)}</small></div>`).join("")}
+      </section>
+    </aside>
+  </div>`;
+}
+
+/* ---------- Sino de atenção (gestor) ---------- */
+const bell = document.getElementById("bell"), panel = document.getElementById("panel");
+const sigOf = items => items.map(i => i.text).join("|");
+let seen = ""; try{ seen = localStorage.getItem("ops-seen") || ""; }catch(e){}
+function renderBell(){
+  const isM = session && session.role === "manager";
+  bell.classList.toggle("hidden", !isM); if(!isM){ closePanel(); return; }
+  const items = attentionItems(), unseen = items.length && sigOf(items) !== seen;
+  bell.innerHTML = ic("bell") + (items.length ? `<span class="badge ${unseen ? "pulse" : ""}" style="${unseen ? "" : "background:#6b7a8c"}">${items.length}</span>` : "");
+  panel.innerHTML = `<div class="ph"><span>Itens de atenção</span><span style="color:var(--muted);font-weight:400">${items.length}</span></div>` +
+    (items.length ? items.map(i => `<div class="pi"><span class="t-${i.k}" style="background:none">${ic(i.k)}</span><span>${i.text}</span></div>`).join("") : '<div class="empty">Nada precisa de atenção agora.</div>');
+}
+function closePanel(){ panel.classList.add("hidden"); }
+bell.addEventListener("click", e => {
+  e.stopPropagation();
+  if(panel.classList.contains("hidden")){
+    panel.classList.remove("hidden");
+    seen = sigOf(attentionItems()); try{ localStorage.setItem("ops-seen", seen); }catch(e){} renderBell();
+  } else closePanel();
+});
+document.addEventListener("click", e => { if(!panel.contains(e.target)) closePanel(); });
+
+/* ---------- Render e eventos ---------- */
+const view = document.getElementById("view");
+function render(){
+  if(!session) return;
+  const isM = session.role === "manager";
+  document.getElementById("roleTag").textContent = isM ? "Gestor" : "Atendimento";
+  document.getElementById("who").textContent = session.name;
+  document.getElementById("av").textContent = initials(session.name);
+  document.getElementById("subtitle").textContent = isM ? "Visão da operação · atendimento e operacional (dados fictícios)" : "Atendimento ao cliente · turno atual (dados fictícios)";
+  document.getElementById("live").textContent = "Atualizado " + new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+  view.innerHTML = (isM ? managerView() : atendimentoView()) + `<div class="foot"><span>Protótipo para o desafio. Os dados ficam só neste navegador.</span><a id="reset">Reiniciar dados de exemplo</a></div>`;
+  renderBell();
+}
+view.addEventListener("click", e => {
+  const t = e.target.closest("[data-start],[data-done],[data-flt],[data-area],[data-nudge],[data-focus],[data-pick],[data-do],#reset,tr.wk");
+  if(!t || e.target.closest("select,input")) return;
+  const ds = t.dataset;
+  if(ds.pick){ pick = pick === ds.pick ? null : ds.pick; render(); return; }
+  if(ds.do){
+    const [mode, id, wid] = ds.do.split(":"), k = S.tasks.find(x => x.id === id);
+    const from = nameOf(k.assignee); k.assignee = wid; if(k.status === "doing") k.status = "open";
+    log(session.name, mode === "move" ? `moveu ${k.title} de ${from} para ${nameOf(wid)}` : `atribuiu ${k.title} a ${nameOf(wid)}`);
+    pick = null; save(S); render(); return;
+  }
+  if(ds.start){ startTask(ds.start, session.user); focusId = ds.start; render(); return; }
+  if(ds.done){ finishTask(ds.done, session.user); render(); return; }
+  if(ds.area){ area = ds.area; flt = "all"; openWorker = null; render(); return; }
+  if(ds.flt !== undefined){ flt = flt === ds.flt ? "all" : ds.flt; render(); return; }
+  if(ds.nudge){
+    S.notifications.unshift({ id:Date.now(), text:`${session.name} pediu um retorno sobre o seu andamento`, when:Date.now(), unread:true });
+    log(session.name, `cobrou o andamento de ${nameOf(ds.nudge)}`); save(S); render(); return;
+  }
+  if(t.id === "reset"){ S = seed(); save(S); openWorker = null; flt = "all"; area = "all"; q = ""; focusId = null; seen = ""; try{ localStorage.removeItem("ops-seen"); }catch(e){} render(); return; }
+  if(ds.focus){ focusId = ds.focus; render(); return; }
+  if(ds.w){ openWorker = openWorker === ds.w ? null : ds.w; render(); }
+});
+view.addEventListener("input", e => {
+  if(e.target.id !== "q") return;
+  q = e.target.value; render(); const i = document.getElementById("q"); i.focus(); i.setSelectionRange(i.value.length, i.value.length);
+});
+addEventListener("storage", e => { if(e.key === KEY){ S = load(); render(); } });
+setInterval(() => { if(session && !document.activeElement.matches("select,input")){ S = load(); render(); } }, 30000);
+
+function start(){
+  document.getElementById("login").classList.add("hidden"); document.getElementById("app").classList.remove("hidden");
+  S = load(); render();
+}
+if(session && session.role !== "operacional") start();
+</script>
+</body>
+</html>

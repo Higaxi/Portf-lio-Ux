@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Fulfillment Ops · App operacional</title>
+<style>
+  :root{
+    --nav:#232F3E; --nav2:#37475A; --orange:#FF9900; --orange-d:#E47911; --bg:#EAEDED; --card:#fff;
+    --ink:#0F1111; --muted:#565959; --line:#D5D9D9; --link:#007185;
+    --crit:#B12704; --crit-bg:#FDECEA; --high:#C45500; --high-bg:#FFF0DC; --med:#7A6A00; --med-bg:#FFF8D6; --low:#565959; --low-bg:#F0F2F2; --ok:#067D62;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%}
+  body{font:15px/1.4 "Amazon Ember",Arial,Helvetica,sans-serif;color:var(--ink);background:#C9CED6;display:grid;place-items:center}
+  button,input,select{font:inherit}
+  .hidden{display:none!important}
+  svg.ic{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+  .phone{width:390px;height:800px;max-height:100vh;background:var(--bg);border-radius:34px;overflow:hidden;position:relative;display:flex;flex-direction:column;box-shadow:0 0 0 10px #111,0 20px 50px rgba(0,0,0,.35)}
+  @media (max-width:520px){ body{display:block;background:var(--bg)} .phone{width:100%;height:100dvh;max-height:none;border-radius:0;box-shadow:none} }
+
+  .scr{flex:1;overflow:auto;position:relative}
+  .bar{background:var(--nav);color:#fff;padding:14px 16px 12px;flex:none}
+  .bar .l1{display:flex;align-items:center;gap:10px}
+  .logo img{height:20px;display:none;filter:brightness(0) invert(1)}
+  #logoFb{font-weight:700;font-size:19px;letter-spacing:-.5px}
+  .bar .sp{flex:1}
+  .av{width:32px;height:32px;border-radius:50%;background:var(--orange);color:var(--nav);display:grid;place-items:center;font-weight:700;font-size:13px}
+  .hello{margin-top:10px;font-size:17px;font-weight:700}
+  .hello small{display:block;font-weight:400;opacity:.8;font-size:13px}
+  .pills{display:flex;gap:8px;margin-top:10px}
+  .pill{background:var(--nav2);border-radius:14px;padding:3px 10px;font-size:12.5px}
+  .pill b{color:var(--orange)}
+
+  .tabs{display:flex;gap:8px;padding:12px 14px 4px;overflow:auto}
+  .tab{border:1px solid #B8BCBC;background:#fff;border-radius:18px;padding:6px 14px;white-space:nowrap}
+  .tab.on{background:var(--nav);color:#fff;border-color:var(--nav)}
+
+  .chip{display:inline-block;font-size:12px;font-weight:700;padding:2px 9px;border-radius:10px;white-space:nowrap}
+  .crit{color:var(--crit);background:var(--crit-bg)} .high{color:var(--high);background:var(--high-bg)}
+  .med{color:var(--med);background:var(--med-bg)} .low{color:var(--low);background:var(--low-bg)}
+  .bar4{border-left:5px solid transparent}
+  .bar4.crit{border-left-color:var(--crit)} .bar4.high{border-left-color:var(--high)} .bar4.med{border-left-color:#C9B100} .bar4.low{border-left-color:#B8BCBC}
+
+  .sec{padding:12px 14px 0}
+  .eyebrow{font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:700;margin:0 0 6px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px}
+  .next{padding:14px}
+  .next .t{font-size:19px;font-weight:700;margin:6px 0 2px}
+  .addr{display:flex;gap:6px;color:var(--muted);align-items:flex-start;margin:4px 0}
+  .addr svg.ic{width:18px;height:18px;margin-top:2px}
+  .why{color:var(--muted);font-size:13.5px} .why b{color:var(--crit)}
+  .btns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .btn{background:var(--orange);border:1px solid var(--orange-d);border-radius:22px;padding:10px 18px;font-weight:700;cursor:pointer;text-decoration:none;color:var(--ink);display:inline-flex;align-items:center;gap:6px;justify-content:center}
+  .btn.full{width:100%}
+  .btn.ghost{background:#fff;border-color:#888}
+  .btn.nav{background:#fff;border-color:#888;flex:1}
+  .btn.dark{background:var(--nav);border-color:var(--nav);color:#fff}
+  .btn.danger{background:#fff;border-color:var(--crit);color:var(--crit)}
+  .list{margin-top:8px;overflow:hidden}
+  .item{display:flex;gap:10px;align-items:center;padding:12px 14px;border-top:1px solid #EEF0F0;cursor:pointer;width:100%;text-align:left;background:#fff;border-left-width:5px}
+  .item:first-child{border-top:0}
+  .item .b{flex:1;min-width:0}
+  .item .b b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .item .b small{color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .item .r{text-align:right;font-size:12.5px;font-weight:700;white-space:nowrap}
+  .item .r.crit{color:var(--crit)}
+  .ti{width:34px;height:34px;border-radius:50%;background:#EEF1F4;color:var(--nav);display:grid;place-items:center;flex:none}
+  .empty{padding:30px 16px;text-align:center;color:var(--muted)}
+
+  .nav{display:flex;background:#fff;border-top:1px solid var(--line);flex:none}
+  .nav button{flex:1;border:0;background:#fff;padding:10px 0 12px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;cursor:pointer}
+  .nav button.on{color:var(--nav);font-weight:700}
+
+  /* detalhe */
+  #det{position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;z-index:5}
+  .dh{background:var(--nav);color:#fff;padding:12px 14px;display:flex;gap:10px;align-items:center;flex:none}
+  .dh button{background:transparent;border:0;color:#fff;padding:4px;cursor:pointer;display:grid}
+  .dh b{font-size:16px}
+  .db{flex:1;overflow:auto;padding:14px}
+  .kv{display:grid;grid-template-columns:92px 1fr;gap:6px 10px;margin:10px 0 4px;font-size:14.5px}
+  .kv dt{color:var(--muted)} .kv dd{margin:0}
+  .code{margin-top:14px;padding:14px;text-align:center}
+  .code label{display:block;font-weight:700;margin-bottom:8px}
+  .code input{width:100%;text-align:center;font-size:30px;letter-spacing:.5em;padding:8px;border:2px solid #888;border-radius:10px}
+  .code input:focus{outline:0;border-color:var(--orange-d)}
+  .hint{font-size:12px;color:var(--muted);margin-top:6px}
+  .err{color:var(--crit);font-weight:700;margin-top:8px;min-height:20px}
+  select{width:100%;padding:10px;border:1px solid #888;border-radius:8px;background:#fff;margin-top:8px}
+
+  /* login */
+  .lg{flex:1;display:flex;flex-direction:column;justify-content:center;padding:26px;background:#fff}
+  .lg h1{font-size:22px;margin:14px 0 4px}
+  .lg p{margin:0 0 14px;color:var(--muted)}
+  .lg label{display:block;font-weight:700;font-size:13px;margin:12px 0 4px}
+  .lg input{width:100%;padding:11px;border:1px solid #888;border-radius:8px}
+  .lg input:focus{outline:2px solid var(--orange);border-color:var(--orange-d)}
+  .lg .logo img{height:26px;filter:none}
+  .lg #logoFb2{font-weight:700;font-size:26px;letter-spacing:-.5px}
+  #lerr{color:var(--crit);font-size:13px;min-height:18px;margin-top:8px}
+  .demo{margin-top:14px;padding:10px 12px;background:#F7FAFA;border:1px solid var(--line);border-radius:8px;font-size:12.5px;color:var(--muted)}
+  .demo b{color:var(--ink)}
+  .toast{position:absolute;left:14px;right:14px;bottom:76px;background:var(--nav);color:#fff;border-radius:10px;padding:10px 14px;z-index:9;font-size:14px}
+</style>
+</head>
+<body>
+<div class="phone" id="phone">
+
+  <section class="lg" id="login">
+    <span class="logo"><img id="logoImg2" alt="Amazon" src="assets/amazon-logo.svg"><span id="logoFb2">amazon</span></span>
+    <h1>App operacional</h1>
+    <p>Recebimento de pedidos e entregas.</p>
+    <form id="lform" autocomplete="off">
+      <label for="u">Usuário</label><input id="u" required>
+      <label for="p">Senha</label><input id="p" type="password" required>
+      <div id="lerr" role="alert"></div>
+      <button class="btn dark full" type="submit" style="margin-top:8px">Entrar</button>
+    </form>
+    <div class="demo"><b>Protótipo, dados fictícios.</b><br>Usuário: <b>bruno</b> / <b>app123</b><br>(também diego, elisa e fabio)</div>
+  </section>
+
+  <div id="app" class="hidden" style="display:none;flex-direction:column;flex:1;min-height:0">
+    <div class="bar">
+      <div class="l1"><span class="logo"><img id="logoImg" alt="Amazon" src="assets/amazon-logo.svg"><span id="logoFb">amazon</span></span><span class="sp"></span><span class="av" id="av"></span></div>
+      <div class="hello" id="hello"></div>
+      <div class="pills" id="pills"></div>
+    </div>
+    <div class="scr" id="scr"></div>
+    <nav class="nav">
+      <button id="nFila" class="on">__FILA__<span>Fila</span></button>
+      <button id="nEu">__EU__<span>Eu</span></button>
+    </nav>
+    <div id="det" class="hidden"></div>
+  </div>
+</div>
+
+<script src="dados.js"></script>
+<script>
+/* ícone de usuário (só neste arquivo) */
+P.user = '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>';
+P.list = '<path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/>';
+document.getElementById("nFila").innerHTML = ic("list") + "<span>Fila</span>";
+document.getElementById("nEu").innerHTML = ic("user") + "<span>Eu</span>";
+setupLogo(document.getElementById("logoImg"), document.getElementById("logoFb"));
+setupLogo(document.getElementById("logoImg2"), document.getElementById("logoFb2"));
+
+let session = null; try{ session = JSON.parse(sessionStorage.getItem("ops-app-session")); }catch(e){}
+let tab = "fila", tipo = "todas", detId = null, pending = "";
+const scr = document.getElementById("scr"), det = document.getElementById("det"), appEl = document.getElementById("app");
+
+document.getElementById("lform").addEventListener("submit", e => {
+  e.preventDefault();
+  const u = document.getElementById("u").value.trim().toLowerCase(), p = document.getElementById("p").value, acc = USERS[u];
+  const err = document.getElementById("lerr");
+  if(!acc || acc.pass !== p){ err.textContent = "Usuário ou senha incorretos."; return; }
+  if(acc.role !== "operacional"){ err.textContent = "Este usuário usa o sistema desktop."; return; }
+  session = { user:u, name:acc.name };
+  try{ sessionStorage.setItem("ops-app-session", JSON.stringify(session)); }catch(e){}
+  start();
+});
+function logout(){
+  session = null; try{ sessionStorage.removeItem("ops-app-session"); }catch(e){}
+  appEl.style.display = "none"; appEl.classList.add("hidden"); document.getElementById("login").style.display = "";
+  document.getElementById("p").value = ""; document.getElementById("lerr").textContent = ""; detId = null;
+}
+
+const mapLinks = addr => ({
+  waze:  "https://waze.com/ul?q=" + encodeURIComponent(addr) + "&navigate=yes",
+  gmaps: "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(addr) + "&travelmode=driving"
+});
+const mine = () => S.tasks.filter(t => t.assignee === session.user && t.status !== "done" && t.area === "operacional").sort(sorter);
+const typeIcon = t => ic(t.type === "Entrega" ? "truck" : "box");
+function toast(msg){ const d = document.createElement("div"); d.className = "toast"; d.textContent = msg; document.getElementById("phone").appendChild(d); setTimeout(() => d.remove(), 2600); }
+
+function navBtns(t){
+  if(t.type !== "Entrega") return "";
+  const m = mapLinks(t.detail);
+  return `<a class="btn nav" href="${m.waze}" target="_blank" rel="noopener">${ic("pin")}Waze</a><a class="btn nav" href="${m.gmaps}" target="_blank" rel="noopener">${ic("pin")}Google Maps</a>`;
+}
+
+function filaView(){
+  const all = mine(), list = all.filter(t => tipo === "todas" || t.type === tipo);
+  const doing = list.find(t => t.status === "doing"), queue = list.filter(t => t.status !== "doing");
+  const next = doing || queue[0], rest = queue.filter(t => t !== next);
+  const nextBlock = next ? `
+    <div class="sec"><p class="eyebrow">${doing ? "Em andamento" : "Próxima parada"}</p>
+      <div class="card next bar4 ${level(next)}">
+        ${chip(next)} <span class="why">${next.type}</span>
+        <div class="t">${next.title}</div>
+        <div class="addr">${ic("pin")}<span>${next.detail}</span></div>
+        ${next.customer ? `<div class="why">Cliente: ${next.customer}</div>` : ""}
+        <div class="why" style="margin-top:4px">${why(next)}</div>
+        <div class="btns">${navBtns(next)}</div>
+        <div class="btns"><button class="btn full" data-open="${next.id}">${doing ? "Continuar" : "Abrir"}</button></div>
+      </div></div>` : `<div class="empty">Nada pendente para você agora.</div>`;
+  const restBlock = rest.length ? `<div class="sec"><p class="eyebrow">Depois, por prioridade</p><div class="card list">` + rest.map(t => `
+      <button class="item bar4 ${level(t)}" data-open="${t.id}">
+        <span class="ti">${typeIcon(t)}</span>
+        <span class="b"><b>${t.title}</b><small>${t.detail}</small></span>
+        <span class="r ${level(t)==="crit" ? "crit" : ""}">${chip(t)}<br>${mins(t) < 0 ? "atrasada" : fmt(mins(t))}</span>
+      </button>`).join("") + `</div></div>` : "";
+  const nE = all.filter(t => t.type === "Entrega").length, nR = all.filter(t => t.type === "Recepção").length;
+  return `<div class="tabs">
+      <button class="tab ${tipo==="todas" ? "on" : ""}" data-tipo="todas">Todas ${all.length}</button>
+      <button class="tab ${tipo==="Entrega" ? "on" : ""}" data-tipo="Entrega">Entregas ${nE}</button>
+      <button class="tab ${tipo==="Recepção" ? "on" : ""}" data-tipo="Recepção">Recepção ${nR}</button></div>
+    ${nextBlock}${restBlock}<div style="height:16px"></div>`;
+}
+function euView(){
+  const st = S.stats[session.user], avg = st.resolved ? Math.round(st.totalMin / st.resolved) : 0, all = mine();
+  return `<div class="sec"><p class="eyebrow">Seu turno</p><div class="card" style="padding:6px 14px">
+      <dl class="kv"><dt>Concluídas</dt><dd><b>${st.resolved}</b></dd><dt>Tempo médio</dt><dd><b>${avg ? avg + " min" : "—"}</b></dd>
+      <dt>Na fila</dt><dd><b>${all.length}</b> (${all.filter(t => level(t) === "crit").length} críticas)</dd></dl></div>
+      <div class="btns"><button class="btn ghost full" id="out">Sair</button></div></div>`;
+}
+
+function detailView(t){
+  const isDel = t.type === "Entrega";
+  let body = `<span class="chip ${level(t)}">${LABEL[level(t)]}</span> <span class="why">${why(t)}</span>
+    <dl class="kv"><dt>${isDel ? "Pedido" : "Lote"}</dt><dd>${t.title}</dd>`;
+  if(isDel) body += `<dt>Cliente</dt><dd>${t.customer}</dd><dt>Telefone</dt><dd>${t.phone}</dd><dt>Endereço</dt><dd>${t.detail}</dd>`;
+  else body += `<dt>Conteúdo</dt><dd>${t.detail}</dd><dt>Esperado</dt><dd>${t.expected} volumes</dd>`;
+  body += `</dl>`;
+  if(isDel) body += `<div class="btns">${navBtns(t)}</div>`;
+  if(t.blocked) body += `<div class="card" style="padding:10px 14px;margin-top:12px;border-color:var(--crit);color:var(--crit)"><b>${blockedLabel(t)}</b></div>`;
+
+  if(t.status !== "doing"){
+    body += `<div class="btns"><button class="btn full" data-start="${t.id}">${isDel ? "Iniciar rota" : "Iniciar recepção"}</button></div>`;
+  } else if(isDel){
+    body += `<div class="card code"><label for="cod">Código de entrega do cliente</label>
+        <input id="cod" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••">
+        <div class="hint">Peça o código de 4 dígitos ao cliente. (demo: ${t.code})</div><div class="err" id="err">${pending}</div>
+        <button class="btn full" data-confirm="${t.id}" style="margin-top:6px">Confirmar entrega</button></div>
+      <div class="card" style="padding:14px;margin-top:12px"><b>Não consegui entregar</b>
+        <select id="why"><option value="">Escolha o motivo…</option><option>Cliente ausente, reagendar</option><option>Endereço não encontrado</option><option>Cliente recusou</option></select>
+        <button class="btn danger full" data-fail="${t.id}" style="margin-top:10px">Registrar problema</button></div>`;
+  } else {
+    body += `<div class="card code"><label for="cnt">Volumes conferidos</label>
+        <input id="cnt" inputmode="numeric" maxlength="3" autocomplete="off" placeholder="0" style="letter-spacing:.1em">
+        <div class="hint">Esperado: ${t.expected} volumes.</div><div class="err" id="err">${pending}</div>
+        <button class="btn full" data-count="${t.id}" style="margin-top:6px">Confirmar recebimento</button></div>`;
+  }
+  return `<div class="dh"><button id="back" aria-label="Voltar">${ic("back")}</button><b>${isDel ? "Entrega" : "Recepção"}</b></div><div class="db">${body}</div>`;
+}
+
+function render(){
+  if(!session) return;
+  const st = S.stats[session.user], all = mine();
+  document.getElementById("av").textContent = initials(session.name);
+  document.getElementById("hello").innerHTML = `Olá, ${session.name.split(" ")[0]}<small>${new Date().toLocaleDateString("pt-BR",{weekday:"long"})} · centro de distribuição</small>`;
+  document.getElementById("pills").innerHTML = `<span class="pill"><b>${all.length}</b> na fila</span><span class="pill"><b>${all.filter(t => level(t)==="crit").length}</b> críticas</span><span class="pill"><b>${st.resolved}</b> concluídas</span>`;
+  document.getElementById("nFila").classList.toggle("on", tab === "fila"); document.getElementById("nEu").classList.toggle("on", tab === "eu");
+  const keep = scr.scrollTop;
+  scr.innerHTML = tab === "fila" ? filaView() : euView(); scr.scrollTop = keep;
+  const t = detId && S.tasks.find(x => x.id === detId);
+  if(t && t.status !== "done"){ det.classList.remove("hidden"); det.innerHTML = detailView(t); }
+  else { det.classList.add("hidden"); det.innerHTML = ""; if(t) detId = null; }
+}
+
+document.getElementById("nFila").onclick = () => { tab = "fila"; detId = null; render(); };
+document.getElementById("nEu").onclick = () => { tab = "eu"; detId = null; render(); };
+appEl.addEventListener("click", e => {
+  const t = e.target.closest("[data-open],[data-tipo],[data-start],[data-confirm],[data-count],[data-fail],#back,#out");
+  if(!t) return; const d = t.dataset;
+  if(d.tipo){ tipo = d.tipo; render(); return; }
+  if(d.open){ detId = d.open; pending = ""; render(); return; }
+  if(t.id === "back"){ detId = null; pending = ""; render(); return; }
+  if(t.id === "out"){ logout(); return; }
+  if(d.start){ startTask(d.start, session.user); pending = ""; render(); return; }
+  if(d.confirm){
+    const k = S.tasks.find(x => x.id === d.confirm), v = document.getElementById("cod").value.trim();
+    if(v !== k.code){ pending = "Código incorreto. Confira com o cliente."; render(); return; }
+    finishTask(k.id, session.user); detId = null; pending = ""; render(); toast("Entrega confirmada."); return;
+  }
+  if(d.count){
+    const k = S.tasks.find(x => x.id === d.count), v = parseInt(document.getElementById("cnt").value, 10);
+    if(isNaN(v)){ pending = "Informe a quantidade conferida."; render(); return; }
+    if(v !== k.expected){
+      finishTask(k.id, session.user, `divergência: ${v} de ${k.expected} volumes`); detId = null; pending = ""; render(); toast("Recebimento registrado com divergência."); return;
+    }
+    finishTask(k.id, session.user); detId = null; pending = ""; render(); toast("Recebimento confirmado."); return;
+  }
+  if(d.fail){
+    const r = document.getElementById("why").value; if(!r){ pending = "Escolha o motivo."; render(); return; }
+    failTask(d.fail, session.user, r); detId = null; pending = ""; render(); toast("Problema registrado. O gestor foi avisado."); return;
+  }
+});
+addEventListener("storage", e => { if(e.key === KEY){ S = load(); if(!document.activeElement.matches("input,select")) render(); } });
+setInterval(() => { if(session && !document.activeElement.matches("input,select")){ S = load(); render(); } }, 30000);
+
+function start(){
+  document.getElementById("login").style.display = "none"; appEl.classList.remove("hidden"); appEl.style.display = "flex";
+  S = load(); render();
+}
+if(session && USERS[session.user] && USERS[session.user].role === "operacional") start();
+</script>
+</body>
+</html>
