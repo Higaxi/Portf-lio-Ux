@@ -48,7 +48,7 @@ export function WebShowcase() {
                 <span className="label shrink-0">{c.pages.length > 1 ? `${c.pages.length} páginas` : "1 página"}</span>
               </span>
               <span className="label block">
-                {c.segment} · {webLabel}
+                {c.segment} · {c.label ?? webLabel}
               </span>
               <span className="sr-only">: abrir o site no mockup</span>
             </button>

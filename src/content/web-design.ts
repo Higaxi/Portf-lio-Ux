@@ -23,6 +23,8 @@ export type WebClient = {
   slug: string;
   name: string;
   segment: string;
+  /** Rótulo próprio; sem ele vale o `webLabel` (landing pages de 2020). */
+  label?: string;
   pages: WebPage[];
 };
 
@@ -107,6 +109,14 @@ const clients: WebClient[] = [
   { slug: "rodrigo-azevedo", name: "Rodrigo Azevedo Advocacia", segment: "Jurídico", pages: [page("l-advrodrigoazevedo-br", "Início", "l.advrodrigoazevedo.com.br")] },
   { slug: "erica-cintra", name: "Érica Cintra", segment: "Gestão de clínicas", pages: [page("l-ericacintra-br", "Início", "l.ericacintra.com.br")] },
   { slug: "movement-me", name: "Movement Me", segment: "Agência de marketing", pages: [page("l-movementme", "Início", "l.movementme.com")] },
+  {
+    // Proposta de site (desafio de design), nov/2026. Não há site no ar: o "endereço" é só um rótulo, sem link.
+    slug: "redlinemd",
+    name: "RedlineMD",
+    segment: "Saúde: revisão de contratos médicos",
+    label: "Proposta de site · 2026",
+    pages: [page("redlinemd", "Início", "RedlineMD · proposta de site")],
+  },
 ];
 
 /** Clientes com mais páginas primeiro (ordem estável para os demais). */
