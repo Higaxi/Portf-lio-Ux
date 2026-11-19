@@ -12,6 +12,13 @@ const nextConfig: NextConfig = {
       { source: "/redline-test", destination: "/redline-test/index.html", permanent: false },
     ];
   },
+  // protótipos em inglês do desafio: endereço curto, arquivos em public/cc/ (as páginas usam <base href="/cc/">)
+  rewrites() {
+    return [
+      { source: "/ccdesktop", destination: "/cc/desktop.html" },
+      { source: "/ccmobile", destination: "/cc/app.html" },
+    ];
+  },
   images: {
     formats: ["image/avif", "image/webp"],
   },

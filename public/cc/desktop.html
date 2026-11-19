@@ -1,0 +1,769 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<base href="/cc/">
+<title>Fulfillment Ops · Desktop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* Amazon visual language: navy bar, yellow button, teal link, light gray page.
+     Surfaces separated by tone, no hairlines or resting shadows. The interface carries data-ui. */
+  :root{
+    --squid:#131921; --nav:#232F3E; --nav2:#37475A; --nav3:#485769;
+    --yellow:#FFD814; --yellow-h:#F7CA00; --orange:#FF9900; --link:#007185;
+    --ink:#0F1111; --muted:#565959; --page:#E3E6E6; --card:#FFFFFF; --tone:#F3F4F4; --tone2:#EAEDED;
+    --crit:#B12704; --crit-bg:#FCE7E3; --high:#C45500; --high-bg:#FFEEDB; --med:#7A6A00; --med-bg:#FFF6CC;
+    --low:#565959; --low-bg:#EEF0F0; --ok:#067D62; --ok-bg:#DDF3EC; --idle:#146EB4; --idle-bg:#E2EEF9; --me:#E7F4F5;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font:15px/1.5 "Open Sans","Amazon Ember",Arial,sans-serif;color:var(--ink);background:var(--page);-webkit-font-smoothing:antialiased}
+  button,select,input,textarea{font:inherit;color:inherit}
+  .hidden{display:none!important}
+  svg.ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+  :focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 20px;border:0;border-radius:999px;background:var(--yellow);font-weight:700;cursor:pointer;transition:background .15s,transform .1s;white-space:nowrap}
+  .btn:hover{background:var(--yellow-h)} .btn:active{transform:scale(.97)}
+  .btn.soft{background:var(--tone2);font-weight:600} .btn.soft:hover{background:#DDE1E1}
+  .btn.dark{background:var(--nav);color:#fff} .btn.dark:hover{background:var(--nav2)}
+  .btn.danger{background:var(--crit-bg);color:var(--crit)}
+  .btn.small{min-height:34px;padding:0 14px;font-size:14px}
+  .link{color:var(--link);font-weight:600;cursor:pointer;background:none;border:0;padding:0}
+  .link:hover{color:#C7511F;text-decoration:underline}
+
+  /* ---------- login with photo ---------- */
+  #login{min-height:100svh;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);background:var(--card)}
+  .lart{position:relative;color:#fff;padding:56px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;background:var(--nav)}
+  .lart img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.35}
+  .lart::after{content:"";position:absolute;inset:0;background:rgba(19,25,33,.55)}
+  .lart > *:not(img){position:relative;z-index:1}
+  .lart h1{font-size:clamp(36px,3.8vw,58px);line-height:1.02;letter-spacing:-.03em;margin:0;max-width:16ch;font-weight:800}
+  .lart p{font-size:18px;color:#DCE2E8;max-width:36ch;margin:18px 0 0}
+  .lart .roles{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:560px}
+  .lart .role{background:rgba(35,47,62,.9);border-radius:12px;padding:16px 18px}
+  .lart .role b{display:block;font-size:17px}
+  .lart .role span{color:#C9D1DA;font-size:14px}
+  .lart .credit{font-size:12px;color:#B9C2CC}
+  .lart .credit a{color:#B9C2CC}
+  .lform{display:flex;flex-direction:column;justify-content:center;padding:56px;max-width:520px;width:100%;margin:0 auto}
+  .lform h2{font-size:30px;letter-spacing:-.02em;margin:22px 0 6px}
+  .lform p{color:var(--muted);margin:0 0 20px}
+  .lform label{display:block;font-weight:700;font-size:14px;margin:14px 0 6px}
+  .lform input{width:100%;height:46px;padding:0 14px;border:0;border-radius:8px;background:var(--tone2)}
+  .lform input:focus{outline:3px solid var(--orange);background:#fff}
+  .lform .btn{width:100%;margin-top:22px;min-height:46px;font-size:16px}
+  .demo{margin-top:22px;padding:14px 16px;background:var(--tone);border-radius:10px;font-size:14px;color:var(--muted)}
+  .demo b{color:var(--ink)}
+  .demo button{all:unset;cursor:pointer;color:var(--link);font-weight:700}
+  #lerr{color:var(--crit);font-size:14px;margin-top:10px;min-height:20px;font-weight:600}
+  .wordmark{display:inline-flex;align-items:baseline;gap:6px;font-weight:800;font-size:26px;letter-spacing:-.04em}
+  .wordmark small{font-size:15px;font-weight:700;color:var(--orange);letter-spacing:0}
+  .lform .wordmark{color:var(--ink)}
+
+  /* ---------- top bar ---------- */
+  .top{background:var(--squid);color:#fff;display:flex;align-items:center;gap:16px;padding:0 20px;height:60px;position:sticky;top:0;z-index:30}
+  .me{display:flex;align-items:center;gap:10px;margin-left:18px}
+  .av{width:34px;height:34px;border-radius:50%;background:var(--orange);color:var(--squid);display:grid;place-items:center;font-weight:800;font-size:13px;flex:none}
+  .me b{display:block;line-height:1.15;font-size:14px}
+  .me small{color:#B9C2CC;font-size:13px}
+  .top .sp{flex:1}
+  .live{color:#B9C2CC;font-size:13px;display:flex;align-items:center;gap:8px;margin-right:6px}
+  .live i{width:8px;height:8px;border-radius:50%;background:#3BD67A}
+  .tbtn{position:relative;background:transparent;border:0;color:#fff;cursor:pointer;padding:8px 12px;border-radius:999px;display:inline-flex;align-items:center;gap:8px;font-weight:600}
+  .tbtn:hover{background:var(--nav2)}
+  .tbtn svg.ic{width:22px;height:22px}
+  .badge{position:absolute;top:2px;right:2px;min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:#E31B23;color:#fff;font-size:11.5px;font-weight:700;display:grid;place-items:center}
+  .pulse{animation:pulse 2.4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+  .rdot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#E31B23;vertical-align:middle;margin-left:6px;flex:none}
+  #panel{position:absolute;right:120px;top:58px;width:400px;max-height:70vh;overflow:auto;background:#fff;color:var(--ink);border-radius:12px;box-shadow:0 12px 32px rgba(15,17,17,.25);z-index:40;padding:8px} /* taste-skill-ignore: floating menu */
+  #panel .ph{padding:10px 12px;font-weight:800;display:flex;justify-content:space-between}
+  #panel .pi{display:flex;gap:10px;padding:10px 12px;border-radius:8px;font-size:14px;align-items:flex-start}
+  #panel .pi:nth-child(even){background:var(--tone)}
+
+  /* ---------- shell: side menu + content ---------- */
+  .shell{display:grid;grid-template-columns:248px minmax(0,1fr);min-height:calc(100svh - 60px)}
+  .side{background:var(--nav);color:#fff;padding:18px 12px;display:flex;flex-direction:column;gap:4px;position:sticky;top:60px;height:calc(100svh - 60px);overflow:auto}
+  .side .grp{font-size:13px;color:#9FAAB6;font-weight:600;padding:16px 12px 6px}
+  .side .grp:first-child{padding-top:2px}
+  .mi{display:flex;align-items:center;gap:12px;width:100%;border:0;background:transparent;color:#DCE2E8;padding:11px 12px;border-radius:10px;cursor:pointer;font-weight:600;text-align:left}
+  .mi:hover{background:var(--nav2);color:#fff}
+  .mi.on{background:#fff;color:var(--ink)}
+  .mi.on svg.ic{color:var(--link)}
+  .mi .n{margin-left:auto;font-size:13px;font-weight:700;color:inherit;opacity:.8}
+  .mi .rdot{margin-left:auto}
+  .mi .rdot + .n{margin-left:8px}
+  .side .bottom{margin-top:auto;display:flex;flex-direction:column;gap:8px;padding:12px 4px 4px}
+  .side .bottom .btn{width:100%}
+  .side .btn.soft{background:var(--nav2);color:#fff} .side .btn.soft:hover{background:var(--nav3)}
+  main{padding:24px 28px 48px;min-width:0}
+  .ptitle{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+  .ptitle h1{font-size:30px;letter-spacing:-.03em;margin:0;line-height:1.1}
+  .ptitle p{margin:4px 0 0;color:var(--muted)}
+
+  .card{background:var(--card);border-radius:12px}
+  .card .hd{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:18px 20px 10px}
+  .card h2{font-size:18px;margin:0;letter-spacing:-.01em;display:flex;align-items:center}
+  .card .hd small{color:var(--muted);font-size:14px}
+  .chip{display:inline-flex;align-items:center;font-size:12.5px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap}
+  .crit{color:var(--crit);background:var(--crit-bg)} .high{color:var(--high);background:var(--high-bg)}
+  .med{color:var(--med);background:var(--med-bg)} .low{color:var(--low);background:var(--low-bg)} .done{color:var(--ok);background:var(--ok-bg)}
+  .lvl{position:relative}
+  .lvl::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:5px;border-radius:0 4px 4px 0;background:#C8CCCC}
+  .lvl.crit::before{background:var(--crit)} .lvl.high::before{background:var(--high)} .lvl.med::before{background:#C9B100} .lvl.done::before{background:var(--ok)}
+  .lvl.crit,.lvl.high,.lvl.med,.lvl.low,.lvl.done{background:transparent;color:inherit}
+  .why{color:var(--muted);font-size:14px} .why b{color:var(--crit)}
+  .stat{display:inline-flex;padding:3px 10px;border-radius:999px;font-size:13px;font-weight:700}
+  .stat.go{background:var(--ok-bg);color:var(--ok)} .stat.wait{background:var(--low-bg);color:var(--low)} .stat.bad{background:var(--crit-bg);color:var(--crit)}
+  .empty{padding:30px 20px;text-align:center;color:var(--muted)}
+  .foot{margin-top:18px;font-size:13px;color:var(--muted);display:flex;gap:14px;align-items:center}
+  .toast{position:fixed;right:24px;bottom:24px;background:var(--squid);color:#fff;border-radius:12px;padding:14px 18px;z-index:60;font-weight:600;max-width:380px;box-shadow:0 12px 32px rgba(15,17,17,.3)} /* taste-skill-ignore: floating notice */
+
+  /* ---------- Customer Service ---------- */
+  .sac{display:grid;grid-template-columns:320px minmax(0,1fr) 300px;gap:18px;align-items:start}
+  .q{padding:0 10px 10px;max-height:calc(100svh - 230px);overflow:auto}
+  .qi{display:grid;grid-template-columns:1fr auto;gap:2px 10px;width:100%;text-align:left;border:0;background:transparent;padding:12px 12px 12px 20px;border-radius:10px;cursor:pointer}
+  .qi:hover{background:var(--tone)}
+  .qi.sel{background:var(--me)}
+  .qi .t{font-weight:700;font-size:15px}
+  .qi .s{color:var(--muted);font-size:13.5px;grid-column:1 / -1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .qi .d{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--muted);text-align:right}
+  .qi .d.late{color:var(--crit)}
+  .qi .meta{display:flex;gap:8px;align-items:center;grid-column:1 / -1;margin-top:4px;flex-wrap:wrap}
+  .ub{min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--link);color:#fff;font-size:11.5px;font-weight:700;display:inline-grid;place-items:center}
+  .chan{display:inline-flex;align-items:center;gap:4px;color:var(--muted);font-size:13px}
+  .chan svg.ic{width:15px;height:15px}
+  .doing-pill{display:inline-flex;align-items:center;gap:6px;background:var(--ok-bg);color:var(--ok);font-weight:700;font-size:13px;padding:3px 10px;border-radius:999px}
+  .case{display:flex;flex-direction:column;min-height:620px;overflow:hidden}
+  .case-hd{padding:22px 24px 18px;background:var(--tone)}
+  .case-hd .row1{display:flex;flex-direction:column;gap:14px}
+  .case-hd h2{font-size:26px;letter-spacing:-.02em;margin:6px 0 2px}
+  .case-hd .sub{color:var(--muted)}
+  .case-hd .acts{display:flex;gap:8px;flex-wrap:wrap}
+  .tabs{display:flex;gap:6px;padding:12px 18px 0;background:var(--tone)}
+  .tabs button{border:0;background:transparent;padding:10px 16px;border-radius:10px 10px 0 0;font-weight:700;color:var(--muted);cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+  .tabs button.on{background:var(--card);color:var(--ink)}
+  .chat{flex:1;display:flex;flex-direction:column;min-height:0}
+  .msgs{flex:1;overflow:auto;padding:22px 24px;display:flex;flex-direction:column;gap:10px;max-height:calc(100svh - 470px);min-height:280px}
+  .msg{max-width:72%;padding:10px 14px;border-radius:14px;background:var(--tone2);font-size:15px;line-height:1.45}
+  .msg small{display:block;font-size:12px;color:var(--muted);margin-top:4px}
+  .msg.mine{align-self:flex-end;background:var(--nav);color:#fff;border-bottom-right-radius:4px}
+  .msg.mine small{color:#B9C2CC}
+  .msg.them{align-self:flex-start;border-bottom-left-radius:4px}
+  .msg.sys{align-self:center;background:transparent;color:var(--muted);font-size:13px;padding:2px}
+  .typing{align-self:flex-start;color:var(--muted);font-size:13.5px;display:flex;align-items:center;gap:8px}
+  .typing i{display:inline-flex;gap:3px}
+  .typing i b{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:dot 1.2s infinite}
+  .typing i b:nth-child(2){animation-delay:.15s} .typing i b:nth-child(3){animation-delay:.3s}
+  @keyframes dot{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+  .quick{display:flex;gap:8px;overflow-x:auto;padding:0 24px 10px;scrollbar-width:thin}
+  .quick button{flex:none;border:0;background:var(--tone);border-radius:999px;padding:7px 14px;font-size:13.5px;cursor:pointer;font-weight:600}
+  .quick button:hover{background:var(--me);color:var(--link)}
+  .compose{display:flex;gap:10px;padding:14px 18px 18px;background:var(--tone)}
+  .compose input{flex:1;height:46px;border:0;border-radius:999px;padding:0 18px;background:#fff}
+  .compose input:focus{outline:3px solid var(--orange)}
+  .compose-off{padding:16px 24px;background:var(--tone);color:var(--muted);font-size:14px}
+  .ctx{display:flex;flex-direction:column;gap:18px}
+  .kv{display:grid;grid-template-columns:104px 1fr;gap:8px 12px;padding:4px 20px 20px;font-size:14.5px;margin:0}
+  .kv dt{color:var(--muted)} .kv dd{margin:0;font-weight:600}
+  .feed{padding:0 10px 12px}
+  .fi{padding:10px 12px;border-radius:10px;font-size:14px}
+  .fi:nth-child(odd){background:var(--tone)}
+  .fi small{display:block;color:var(--muted);font-size:13px}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--link);margin-right:6px}
+
+  /* ---------- Manager ---------- */
+  .sit{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px}
+  .scard{display:flex;align-items:flex-start;gap:14px;padding:18px 20px;cursor:pointer;text-align:left;width:100%;border:0;background:var(--card);border-radius:12px;position:relative;transition:background .15s}
+  .scard:hover{background:#FAFAFA}
+  .scard.on{background:var(--nav);color:#fff}
+  .scard.on small{color:#C9D1DA}
+  .scard .n{font-size:38px;font-weight:800;line-height:1;letter-spacing:-.03em}
+  .scard small{display:block;color:var(--muted);font-size:14px;margin-top:6px;line-height:1.35}
+  .scard b.l{display:block;font-size:15px;margin-top:6px}
+  .bubble{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;flex:none}
+  .bubble svg.ic{width:24px;height:24px}
+  .scard .rdot{position:absolute;top:14px;right:14px;margin:0}
+  .t-idle{color:var(--idle);background:var(--idle-bg)} .t-over{color:var(--high);background:var(--high-bg)}
+  .t-stalled{color:var(--crit);background:var(--crit-bg)} .t-slow{color:var(--med);background:var(--med-bg)} .t-ok{color:var(--ok);background:var(--ok-bg)}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);background:var(--nav);color:#fff;border-radius:12px;margin-bottom:18px;overflow:hidden}
+  .kpi{padding:16px 20px}
+  .kpi:nth-child(even){background:var(--nav2)}
+  .kpi .n{font-size:26px;font-weight:800;letter-spacing:-.02em}
+  .kpi small{color:#C9D1DA;font-size:13.5px}
+  .mgr{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:18px;align-items:start}
+  .filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:0 20px 14px}
+  .fchip{display:inline-flex;align-items:center;gap:6px;border:0;background:var(--tone);border-radius:999px;padding:6px 14px 6px 10px;cursor:pointer;font-size:14px;font-weight:600}
+  .fchip svg.ic{width:16px;height:16px}
+  .fchip:hover{background:var(--tone2)}
+  .fchip.on{background:var(--nav);color:#fff}
+  .search{margin-left:auto;height:38px;padding:0 16px;border:0;border-radius:999px;background:var(--tone);min-width:210px}
+  .search:focus{outline:3px solid var(--orange);background:#fff}
+  table{width:100%;border-collapse:collapse}
+  th{font-size:13.5px;color:var(--muted);text-align:left;padding:10px 20px;font-weight:600;background:var(--tone)}
+  td{padding:12px 20px;vertical-align:middle;border-top:1px solid var(--tone2)}
+  tr.wk{cursor:pointer} tr.wk:hover td{background:#FAFAFA}
+  tr.wk.open td{background:var(--me)}
+  .pname{display:flex;align-items:center;gap:12px}
+  .pname .av{background:var(--tone2);color:var(--ink)}
+  .tag{display:inline-block;font-size:12.5px;color:var(--muted);background:var(--tone);border-radius:999px;padding:1px 9px;margin-top:3px;font-weight:600}
+  .tag.blk{background:var(--crit-bg);color:var(--crit)}
+  .ics{display:flex;gap:6px}
+  .ics .b{width:32px;height:32px;border-radius:50%;display:grid;place-items:center}
+  .ics .b svg.ic{width:18px;height:18px}
+  .load{height:8px;background:var(--tone2);border-radius:4px;overflow:hidden;width:120px;margin-bottom:4px}
+  .load i{display:block;height:100%;background:var(--ok)}
+  .load.hot i{background:var(--crit)}
+  .up{color:var(--crit);font-weight:700} .down{color:var(--ok);font-weight:700}
+  tr.avgrow td{background:var(--tone);font-weight:700}
+  .ctl td{background:#F7FAFB;padding:12px 20px 16px 66px}
+  .ctl .tk{display:flex;gap:12px;align-items:center;padding:7px 0;font-size:14px}
+  .ctl .tk .grow{flex:1}
+  .legend{display:flex;flex-wrap:wrap;gap:18px;padding:14px 20px 18px;color:var(--muted);font-size:13.5px}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .legend svg.ic{width:16px;height:16px}
+  .sidecol{display:flex;flex-direction:column;gap:18px}
+  .dec{padding:0 10px 12px}
+  .di{padding:12px 12px 12px 20px;border-radius:10px;font-size:14px}
+  .di:nth-child(odd){background:var(--tone)}
+  .di b{font-size:15px}
+  .autobar{display:flex;flex-direction:column;gap:6px;align-items:flex-start;padding:0 20px 14px;color:var(--muted);font-size:13.5px}
+  .pick{margin-top:10px;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 8px 24px rgba(15,17,17,.18)} /* taste-skill-ignore: floating picker */
+  .pick .ph{padding:8px 12px;font-size:13px;color:var(--muted);background:var(--tone)}
+  .prow{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;background:#fff;padding:9px 12px;cursor:pointer}
+  .prow:hover{background:var(--me)}
+  .prow .bb{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;flex:none}
+  .prow .bb svg.ic{width:16px;height:16px}
+  .prow .nm{flex:1;line-height:1.3}
+  .prow .nm small{display:block;color:var(--muted);font-size:12.5px}
+  .sug{font-size:12px;font-weight:700;color:var(--ok);background:var(--ok-bg);border-radius:999px;padding:2px 9px}
+  .conv{display:flex;gap:10px;align-items:center}
+  .conv .grow{flex:1;min-width:0}
+  .conv .grow small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .wait{font-size:13px;font-weight:700;color:var(--high);white-space:nowrap}
+  .wait.late{color:var(--crit)}
+  .people{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .person{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:10px}
+  .person:nth-child(odd){background:var(--tone)}
+  .person .grow{flex:1}
+
+  /* ---------- dialogs (settings, new team member, call) ---------- */
+  dialog{border:0;border-radius:16px;padding:0;width:min(760px,calc(100vw - 32px));max-height:calc(100svh - 48px);color:var(--ink)}
+  dialog::backdrop{background:rgba(15,17,17,.55)}
+  .dhd{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;background:var(--nav);color:#fff}
+  .dhd h2{margin:0;font-size:21px}
+  .dhd button{background:transparent;border:0;color:#fff;font-size:26px;cursor:pointer;width:40px;height:40px;border-radius:50%}
+  .dhd button:hover{background:var(--nav2)}
+  .dbody{padding:20px 24px;overflow:auto;max-height:calc(100svh - 220px)}
+  .dfoot{display:flex;justify-content:flex-end;gap:10px;padding:16px 24px;background:var(--tone)}
+  .areatabs{display:flex;gap:6px;background:var(--tone);padding:5px;border-radius:999px;width:max-content;margin-bottom:18px}
+  .areatabs button{border:0;background:transparent;padding:8px 18px;border-radius:999px;font-weight:700;color:var(--muted);cursor:pointer}
+  .areatabs button.on{background:var(--nav);color:#fff}
+  .fset{margin-bottom:22px}
+  .fset h3{font-size:16px;margin:0 0 4px}
+  .fset p{margin:0 0 12px;color:var(--muted);font-size:14px}
+  .fgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 16px}
+  .fld label{display:block;font-weight:700;font-size:13.5px;margin-bottom:6px}
+  .fld input,.fld select{width:100%;height:44px;padding:0 12px;border:0;border-radius:8px;background:var(--tone2)}
+  .fld input:focus,.fld select:focus{outline:3px solid var(--orange);background:#fff}
+  .fld small{display:block;color:var(--muted);font-size:12.5px;margin-top:4px}
+  .ferr{color:var(--crit);font-weight:700;font-size:14px;min-height:20px}
+  .call{width:min(380px,calc(100vw - 32px))}
+  .callbox{background:var(--squid);color:#fff;padding:36px 28px;text-align:center}
+  .callbox .av{width:84px;height:84px;font-size:28px;margin:0 auto 16px}
+  .callbox h2{margin:0;font-size:24px}
+  .callbox p{margin:6px 0 0;color:#B9C2CC}
+  .callbox .tm{font-size:30px;font-weight:800;margin:20px 0 6px;font-variant-numeric:tabular-nums}
+  .callbox .cbtns{display:flex;gap:12px;justify-content:center;margin-top:22px}
+  .callbox .cb{width:58px;height:58px;border-radius:50%;border:0;background:var(--nav2);color:#fff;display:grid;place-items:center;cursor:pointer}
+  .callbox .cb.on{background:#fff;color:var(--ink)}
+  .callbox .cb.end{background:#E31B23}
+  .callbox .cb svg.ic{width:24px;height:24px}
+  .callbox .note{font-size:13px;color:#9FAAB6;margin-top:18px}
+
+  @media (max-width:1600px){ .mgr{grid-template-columns:1fr} .sidecol{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:start} }
+  @media (max-width:1320px){ .sac{grid-template-columns:320px minmax(0,1fr)} .ctx{grid-column:1 / -1;display:grid;grid-template-columns:repeat(3,1fr)} .sidecol{grid-template-columns:1fr} }
+  @media (max-width:980px){ .shell{grid-template-columns:1fr} .side{position:static;height:auto;flex-direction:row;flex-wrap:wrap} .side .grp,.side .bottom{display:none} .mi{width:auto} #login{grid-template-columns:1fr} .lart{padding:32px;min-height:340px} .lart .roles{display:none} .sac,.people{grid-template-columns:1fr} .ctx{grid-template-columns:1fr} .sit,.kpis{grid-template-columns:1fr 1fr} main{padding:16px} .top{padding:0 12px;gap:8px} .me div,.live{display:none} .fgrid{grid-template-columns:1fr} }
+  @media (prefers-reduced-motion:reduce){ .pulse,.typing i b{animation:none} .btn{transition:none} }
+</style>
+</head>
+<body>
+
+<section id="login">
+  <div class="lart">
+    <img src="assets/binders-boxes-shelves-large-archive.webp" alt="Warehouse aisle with metal shelves full of labeled boxes">
+    <span class="wordmark">amazon <small>ops</small></span>
+    <div>
+      <h1>Most urgent first, always.</h1>
+      <p>Customer service and fulfillment center management in one place. Field operations use the app.</p>
+    </div>
+    <div>
+      <div class="roles">
+        <div class="role"><b>Manager</b><span>Who is idle, overloaded or stuck, and who to reassign work to.</span></div>
+        <div class="role"><b>Customer Service</b><span>The next case, the chat with the customer and the order's driver.</span></div>
+      </div>
+      <p class="credit">Photo: <a href="https://www.rawpixel.com/image/3298148/free-photo-image-warehouse-aisle-book" target="_blank" rel="noopener">“Binders boxes shelves large archive”</a>, CC0, via rawpixel.</p>
+    </div>
+  </div>
+  <form class="lform" id="lform" autocomplete="off">
+    <span class="wordmark">amazon <small>ops</small></span>
+    <h2>Sign in</h2>
+    <p>Use your fulfillment center username.</p>
+    <label for="u">Username</label>
+    <input id="u" required autofocus>
+    <label for="p">Password</label>
+    <input id="p" type="password" required>
+    <div id="lerr" role="alert"></div>
+    <button class="btn" type="submit">Sign in</button>
+    <div class="demo">
+      <b>Prototype with fictional data.</b> Sign in with one click:<br>
+      <button type="button" data-fill="manager:manager123">Manager (manager / manager123)</button><br>
+      <button type="button" data-fill="ana.silva:agent123">Customer Service (ana.silva / agent123)</button>
+    </div>
+  </form>
+</section>
+
+<div id="app" class="hidden" data-ui>
+  <header class="top">
+    <span class="wordmark">amazon <small>ops</small></span>
+    <span class="me"><span class="av" id="av"></span><div><b id="who"></b><small id="roleTag"></small></div></span>
+    <span class="sp"></span>
+    <span class="live"><i></i><span id="live"></span></span>
+    <button class="tbtn hidden" id="bell" aria-label="Attention items" aria-haspopup="true"></button>
+    <button class="tbtn hidden" id="gear" aria-label="Settings"></button>
+    <button class="tbtn" id="logout">Sign out</button>
+    <div id="panel" class="hidden" role="region" aria-label="Attention items"></div>
+  </header>
+  <div class="shell">
+    <nav class="side" id="side" aria-label="Menu"></nav>
+    <main id="view"></main>
+  </div>
+</div>
+
+<dialog id="dlg"></dialog>
+
+<script src="dados.js"></script>
+<script>
+P.chat = '<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.2-4.4A8 8 0 1 1 21 12z"/>';
+P.mail = '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>';
+P.gear = '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>';
+P.home = '<path d="M3 11l9-7 9 7M5 10v10h14V10"/>';
+P.headset = '<path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/>';
+P.users = '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a5 5 0 0 1 3.5 6"/>';
+P.plus = '<path d="M12 5v14M5 12h14"/>';
+P.inbox = '<path d="M3 13h5l2 3h4l2-3h5M5 5h14l2 8v6H3v-6z"/>';
+P.clock = '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>';
+P.alert = '<path d="M12 3l9.5 17h-19z"/><path d="M12 10v4M12 17.2v.3"/>';
+P.history = '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/>';
+P.all = '<path d="M4 6h16M4 12h16M4 18h16"/>';
+P.mic = '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>';
+P.hold = '<path d="M9 5v14M15 5v14"/>';
+P.hang = '<path d="M3 15c5-5 13-5 18 0l-2.5 2.5-3.5-2v-3a10 10 0 0 0-6 0v3l-3.5 2z"/>';
+const chanIc = t => ic(t.type === "Chat" ? "chat" : t.type === "Email" ? "mail" : "phone");
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" })[c]);
+function toast(msg){ const d = document.createElement("div"); d.className = "toast"; d.textContent = msg; document.body.appendChild(d); setTimeout(() => d.remove(), 3400); }
+const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+
+/* ---------- Session ---------- */
+let session = null;
+try{ session = JSON.parse(sessionStorage.getItem("ops-en-session")); }catch(e){}
+document.querySelector(".demo").addEventListener("click", e => {
+  const b = e.target.closest("[data-fill]"); if(!b) return;
+  const [u, p] = b.dataset.fill.split(":"); document.getElementById("u").value = u; document.getElementById("p").value = p;
+  document.getElementById("lform").requestSubmit();
+});
+document.getElementById("lform").addEventListener("submit", e => {
+  e.preventDefault(); S = load();
+  const u = document.getElementById("u").value.trim().toLowerCase(), p = document.getElementById("p").value, acc = accountOf(u), err = document.getElementById("lerr");
+  if(!acc || acc.pass !== p){ err.textContent = "Wrong username or password."; return; }
+  if(isBlocked(u)){ err.textContent = "This user is blocked. Talk to your manager."; return; }
+  if(acc.role === "operacional"){ err.textContent = "Field operations use the app, not the desktop system."; return; }
+  session = { user:u, role:acc.role, name:acc.name };
+  try{ sessionStorage.setItem("ops-en-session", JSON.stringify(session)); }catch(e){}
+  start();
+});
+document.getElementById("logout").onclick = () => {
+  session = null; try{ sessionStorage.removeItem("ops-en-session"); }catch(e){}
+  document.getElementById("app").classList.add("hidden"); document.getElementById("login").classList.remove("hidden");
+  document.getElementById("p").value = ""; document.getElementById("lerr").textContent = ""; closePanel();
+};
+
+/* ---------- Side menu ---------- */
+let menu = null; // Support: aberto | pendentes | naores | historico | todos · Manager: all | atendimento | operacional | pessoas
+function sacSets(){
+  const me = session.user, all = S.tasks.filter(t => t.area === "atendimento" && (t.assignee === me || t.doneBy === me));
+  const open = all.filter(t => t.status !== "done");
+  return {
+    aberto: open.sort(sorter),
+    pendentes: open.filter(t => t.status === "open").sort(sorter),
+    naores: open.filter(t => t.blocked || mins(t) < 0).sort(sorter),
+    historico: all.filter(t => t.status === "done").sort((a,b) => (b.doneAt||0) - (a.doneAt||0)),
+    todos: open.sort(sorter).concat(all.filter(t => t.status === "done").sort((a,b) => (b.doneAt||0) - (a.doneAt||0)))
+  };
+}
+function renderSide(){
+  const side = document.getElementById("side"), mi = (k, icon, label, extra) => `<button class="mi ${menu === k ? "on" : ""}" data-menu="${k}">${ic(icon)}<span>${label}</span>${extra || ""}</button>`;
+  if(session.role === "manager"){
+    const pend = a => S.tasks.filter(t => t.status !== "done" && !t.assignee && (a === "all" || t.area === a)).length;
+    const dot = a => pend(a) ? '<span class="rdot pulse" title="unassigned tasks"></span>' : "";
+    side.innerHTML = `<div class="grp">View</div>${mi("all","home","Overview", dot("all"))}${mi("atendimento","headset","Customer Service", dot("atendimento"))}${mi("operacional","truck","Field Operations", dot("operacional"))}
+      <div class="grp">Team</div>${mi("pessoas","users","Team members", `<span class="n">${team().length}</span>`)}
+      <div class="bottom"><button class="btn" data-dlg="novo">${ic("plus")}New team member</button><button class="btn soft" data-dlg="config">${ic("gear")}Settings</button></div>`;
+  } else {
+    const s = sacSets(), n = k => `<span class="n">${s[k].length}</span>`;
+    side.innerHTML = `<div class="grp">Cases</div>${mi("aberto","inbox","Open", n("aberto"))}${mi("pendentes","clock","Not started", n("pendentes"))}${mi("naores","alert","Unresolved", s.naores.length ? '<span class="rdot"></span>' + n("naores") : n("naores"))}${mi("historico","history","History", n("historico"))}${mi("todos","all","All", n("todos"))}`;
+  }
+}
+
+/* ---------- Customer Service ---------- */
+let focusId = null, chatTab = "cli";
+function deliveryOf(t){
+  const d = S.tasks.find(x => x.area === "operacional" && x.type === "Delivery" && x.order && x.order === t.order);
+  if(!d) return { txt:"No delivery in this prototype", cls:"wait", who:null, addr:null, task:null };
+  const who = d.assignee ? nameOf(d.assignee) : null;
+  if(d.status === "done")  return { txt:"Delivered", cls:"go", who, addr:d.detail, task:d };
+  if(d.blocked)            return { txt:"Failed: " + (d.blockedReason || "blocked"), cls:"bad", who, addr:d.detail, task:d };
+  if(d.status === "doing") return { txt:"Out for delivery", cls:"go", who, addr:d.detail, task:d };
+  return { txt:d.assignee ? "Waiting to leave" : "No driver", cls:d.assignee ? "wait" : "bad", who, addr:d.detail, task:d };
+}
+const fmtTime = w => new Date(w).toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"});
+function bubbles(k, mineFrom){
+  const list = thread(k).map(x => x.from === "sistema" ? `<div class="msg sys">${esc(x.text)}</div>`
+    : `<div class="msg ${x.from === mineFrom ? "mine" : "them"}">${esc(x.text)}<small>${x.from === mineFrom ? "You" : esc(x.name)} · ${fmtTime(x.when)}</small></div>`).join("");
+  const ty = typingNow(k);
+  return (list || `<div class="msg sys">No messages yet.</div>`) + (ty ? `<div class="typing"><i><b></b><b></b><b></b></i>${esc(ty)} is typing…</div>` : "");
+}
+const QUICK = {
+  cli:["Sorry about that, I'm checking it now.","Your order is out for delivery and arrives today.","Could you share your delivery code?","All sorted. Thanks for reaching out!"],
+  ent:["The customer is home waiting.","Can you prioritize this delivery?","What's your ETA?","The customer's code is 4821."]
+};
+const MENU_TITLE = { aberto:["Open","Everything still with you, from most critical to least urgent."], pendentes:["Not started","Cases you haven't started yet."], naores:["Unresolved","Escalated or past due: handle these first."], historico:["History","What you've already solved today."], todos:["All","Open and solved, in one place."] };
+function atendimentoView(){
+  const sets = sacSets(), list = sets[menu] || sets.aberto, open = sets.aberto;
+  const focus = list.find(t => t.id === focusId) || open.find(t => t.status === "doing") || list[0];
+  if(focus) focusId = focus.id;
+  const queue = list.map(t => {
+    const done = t.status === "done", u = !done && t.type === "Chat" ? unreadFor("cli:" + t.id, session.user) : 0;
+    return `<button class="qi lvl ${done ? "done" : level(t)} ${focus && focus.id === t.id ? "sel" : ""}" data-focus="${t.id}">
+      <span class="t">${esc(t.title)}</span><span class="d ${!done && mins(t) < 0 ? "late" : ""}">${done ? fmtTime(t.doneAt) : mins(t) < 0 ? "late" : fmt(mins(t))}</span>
+      <span class="s">${esc(t.detail)}</span>
+      <span class="meta">${done ? '<span class="chip done">Solved</span>' : chip(t)}<span class="chan">${chanIc(t)}${t.type}</span>${t.status === "doing" ? '<span class="doing-pill">In progress</span>' : ""}${u ? `<span class="ub" title="new messages">${u}</span>` : ""}</span>
+    </button>`;
+  }).join("") || `<div class="empty">Nothing here right now.</div>`;
+
+  let center = `<section class="card case"><div class="empty" style="margin:auto">Pick a case from the list.</div></section>`, ctx = "";
+  if(focus){
+    const done = focus.status === "done", d = deliveryOf(focus), hasEnt = d.task && d.task.assignee;
+    if(chatTab === "ent" && !hasEnt) chatTab = "cli";
+    const k = chatTab === "cli" ? "cli:" + focus.id : "ent:" + focus.order;
+    const uEnt = hasEnt ? unreadFor("ent:" + focus.order, session.user) : 0, uCli = unreadFor("cli:" + focus.id, session.user);
+    const action = done ? `<span class="chip done">Solved at ${fmtTime(focus.doneAt)}</span>` : focus.status === "doing" ? `<button class="btn" data-done="${focus.id}">Mark as solved</button>` : `<button class="btn" data-start="${focus.id}">Start case</button>`;
+    const callBtn = done ? "" : chatTab === "cli" ? `<button class="btn soft" data-call="cli">${ic("phone")}Call customer</button>` : `<button class="btn soft" data-call="ent">${ic("phone")}Call ${esc(d.who.split(" ")[0])}</button>`;
+    const canWrite = focus.status === "doing";
+    center = `<section class="card case">
+      <div class="case-hd lvl ${done ? "done" : level(focus)}">
+        <div class="row1"><div>${done ? "" : chip(focus)} ${focus.status === "doing" ? '<span class="doing-pill">In progress</span>' : ""}
+          <h2>${esc(focus.title)}</h2><div class="sub">${esc(focus.detail)} · order ${focus.order}</div>${done ? "" : `<div class="why" style="margin-top:4px">${why(focus)}</div>`}</div>
+          <div class="acts">${callBtn}${action}</div></div>
+      </div>
+      <div class="tabs" role="tablist">
+        <button role="tab" aria-selected="${chatTab === "cli"}" class="${chatTab === "cli" ? "on" : ""}" data-tab="cli">${chanIc(focus)}Customer${uCli ? `<span class="ub">${uCli}</span>` : ""}</button>
+        ${hasEnt ? `<button role="tab" aria-selected="${chatTab === "ent"}" class="${chatTab === "ent" ? "on" : ""}" data-tab="ent">${ic("truck")}Driver · ${esc(d.who.split(" ")[0])}${uEnt ? `<span class="ub">${uEnt}</span>` : ""}</button>` : ""}
+      </div>
+      <div class="chat">
+        <div class="msgs" id="msgs">${bubbles(k, "sac")}</div>
+        ${canWrite ? `<div class="quick">${QUICK[chatTab].map(q => `<button data-quick="${esc(q)}">${q}</button>`).join("")}</div>
+          <form class="compose" id="compose"><input id="txt" autocomplete="off" placeholder="${chatTab === "cli" ? "Reply to the customer" : "Message the driver"}" aria-label="Message"><button class="btn" type="submit">Send</button></form>`
+          : `<div class="compose-off">${done ? "Case solved. The conversation stays in your history." : "Start the case to reply."}</div>`}
+      </div></section>`;
+    markRead(k, session.user);
+    ctx = `<section class="card"><div class="hd"><h2>Order and delivery</h2></div>
+      <dl class="kv"><dt>Order</dt><dd>${focus.order}${focus.prime ? " · Prime" : ""}</dd><dt>Channel</dt><dd>${focus.type}</dd>
+        <dt>Delivery</dt><dd><span class="stat ${d.cls}">${d.txt}</span></dd><dt>Driver</dt><dd>${d.who || "—"}</dd><dt>Address</dt><dd>${d.addr || "—"}</dd></dl></section>`;
+  }
+  const [title, sub] = MENU_TITLE[menu] || MENU_TITLE.aberto;
+  return `<div class="ptitle"><div><h1>${title}</h1><p>${sub}</p></div><span class="why">${open.length} open · ${open.filter(t => level(t) === "crit").length} critical</span></div>
+    <div class="sac">
+    <section class="card"><div class="hd"><h2>${title}</h2><small>${list.length}</small></div><div class="q">${queue}</div></section>
+    ${center}
+    <aside class="ctx">${ctx}
+      <section class="card"><div class="hd"><h2>Notifications</h2><small>${S.notifications.filter(n=>n.unread).length} new</small></div>
+        <div class="feed">${S.notifications.slice(0,4).map(n => `<div class="fi">${n.unread ? '<span class="dot"></span>' : ""}${esc(n.text)}<small>${ago(n.when)}</small></div>`).join("")}</div></section>
+      <section class="card"><div class="hd"><h2>Team notes</h2></div>
+        <div class="feed">${S.updates.map(u => `<div class="fi"><b>${esc(u.who)}</b>: ${esc(u.text)}<small>${ago(u.when)}</small></div>`).join("")}</div></section>
+    </aside></div>`;
+}
+
+/* ---------- Manager ---------- */
+let openWorker = null, flt = "all", q = "", pick = null;
+const area = () => (menu === "atendimento" || menu === "operacional") ? menu : "all";
+const pState = m => m.f.idle ? "idle" : m.f.over ? "over" : "ok";
+const pRank = m => ({ idle:0, ok:1, over:2 })[pState(m)];
+function picker(t, mode){
+  const c = team().filter(w => w.area === t.area && w.id !== t.assignee && !isBlocked(w.id)).map(wm).sort((a,b) => pRank(a) - pRank(b) || a.ts.length - b.ts.length);
+  if(!c.length) return `<div class="pick"><div class="ph">No one available in this area.</div></div>`;
+  const label = { idle:"Idle", over:"Overloaded", ok:"Normal" };
+  return `<div class="pick"><div class="ph">${mode === "move" ? "Move" : "Assign"} to whom? Idle people first.</div>` + c.map((m,i) => {
+    const s = pState(m), sub = `${m.ts.length} open${m.crit ? ` · ${m.crit} critical` : ""}${s === "idle" && m.ts.length ? ` · idle ${fmt(m.idleMin)}` : ""}`;
+    return `<button class="prow" data-do="${mode}:${t.id}:${m.w.id}"><span class="bb t-${s}">${ic(s)}</span>
+      <span class="nm"><b>${esc(m.w.name)}</b> <span style="color:var(--muted)">· ${label[s]}</span><small>${sub}</small></span>${i === 0 && s !== "over" ? '<span class="sug">Suggested</span>' : ""}</button>`;
+  }).join("") + `</div>`;
+}
+function summary(group, open){
+  const a = area(), T = teamAvg(group), n = Math.max(1, group.length);
+  if(a === "operacional"){ const ops = open.filter(t => t.area === "operacional");
+    return [[group.reduce((s,w) => s + statOf(w.id).resolved, 0), "completed today"],[ops.filter(t => t.status === "doing").length, "in progress now"],[ops.filter(t => t.blocked || mins(t) < 0).length, "late or failed"],[ops.filter(t => t.type === "Receiving").length, "receiving pending"]]; }
+  if(a === "atendimento"){ const at = open.filter(t => t.area === "atendimento");
+    return [[at.length, "open cases"],[at.filter(t => mins(t) < 0).length, "past due"],[at.filter(t => t.blocked).length, "escalated to supervisor"],[(T.avg ? Math.round(T.avg) : "—") + " min", "average time to solve"]]; }
+  const onTime = open.length ? Math.round(100 * open.filter(t => !t.blocked && mins(t) >= 0).length / open.length) : 100;
+  return [[(T.avg ? Math.round(T.avg) : "—") + " min", "average time to solve"],[(T.resolved / n).toFixed(1), "solved per person"],[(open.filter(t => t.assignee).length / n).toFixed(1), "open per person"],[onTime + "%", "of open tasks on time"]];
+}
+function waitingChats(){
+  return S.tasks.filter(t => t.area === "atendimento" && t.status !== "done" && t.type === "Chat").map(t => {
+    const th = thread("cli:" + t.id), last = th[th.length - 1];
+    return last && last.from === "cliente" ? { t, last, wait:Math.round((Date.now() - last.when)/MIN) } : null;
+  }).filter(Boolean).sort((a,b) => b.wait - a.wait);
+}
+function managerView(){
+  const a = area(); FLAGS = flagsFor(a);
+  const group = team().filter(w => a === "all" || w.area === a);
+  const open = S.tasks.filter(t => t.status !== "done" && (a === "all" || t.area === a));
+  const unassigned = open.filter(t => !t.assignee).sort(sorter);
+  const all = group.map(wm), T = teamAvg(group), n = Math.max(1, group.length), count = k => all.filter(m => m.f[k]).length;
+  const cards = FLAGS.map(f => `<button class="scard ${flt === f.k ? "on" : ""}" data-flt="${f.k}">
+      <span class="bubble t-${f.k}">${ic(f.k)}</span><span><span class="n">${count(f.k)}</span><b class="l">${f.label}</b><small>${f.desc}</small></span>
+      ${count(f.k) ? '<span class="rdot pulse"></span>' : ""}</button>`).join("");
+  const kpis = `<div class="kpis">${summary(group, S.tasks.filter(t => t.status !== "done")).map(([v,l]) => `<div class="kpi"><div class="n">${v}</div><small>${l}</small></div>`).join("")}</div>`;
+  const chips = `<button class="fchip ${flt==="all" ? "on" : ""}" data-flt="all">All situations</button>` + FLAGS.map(f => `<button class="fchip ${flt===f.k ? "on" : ""}" data-flt="${f.k}">${ic(f.k)}${f.one}</button>`).join("") +
+    `<input class="search" id="q" type="search" placeholder="Search person" value="${esc(q)}" aria-label="Search person">`;
+  const rows = all.filter(m => (flt === "all" || m.f[flt]) && m.w.name.toLowerCase().includes(q.toLowerCase())).sort((x,y) => y.n - x.n || x.w.name.localeCompare(y.w.name)).map(m => {
+    const icons = m.n ? FLAGS.filter(f => m.f[f.k]).map(f => `<span class="b t-${f.k}" title="${f.one}: ${f.desc}">${ic(f.k)}</span>`).join("") : `<span class="b t-ok" title="No alerts">${ic("ok")}</span>`;
+    const trend = m.avg ? (m.avg > m.T*1.15 ? ' <span class="up" title="above the area average">▲</span>' : m.avg < m.T*0.85 ? ' <span class="down" title="below the area average">▼</span>' : "") : "";
+    const agora = isBlocked(m.w.id) ? `<span class="tag blk">Blocked</span>` : m.doing ? `<b>${esc(m.doing.title)}</b><div class="why">${m.doing.type}</div>` : `<span class="why">No task in progress<br>${ago(m.st.lastActive)}</span>`;
+    let ctl = "";
+    if(openWorker === m.w.id){
+      ctl = `<tr class="ctl"><td colspan="6"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b>${esc(m.w.name)}'s queue</b><button class="btn soft small" data-nudge="${m.w.id}">Ask for an update</button></div>
+        ${m.ts.map(t => `<div class="tk">${chip(t)}<span class="grow">${esc(t.title)} · ${t.type} <span class="why">· ${esc(t.detail)}, ${dueText(t).toLowerCase()}${t.status==="doing" ? ", in progress" : ""}</span></span>
+          <button class="btn soft small" data-pick="move:${t.id}">${pick === "move:" + t.id ? "Close" : "Move"}</button></div>${pick === "move:" + t.id ? picker(t, "move") : ""}`).join("") || "No open tasks."}</td></tr>`;
+    }
+    return `<tr class="wk ${openWorker === m.w.id ? "open" : ""}" data-w="${m.w.id}">
+      <td><div class="pname"><span class="av">${initials(m.w.name)}</span><div><b>${esc(m.w.name)}</b>${m.n ? '<span class="rdot pulse"></span>' : ""}<br><span class="tag">${AREA[m.w.area]}</span></div></div></td>
+      <td><div class="ics">${icons}</div></td><td>${agora}</td>
+      <td><div class="load ${m.crit ? "hot" : ""}"><i style="width:${Math.min(100, m.ts.length * 100 / Math.max(1, cfgOf(m.w.area).maxOpen))}%"></i></div><span class="why">${m.ts.length} of ${cfgOf(m.w.area).maxOpen}${m.crit ? ` · <b>${m.crit} critical</b>` : ""}</span></td>
+      <td><b>${m.st.resolved}</b></td><td>${m.avg ? Math.round(m.avg) + " min" : "—"}${trend}</td></tr>${ctl}`;
+  }).join("") || `<tr><td colspan="6" class="empty">No one matches the filter.</td></tr>`;
+  const legend = FLAGS.map(f => `<span class="t-${f.k}" style="background:none">${ic(f.k)}<span style="color:var(--muted)"><b style="color:var(--ink)">${f.one}</b>: ${f.desc}</span></span>`).join("");
+  const wc = a === "operacional" ? [] : waitingChats();
+  const title = a === "all" ? "Operations now" : a === "atendimento" ? "Customer Service now" : "Field Operations now";
+  return `<div class="ptitle"><div><h1>${title}</h1><p>${a === "all" ? "Customer Service and Field Operations together. Use the menu to see each area on its own." : "This area's limits live in Settings."}</p></div></div>
+  <div class="sit">${cards}</div>${kpis}
+  <div class="mgr">
+    <section class="card"><div class="hd"><h2>${a === "all" ? "Team" : AREA[a] + " team"}</h2><small>Click a person to see their queue and reassign</small></div>
+      <div class="filters">${chips}</div>
+      <table><thead><tr><th>Person</th><th>Situation</th><th>Now</th><th>Load</th><th>Solved</th><th>Avg. time</th></tr></thead><tbody>${rows}</tbody>
+        <tfoot><tr class="avgrow"><td>${a === "all" ? "Team" : "Area"} average</td><td></td><td></td><td>${(open.filter(t => t.assignee).length / n).toFixed(1)} open</td><td>${(T.resolved / n).toFixed(1)}</td><td>${T.avg ? Math.round(T.avg) + " min" : "—"}</td></tr></tfoot></table>
+      <div class="legend">${legend}</div></section>
+    <aside class="sidecol">
+      <section class="card"><div class="hd"><h2>Needs a decision${unassigned.length ? '<span class="rdot pulse"></span>' : ""}</h2><small>${unassigned.length} unassigned</small></div>
+        ${unassigned.length ? `<div class="autobar"><button class="btn" data-auto="${a}">Auto-assign</button><span>Goes to whoever has the fewest tasks, without going over the limit.</span></div>` : ""}
+        <div class="dec">${unassigned.length ? unassigned.map(t => `<div class="di lvl ${level(t)}">${chip(t)} <span class="tag">${AREA[t.area]}</span><br><b>${esc(t.title)}</b><div class="why">${t.type} · ${esc(t.detail)} · ${dueText(t).toLowerCase()}</div><div style="margin-top:8px"><button class="btn soft small" data-pick="assign:${t.id}">${pick === "assign:" + t.id ? "Close" : "Assign manually"}</button></div>${pick === "assign:" + t.id ? picker(t, "assign") : ""}</div>`).join("") : '<div class="empty">Everything is assigned in this area.</div>'}</div></section>
+      ${a === "operacional" ? "" : `<section class="card"><div class="hd"><h2>Customers waiting for a reply</h2><small>${plural(wc.length, "chat", "chats")}</small></div>
+        <div class="feed">${wc.length ? wc.map(c => `<div class="fi conv"><span class="grow"><b>${esc(c.t.title)}</b> · ${esc(nameOf(c.t.assignee))}<small>“${esc(c.last.text)}”</small></span><span class="wait ${c.wait >= 5 ? "late" : ""}">${c.wait < 1 ? "now" : c.wait + " min"}</span></div>`).join("") : '<div class="empty">No customers waiting.</div>'}</div></section>`}
+      <section class="card"><div class="hd"><h2>Recent activity</h2></div>
+        <div class="feed">${S.activity.slice(0,6).map(x => `<div class="fi"><b>${esc(x.who)}</b> ${esc(x.text)}<small>${ago(x.when)}</small></div>`).join("")}</div></section>
+    </aside></div>`;
+}
+function peopleView(){
+  const col = a => {
+    const list = team().filter(w => w.area === a);
+    return `<section class="card"><div class="hd"><h2>${AREA[a]}</h2><small>${plural(list.length, "person", "people")}</small></div><div class="feed">${list.map(w => {
+      const open = S.tasks.filter(t => t.assignee === w.id && t.status !== "done").length, b = isBlocked(w.id), extra = (S.extra || []).find(x => x.id === w.id);
+      return `<div class="person"><span class="av" style="background:var(--tone2);color:var(--ink)">${initials(w.name)}</span><span class="grow"><b>${esc(w.name)}</b> ${b ? '<span class="tag blk">Blocked</span>' : ""}${extra ? ' <span class="tag">New</span>' : ""}<br><span class="why">username ${w.id} · ${open} open${extra && extra.turno ? " · " + extra.turno + " shift" : ""}</span></span>
+        <button class="btn ${b ? "" : "soft"} small" data-block="${w.id}">${b ? "Unblock" : "Block"}</button></div>`;
+    }).join("")}</div></section>`;
+  };
+  return `<div class="ptitle"><div><h1>Team members</h1><p>Split by area. Blocked people can't sign in or receive tasks.</p></div><button class="btn" data-dlg="novo">${ic("plus")}New team member</button></div>
+    <div class="people">${col("atendimento")}${col("operacional")}</div>`;
+}
+
+/* ---------- Dialogs: settings, new team member, call ---------- */
+const dlg = document.getElementById("dlg");
+let cfgArea = "atendimento", callTimer = null;
+const CFG_FIELDS = [
+  ["Overload", "When someone shows up as overloaded, and the limit used by auto-assign.", [["maxOpen","Open tasks per person","limit"],["maxCrit","Critical at the same time","limit"]]],
+  ["Team alerts", "When the manager is told someone has stopped, is stuck or is slow.", [["idleMin","Idle after","minutes"],["stalledMin","Stuck after","minutes"],["slowPct","Slow when above the average by","%"]]],
+  ["Service deadlines", "How priority is calculated from the time left until due.", [["slaCrit","Critical within","minutes"],["slaHigh","High within","minutes"],["slaMed","Medium within","minutes"]]]
+];
+function openConfig(){
+  const c = cfgOf(cfgArea), people = team().filter(w => w.area === cfgArea);
+  dlg.innerHTML = `<form method="dialog" id="cfgForm"><div class="dhd"><h2>Settings</h2><button type="button" data-close aria-label="Close">×</button></div>
+    <div class="dbody">
+      <div class="areatabs" role="tablist">${["atendimento","operacional"].map(a => `<button type="button" class="${cfgArea === a ? "on" : ""}" data-cfgarea="${a}">${AREA[a]}</button>`).join("")}</div>
+      ${CFG_FIELDS.map(([h, p, fs]) => `<div class="fset"><h3>${h}</h3><p>${p}</p><div class="fgrid">${fs.map(([k, l, u]) => `<div class="fld"><label for="c_${k}">${l}</label><input id="c_${k}" name="${k}" type="number" min="1" value="${c[k]}"><small>${u}</small></div>`).join("")}</div></div>`).join("")}
+      <div class="fset"><h3>${AREA[cfgArea]} users</h3><p>Block someone to remove their access and stop sending them tasks.</p>
+        ${people.map(w => `<div class="person"><span class="av" style="background:var(--tone2);color:var(--ink)">${initials(w.name)}</span><span class="grow"><b>${esc(w.name)}</b><br><span class="why">username ${w.id}</span></span><button type="button" class="btn ${isBlocked(w.id) ? "" : "soft"} small" data-block="${w.id}">${isBlocked(w.id) ? "Unblock" : "Block"}</button></div>`).join("")}</div>
+    </div>
+    <div class="dfoot"><button type="button" class="btn soft" data-cfgreset>Restore defaults</button><button type="submit" class="btn">Save ${AREA[cfgArea]}</button></div></form>`;
+  if(!dlg.open) dlg.showModal();
+}
+function openNovo(){
+  dlg.innerHTML = `<form id="novoForm"><div class="dhd"><h2>New team member</h2><button type="button" data-close aria-label="Close">×</button></div>
+    <div class="dbody"><div class="fgrid">
+      <div class="fld" style="grid-column:1 / -1"><label for="n_nome">Full name</label><input id="n_nome" required></div>
+      <div class="fld"><label for="n_user">Username</label><input id="n_user" required placeholder="e.g. jane.reed"></div>
+      <div class="fld"><label for="n_pass">Temporary password</label><input id="n_pass" required value="agent123"></div>
+      <div class="fld"><label for="n_area">Area</label><select id="n_area"><option value="atendimento">Customer Service</option><option value="operacional">Field Operations (app)</option></select></div>
+      <div class="fld"><label for="n_turno">Shift</label><select id="n_turno"><option value="morning">Morning</option><option value="afternoon">Afternoon</option><option value="night">Night</option></select></div>
+    </div><div class="ferr" id="nerr" role="alert"></div></div>
+    <div class="dfoot"><button type="button" class="btn soft" data-close>Cancel</button><button type="submit" class="btn">Add and close</button></div></form>`;
+  if(!dlg.open) dlg.showModal(); document.getElementById("n_nome").focus();
+}
+function openCall(name, sub){
+  let s = 0, muted = false, held = false;
+  dlg.innerHTML = `<div class="callbox"><div class="av">${initials(name)}</div><h2>${esc(name)}</h2><p>${esc(sub)}</p><div class="tm" id="ctm">Calling…</div><div class="why" id="cst" style="color:#B9C2CC">The call goes through the system, so the number stays private.</div>
+    <div class="cbtns"><button class="cb" id="cmute" aria-label="Mute">${ic("mic")}</button><button class="cb" id="chold" aria-label="Hold">${ic("hold")}</button><button class="cb end" data-hang aria-label="End call">${ic("hang")}</button></div>
+    <div class="note">Simulated call in this prototype.</div></div>`;
+  dlg.classList.add("call"); if(!dlg.open) dlg.showModal();
+  clearInterval(callTimer); setTimeout(() => { if(!dlg.open) return; document.getElementById("cst").textContent = "On call"; callTimer = setInterval(() => { s++; const el = document.getElementById("ctm"); if(el) el.textContent = `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`; }, 1000); }, 1800);
+  document.getElementById("cmute").onclick = e => { muted = !muted; e.currentTarget.classList.toggle("on", muted); };
+  document.getElementById("chold").onclick = e => { held = !held; e.currentTarget.classList.toggle("on", held); document.getElementById("cst").textContent = held ? "On hold" : "On call"; };
+}
+let callName = "";
+dlg.addEventListener("close", () => { clearInterval(callTimer); dlg.classList.remove("call"); });
+dlg.addEventListener("click", e => {
+  if(e.target === dlg || e.target.closest("[data-close]")){ dlg.close(); return; }
+  const ca = e.target.closest("[data-cfgarea]"); if(ca){ cfgArea = ca.dataset.cfgarea; openConfig(); return; }
+  if(e.target.closest("[data-cfgreset]")){ S.config[cfgArea] = JSON.parse(JSON.stringify(CONFIG_PADRAO[cfgArea])); save(S); openConfig(); render(); toast("Defaults restored for " + AREA[cfgArea] + "."); return; }
+  const bl = e.target.closest("[data-block]"); if(bl){ toggleBlock(bl.dataset.block); openConfig(); return; }
+  if(e.target.closest("[data-hang]")){
+    const k = chatTab === "cli" ? "cli:" + focusId : "ent:" + (S.tasks.find(t => t.id === focusId) || {}).order;
+    const secs = document.getElementById("ctm").textContent; thread(k).push({ from:"sistema", name:"", text:`Call with ${callName} ended${/:/.test(secs) ? " · " + secs : ", no answer"}`, when:Date.now() }); save(S);
+    dlg.close(); render(); return;
+  }
+});
+dlg.addEventListener("submit", e => {
+  e.preventDefault();
+  if(e.target.id === "cfgForm"){
+    const c = Object.assign({}, cfgOf(cfgArea)); new FormData(e.target).forEach((v, k) => { c[k] = Math.max(1, parseInt(v, 10) || 1); });
+    if(!(c.slaCrit < c.slaHigh && c.slaHigh < c.slaMed)){ toast("Deadlines must increase: critical < high < medium."); return; }
+    S.config[cfgArea] = c; log(session.name, `changed the ${AREA[cfgArea]} settings`); save(S); dlg.close(); render(); toast(AREA[cfgArea] + " settings saved."); return;
+  }
+  if(e.target.id === "novoForm"){
+    const nome = document.getElementById("n_nome").value.trim(), user = document.getElementById("n_user").value.trim().toLowerCase(), pass = document.getElementById("n_pass").value, ar = document.getElementById("n_area").value, turno = document.getElementById("n_turno").value;
+    const err = document.getElementById("nerr");
+    if(nome.split(" ").length < 2){ err.textContent = "Enter first and last name."; return; }
+    if(!/^[a-z0-9._]{3,}$/.test(user)){ err.textContent = "Username needs at least 3 characters, no spaces."; return; }
+    if(accountOf(user)){ err.textContent = "That username already exists."; return; }
+    S.extra.push({ id:user, name:nome, area:ar, pass, turno }); statOf(user); log(session.name, `added ${nome} to ${AREA[ar]}`); save(S); dlg.close(); render();
+    toast(`Access created for ${nome} in ${AREA[ar]}: ${user} / ${pass}` + (ar === "operacional" ? " (in the app)." : "."));
+  }
+});
+function toggleBlock(id){
+  S.blocked[id] = !S.blocked[id];
+  if(S.blocked[id]){ const moved = S.tasks.filter(t => t.assignee === id && t.status !== "done"); moved.forEach(t => { t.assignee = null; if(t.status === "doing") t.status = "open"; }); log(session.name, `blocked ${nameOf(id)}` + (moved.length ? ` and sent ${plural(moved.length, "task", "tasks")} back for a decision` : "")); }
+  else log(session.name, `unblocked ${nameOf(id)}`);
+  save(S); render();
+}
+
+/* ---------- Attention bell (manager) ---------- */
+const bell = document.getElementById("bell"), gear = document.getElementById("gear"), panel = document.getElementById("panel");
+const sigOf = items => items.map(i => i.text).join("|");
+let seen = ""; try{ seen = localStorage.getItem("ops-en-seen") || ""; }catch(e){}
+function renderBell(){
+  const isM = session && session.role === "manager";
+  bell.classList.toggle("hidden", !isM); gear.classList.toggle("hidden", !isM); if(!isM){ closePanel(); return; }
+  gear.innerHTML = ic("gear") + "<span>Settings</span>";
+  const items = attentionItems(), unseen = items.length && sigOf(items) !== seen;
+  bell.innerHTML = ic("bell") + (items.length ? `<span class="badge ${unseen ? "pulse" : ""}" style="${unseen ? "" : "background:#6b7a8c"}">${items.length}</span>` : "");
+  panel.innerHTML = `<div class="ph"><span>Attention items</span><span style="color:var(--muted);font-weight:600">${items.length}</span></div>` +
+    (items.length ? items.map(i => `<div class="pi"><span class="t-${i.k}" style="background:none">${ic(i.k)}</span><span>${esc(i.text)}</span></div>`).join("") : '<div class="empty">Nothing needs attention right now.</div>');
+}
+function closePanel(){ panel.classList.add("hidden"); }
+bell.addEventListener("click", e => { e.stopPropagation(); if(panel.classList.contains("hidden")){ panel.classList.remove("hidden"); seen = sigOf(attentionItems()); try{ localStorage.setItem("ops-en-seen", seen); }catch(e){} renderBell(); } else closePanel(); });
+gear.addEventListener("click", () => { cfgArea = area() === "operacional" ? "operacional" : "atendimento"; openConfig(); });
+document.addEventListener("click", e => { if(!panel.contains(e.target)) closePanel(); });
+
+/* ---------- Render and events ---------- */
+const view = document.getElementById("view");
+function render(){
+  if(!session) return;
+  const isM = session.role === "manager";
+  const draft = document.getElementById("txt") ? document.getElementById("txt").value : "", typingFocus = document.activeElement && document.activeElement.id === "txt";
+  document.getElementById("roleTag").textContent = isM ? "Shift manager · FC SEA-1" : "Customer Service · 8 AM to 5 PM shift";
+  document.getElementById("who").textContent = session.name;
+  document.getElementById("av").textContent = initials(session.name);
+  document.getElementById("live").textContent = "live · " + new Date().toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"});
+  renderSide();
+  view.innerHTML = (isM ? (menu === "pessoas" ? peopleView() : managerView()) : atendimentoView()) + `<div class="foot"><span>Prototype for the challenge, with fictional data. Data stays in this browser only.</span><button class="link" id="reset">Reset sample data</button></div>`;
+  const ms = document.getElementById("msgs"); if(ms) ms.scrollTop = ms.scrollHeight;
+  const tx = document.getElementById("txt"); if(tx){ tx.value = draft; if(typingFocus){ tx.focus(); tx.setSelectionRange(draft.length, draft.length); } }
+  renderBell();
+}
+function sendFromSac(text){
+  const focus = S.tasks.find(t => t.id === focusId); if(!focus || !text.trim()) return;
+  if(chatTab === "cli"){ sendMsg("cli:" + focus.id, "sac", session.name, text); simulateCustomer(focus, render); }
+  else { sendMsg("ent:" + focus.order, "sac", session.name, text); const d = deliveryOf(focus); if(d.who) simulateDriver(focus.order, d.who, render); }
+  const tx = document.getElementById("txt"); if(tx) tx.value = ""; render();
+}
+document.getElementById("side").addEventListener("click", e => {
+  const m = e.target.closest("[data-menu]"), d = e.target.closest("[data-dlg]");
+  if(d){ d.dataset.dlg === "novo" ? openNovo() : (cfgArea = area() === "operacional" ? "operacional" : "atendimento", openConfig()); return; }
+  if(m){ menu = m.dataset.menu; flt = "all"; openWorker = null; pick = null; focusId = null; chatTab = "cli"; render(); window.scrollTo(0, 0); }
+});
+view.addEventListener("submit", e => { if(e.target.id === "compose"){ e.preventDefault(); sendFromSac(document.getElementById("txt").value); } });
+view.addEventListener("click", e => {
+  const t = e.target.closest("[data-start],[data-done],[data-flt],[data-nudge],[data-focus],[data-pick],[data-do],[data-tab],[data-quick],[data-call],[data-auto],[data-block],[data-dlg],#reset,tr.wk");
+  if(!t || e.target.closest("select,input")) return;
+  const ds = t.dataset;
+  if(ds.dlg){ ds.dlg === "novo" ? openNovo() : openConfig(); return; }
+  if(ds.block){ toggleBlock(ds.block); return; }
+  if(ds.quick){ sendFromSac(ds.quick); return; }
+  if(ds.tab){ chatTab = ds.tab; render(); return; }
+  if(ds.call){
+    const f = S.tasks.find(x => x.id === focusId), d = deliveryOf(f);
+    callName = ds.call === "cli" ? f.title : d.who; openCall(callName, ds.call === "cli" ? `Customer · order ${f.order}` : `Driver · ${f.order}`); return;
+  }
+  if(ds.auto !== undefined){
+    const r = autoDistribute(ds.auto, session.name); pick = null; render();
+    toast(r.ok ? `${plural(r.ok, "task", "tasks")} assigned without overloading anyone.` + (r.left ? ` ${r.left} left for a decision: everyone is at the limit.` : "") : "Everyone is already at the limit. Adjust it in Settings or assign manually."); return;
+  }
+  if(ds.pick){ pick = pick === ds.pick ? null : ds.pick; render(); return; }
+  if(ds.do){
+    const [mode, id, wid] = ds.do.split(":"), k = S.tasks.find(x => x.id === id), from = nameOf(k.assignee);
+    k.assignee = wid; if(k.status === "doing") k.status = "open";
+    log(session.name, mode === "move" ? `moved ${k.title} from ${from} to ${nameOf(wid)}` : `assigned ${k.title} to ${nameOf(wid)}`); pick = null; save(S); render(); return;
+  }
+  if(ds.start){ startTask(ds.start, session.user); focusId = ds.start; if(menu === "pendentes") menu = "aberto"; render(); document.getElementById("txt") && document.getElementById("txt").focus(); return; }
+  if(ds.done){ finishTask(ds.done, session.user); focusId = null; chatTab = "cli"; render(); toast("Case solved and saved to your history."); return; }
+  if(ds.flt !== undefined){ flt = flt === ds.flt ? "all" : ds.flt; render(); return; }
+  if(ds.nudge){ S.notifications.unshift({ id:Date.now(), text:`${session.name} asked for an update on your progress`, when:Date.now(), unread:true }); log(session.name, `asked ${nameOf(ds.nudge)} for an update`); save(S); render(); toast("Update request sent."); return; }
+  if(t.id === "reset"){ S = seed(); save(S); openWorker = null; flt = "all"; q = ""; focusId = null; chatTab = "cli"; seen = ""; try{ localStorage.removeItem("ops-en-seen"); }catch(e){} render(); return; }
+  if(ds.focus){ focusId = ds.focus; chatTab = "cli"; render(); return; }
+  if(ds.w){ openWorker = openWorker === ds.w ? null : ds.w; render(); }
+});
+view.addEventListener("input", e => { if(e.target.id !== "q") return; q = e.target.value; render(); const i = document.getElementById("q"); i.focus(); i.setSelectionRange(i.value.length, i.value.length); });
+addEventListener("storage", e => { if(e.key === KEY){ S = load(); if(!dlg.open) render(); } });
+setInterval(() => { if(session && !dlg.open && !(document.activeElement && document.activeElement.matches("select,#q"))){ S = load(); render(); } }, 20000);
+/* Simulated situations: only on the support screen. */
+setInterval(() => {
+  if(!session || session.role !== "atendimento") return;
+  S = load(); runSimulation(session.user, (kind, t) => {
+    if(!dlg.open) render();
+    if(kind === "novo") toast(`New case: ${t.title}, ${t.detail.toLowerCase()}.`);
+    if(kind === "cobra") toast(`${t.title} is waiting for a reply.`);
+    if(kind === "ent") toast("The driver sent a message about Helen's order.");
+  });
+}, 9000);
+
+function start(){
+  document.getElementById("login").classList.add("hidden"); document.getElementById("app").classList.remove("hidden");
+  S = load(); menu = session.role === "manager" ? "all" : "aberto"; render();
+}
+if(session && session.role !== "operacional") start();
+</script>
+</body>
+</html>
