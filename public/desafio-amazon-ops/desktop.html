@@ -96,8 +96,12 @@
   .mi .n{margin-left:auto;font-size:13px;font-weight:700;color:inherit;opacity:.8}
   .mi .rdot{margin-left:auto}
   .mi .rdot + .n{margin-left:8px}
-  .side .bottom{margin-top:auto;display:flex;flex-direction:column;gap:8px;padding:12px 4px 4px}
-  .side .bottom .btn{width:100%}
+  .mi.add{color:#fff}
+  .mi.add .plus{width:26px;height:26px;margin:-3px;border-radius:50%;background:var(--yellow);color:var(--squid);display:grid;place-items:center;flex:none;transition:transform .2s cubic-bezier(.2,.8,.2,1)}
+  .mi.add .plus svg.ic{width:16px;height:16px;stroke-width:2.6}
+  .mi.add:hover .plus{transform:rotate(90deg)}
+  .mi.add small{display:block;font-size:12.5px;font-weight:500;color:#9FAAB6;margin-top:1px}
+  .mi.add > span:last-child{line-height:1.25}
   main{padding:24px 28px 48px;min-width:0}
   .ptitle{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
   .ptitle h1{font-size:30px;letter-spacing:-.03em;margin:0;line-height:1.1}
@@ -285,10 +289,72 @@
   .callbox .cb svg.ic{width:24px;height:24px}
   .callbox .note{font-size:13px;color:#9FAAB6;margin-top:18px}
 
-  @media (max-width:1600px){ .mgr{grid-template-columns:1fr} .sidecol{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:start} }
-  @media (max-width:1320px){ .sac{grid-template-columns:320px minmax(0,1fr)} .ctx{grid-column:1 / -1;display:grid;grid-template-columns:repeat(3,1fr)} .sidecol{grid-template-columns:1fr} }
-  @media (max-width:980px){ .shell{grid-template-columns:1fr} .side{position:static;height:auto;flex-direction:row;flex-wrap:wrap} .side .grp,.side .bottom{display:none} .mi{width:auto} #login{grid-template-columns:1fr} .lart{padding:32px;min-height:340px} .lart .roles{display:none} .sac,.people{grid-template-columns:1fr} .ctx{grid-template-columns:1fr} .sit,.kpis{grid-template-columns:1fr 1fr} main{padding:16px} .top{padding:0 12px;gap:8px} .me div,.live{display:none} .fgrid{grid-template-columns:1fr} }
-  @media (prefers-reduced-motion:reduce){ .pulse,.typing i b{animation:none} .btn{transition:none} }
+  /* ---------- leitura: nada abaixo de 12.5px, rótulos que não quebram ---------- */
+  .chip,.tag,.prow .nm small,.fld small,.sug{font-size:13px}
+  .badge,.ub{font-size:12px}
+  .msg small,.lart .credit{font-size:12.5px}
+  .qi .s{font-size:14px}
+  .card .hd small{white-space:nowrap}
+  .card .hd h2{min-width:0}
+  .demo button{display:inline-block;padding:3px 0}
+  .demo button:focus-visible{outline:3px solid var(--orange);outline-offset:2px;border-radius:4px}
+
+  /* ---------- área de trabalho do SAC: a resposta sempre à vista ---------- */
+  .sac{--work-h:max(540px, calc(100svh - 196px))}
+  .sac .case{height:var(--work-h);min-height:0}
+  .sac .q{max-height:calc(var(--work-h) - 56px)}
+  .chat{min-height:0}
+  .msgs{max-height:none;min-height:120px}
+  .compose-off{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .compose-off span{color:var(--ink);font-weight:600}
+  .qi:focus-visible{outline-offset:-3px}
+  .hint-keys{color:var(--muted);font-size:13px;padding:0 20px 14px}
+
+  /* ---------- movimento: troca de tela, janelas, avisos, mensagens ---------- */
+  :root{--ease:cubic-bezier(.2,.8,.2,1)}
+  @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  @keyframes pop{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}
+  @keyframes drop{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+  @keyframes toastin{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  #view.enter .ptitle,#view.enter .sit > *,#view.enter .kpis,#view.enter .sac > *,#view.enter .mgr > section,#view.enter .sidecol > *,#view.enter .people > *{animation:rise .46s var(--ease) both}
+  #view.enter .sit > *:nth-child(2),#view.enter .sac > *:nth-child(2),#view.enter .sidecol > *:nth-child(2),#view.enter .people > *:nth-child(2){animation-delay:.06s}
+  #view.enter .sit > *:nth-child(3),#view.enter .sac > *:nth-child(3),#view.enter .sidecol > *:nth-child(3){animation-delay:.12s}
+  #view.enter .sit > *:nth-child(4),#view.enter .kpis{animation-delay:.18s}
+  #view.enter .mgr > section{animation-delay:.22s}
+  #view.swap .case,#view.swap .ctx > section:first-child{animation:fade .25s ease both}
+  #login:not(.hidden) .lart > div,#login:not(.hidden) .lform > *{animation:rise .5s var(--ease) both}
+  #login:not(.hidden) .lform > *:nth-child(n+3){animation-delay:.08s}
+  #login:not(.hidden) .lform > *:nth-child(n+6){animation-delay:.14s}
+  #app:not(.hidden) .side{animation:fade .3s ease both}
+  .msg.new{animation:pop .3s var(--ease) both}
+  .typing{animation:fade .2s ease both}
+  dialog[open]{animation:pop .24s var(--ease) both}
+  dialog[open]::backdrop{animation:fade .2s ease both}
+  #panel:not(.hidden){animation:drop .18s var(--ease) both}
+  .pick{animation:drop .18s var(--ease) both}
+  tr.ctl td{animation:fade .22s ease both}
+  .mi,.qi,.fchip,.prow,.quick button,.tabs button,.areatabs button,.tbtn,.link,.search,tr.wk td{transition:background-color .16s ease,color .16s ease}
+  .scard{transition:background-color .16s ease,transform .12s ease}
+  .scard:active,.qi:active,.mi:active,.fchip:active,.quick button:active,.prow:active{transform:scale(.98)}
+  .load i{transition:width .5s var(--ease)}
+  #toasts{position:fixed;right:24px;bottom:24px;z-index:60;display:flex;flex-direction:column;align-items:flex-end;gap:10px;pointer-events:none}
+  #toasts .toast{position:static;pointer-events:auto;cursor:pointer;animation:toastin .3s var(--ease) both;transition:opacity .25s ease,transform .25s ease}
+  #toasts .toast.out{opacity:0;transform:translateY(8px)}
+
+  .tag,th,.mi > span:not(.plus){white-space:nowrap}
+  .mi.add > span:last-child{white-space:normal}
+  .kv dd{min-width:0;overflow-wrap:anywhere} .kv .stat{white-space:normal;line-height:1.3}
+  main{overflow-x:clip}
+  .side{overflow-x:hidden}
+  .mgr td .why{display:block;max-width:24ch}
+  @media (max-width:1600px){ .mgr{grid-template-columns:minmax(0,1fr) 320px} .mgr .card .hd{flex-wrap:wrap} .mgr th,.mgr td{padding-left:12px;padding-right:12px} .mgr .pname{gap:10px} .load{width:96px} }
+  @media (max-width:1280px){ .mgr{grid-template-columns:1fr} .sidecol{order:-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:start} .sidecol .dec{max-height:440px;overflow:auto} }
+  @media (max-width:1320px){ .sac{grid-template-columns:320px minmax(0,1fr)} .ctx{grid-column:1 / -1;display:grid;grid-template-columns:repeat(3,1fr)} }
+  @media (max-width:1100px){ .sidecol{grid-template-columns:1fr} }
+  @media (max-width:980px){ .sac .case{height:auto} .sac .q{max-height:360px} .msgs{max-height:60svh;min-height:260px} .hint-keys{display:none} #toasts{left:16px;right:16px;bottom:16px;align-items:stretch} }
+  @media (max-width:980px){ .shell{grid-template-columns:1fr} .side{position:static;height:auto;flex-direction:row;flex-wrap:wrap} .side .grp,.mi.add small{display:none} .mi{width:auto} #login{grid-template-columns:1fr} .lart{padding:32px;min-height:340px} .lart .roles{display:none} .sac,.people{grid-template-columns:1fr} .ctx{grid-template-columns:1fr} .sit,.kpis{grid-template-columns:1fr 1fr} main{padding:16px} .top{padding:0 12px;gap:8px} .me div,.live{display:none} .fgrid{grid-template-columns:1fr} }
+  @media (prefers-reduced-motion:reduce){ *,*::before,*::after,dialog::backdrop{animation-duration:.01ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.01ms!important} .pulse,.typing i b{animation:none!important} }
 </style>
 </head>
 <body>
@@ -314,9 +380,9 @@
     <h2>Entrar no sistema</h2>
     <p>Use o seu usuário do centro de distribuição.</p>
     <label for="u">Usuário</label>
-    <input id="u" required autofocus>
+    <input id="u" required autofocus autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="username">
     <label for="p">Senha</label>
-    <input id="p" type="password" required>
+    <input id="p" type="password" required autocomplete="current-password">
     <div id="lerr" role="alert"></div>
     <button class="btn" type="submit">Entrar</button>
     <div class="demo">
@@ -365,7 +431,14 @@ P.hold = '<path d="M9 5v14M15 5v14"/>';
 P.hang = '<path d="M3 15c5-5 13-5 18 0l-2.5 2.5-3.5-2v-3a10 10 0 0 0-6 0v3l-3.5 2z"/>';
 const chanIc = t => ic(t.type === "Chat" ? "chat" : t.type === "E-mail" ? "mail" : "phone");
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" })[c]);
-function toast(msg){ const d = document.createElement("div"); d.className = "toast"; d.textContent = msg; document.body.appendChild(d); setTimeout(() => d.remove(), 3400); }
+function toast(msg){
+  let box = document.getElementById("toasts");
+  if(!box){ box = document.createElement("div"); box.id = "toasts"; box.setAttribute("role", "status"); box.setAttribute("aria-live", "polite"); document.body.appendChild(box); }
+  const d = document.createElement("div"); d.className = "toast"; d.textContent = msg; box.appendChild(d);
+  while(box.children.length > 3) box.firstChild.remove();
+  const bye = () => { d.classList.add("out"); setTimeout(() => d.remove(), 260); };
+  d.onclick = bye; setTimeout(bye, 4200);
+}
 
 /* ---------- Sessão ---------- */
 let session = null;
@@ -388,7 +461,7 @@ document.getElementById("lform").addEventListener("submit", e => {
 document.getElementById("logout").onclick = () => {
   session = null; try{ sessionStorage.removeItem("ops-session"); }catch(e){}
   document.getElementById("app").classList.add("hidden"); document.getElementById("login").classList.remove("hidden");
-  document.getElementById("p").value = ""; document.getElementById("lerr").textContent = ""; closePanel();
+  document.getElementById("p").value = ""; document.getElementById("lerr").textContent = ""; closePanel(); lastScreen = "";
 };
 
 /* ---------- Menu lateral ---------- */
@@ -408,10 +481,10 @@ function renderSide(){
   const side = document.getElementById("side"), mi = (k, icon, label, extra) => `<button class="mi ${menu === k ? "on" : ""}" data-menu="${k}">${ic(icon)}<span>${label}</span>${extra || ""}</button>`;
   if(session.role === "manager"){
     const pend = a => S.tasks.filter(t => t.status !== "done" && !t.assignee && (a === "all" || t.area === a)).length;
-    const dot = a => pend(a) ? '<span class="rdot pulse" title="tarefas sem responsável"></span>' : "";
+    const dot = a => pend(a) ? `<span class="rdot" title="${pend(a)} sem responsável"></span><span class="n">${pend(a)}</span>` : "";
     side.innerHTML = `<div class="grp">Visão</div>${mi("all","home","Visão geral", dot("all"))}${mi("atendimento","headset","Atendimento (SAC)", dot("atendimento"))}${mi("operacional","truck","Operacional", dot("operacional"))}
       <div class="grp">Equipe</div>${mi("pessoas","users","Colaboradores", `<span class="n">${team().length}</span>`)}
-      <div class="bottom"><button class="btn" data-dlg="novo">${ic("plus")}Novo colaborador</button><button class="btn soft" data-dlg="config">${ic("gear")}Configurações</button></div>`;
+      <button class="mi add" data-dlg="novo"><span class="plus">${ic("plus")}</span><span>Novo colaborador<small>Cria o acesso ao sistema ou ao app</small></span></button>`;
   } else {
     const s = sacSets(), n = k => `<span class="n">${s[k].length}</span>`;
     side.innerHTML = `<div class="grp">Atendimentos</div>${mi("aberto","inbox","Em aberto", n("aberto"))}${mi("pendentes","clock","Pendentes", n("pendentes"))}${mi("naores","alert","Não resolvidos", s.naores.length ? '<span class="rdot"></span>' + n("naores") : n("naores"))}${mi("historico","history","Histórico", n("historico"))}${mi("todos","all","Todos", n("todos"))}`;
@@ -430,9 +503,12 @@ function deliveryOf(t){
   return { txt:d.assignee ? "Aguardando saída" : "Sem entregador", cls:d.assignee ? "wait" : "bad", who, addr:d.detail, task:d };
 }
 const fmtTime = w => new Date(w).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+const shown = {};
 function bubbles(k, mineFrom){
-  const list = thread(k).map(x => x.from === "sistema" ? `<div class="msg sys">${esc(x.text)}</div>`
-    : `<div class="msg ${x.from === mineFrom ? "mine" : "them"}">${esc(x.text)}<small>${x.from === mineFrom ? "Você" : esc(x.name)} · ${fmtTime(x.when)}</small></div>`).join("");
+  const all = thread(k), before = shown[k]; shown[k] = all.length;
+  const nw = i => before !== undefined && i >= before ? " new" : "";
+  const list = all.map((x, i) => x.from === "sistema" ? `<div class="msg sys${nw(i)}">${esc(x.text)}</div>`
+    : `<div class="msg ${x.from === mineFrom ? "mine" : "them"}${nw(i)}">${esc(x.text)}<small>${x.from === mineFrom ? "Você" : esc(x.name)} · ${fmtTime(x.when)}</small></div>`).join("");
   const ty = typingNow(k);
   return (list || `<div class="msg sys">Nenhuma mensagem ainda.</div>`) + (ty ? `<div class="typing"><i><b></b><b></b><b></b></i>${esc(ty)} está digitando…</div>` : "");
 }
@@ -447,7 +523,7 @@ function atendimentoView(){
   if(focus) focusId = focus.id;
   const queue = list.map(t => {
     const done = t.status === "done", u = !done && t.type === "Chat" ? unreadFor("cli:" + t.id, session.user) : 0;
-    return `<button class="qi lvl ${done ? "done" : level(t)} ${focus && focus.id === t.id ? "sel" : ""}" data-focus="${t.id}">
+    return `<button class="qi lvl ${done ? "done" : level(t)} ${focus && focus.id === t.id ? "sel" : ""}" data-focus="${t.id}" role="option" aria-selected="${!!(focus && focus.id === t.id)}" tabindex="${focus && focus.id === t.id ? 0 : -1}">
       <span class="t">${esc(t.title)}</span><span class="d ${!done && mins(t) < 0 ? "late" : ""}">${done ? fmtTime(t.doneAt) : mins(t) < 0 ? "atrasada" : fmt(mins(t))}</span>
       <span class="s">${esc(t.detail)}</span>
       <span class="meta">${done ? '<span class="chip done">Resolvido</span>' : chip(t)}<span class="chan">${chanIc(t)}${t.type}</span>${t.status === "doing" ? '<span class="doing-pill">Em atendimento</span>' : ""}${u ? `<span class="ub" title="mensagens novas">${u}</span>` : ""}</span>
@@ -477,7 +553,7 @@ function atendimentoView(){
         <div class="msgs" id="msgs">${bubbles(k, "sac")}</div>
         ${canWrite ? `<div class="quick">${QUICK[chatTab].map(q => `<button data-quick="${esc(q)}">${q}</button>`).join("")}</div>
           <form class="compose" id="compose"><input id="txt" autocomplete="off" placeholder="${chatTab === "cli" ? "Responder ao cliente" : "Mensagem para o entregador"}" aria-label="Mensagem"><button class="btn" type="submit">Enviar</button></form>`
-          : `<div class="compose-off">${done ? "Atendimento resolvido. A conversa fica guardada no histórico." : "Inicie o atendimento para responder."}</div>`}
+          : `<div class="compose-off">${done ? "<span>Atendimento resolvido. A conversa fica guardada no histórico.</span>" : `<span>Inicie o atendimento para responder ao cliente.</span><button class="btn small" data-start="${focus.id}">Iniciar e responder</button>`}</div>`}
       </div></section>`;
     markRead(k, session.user);
     ctx = `<section class="card"><div class="hd"><h2>Pedido e entrega</h2></div>
@@ -487,7 +563,7 @@ function atendimentoView(){
   const [title, sub] = MENU_TITLE[menu] || MENU_TITLE.aberto;
   return `<div class="ptitle"><div><h1>${title}</h1><p>${sub}</p></div><span class="why">${open.length} abertos · ${open.filter(t => level(t) === "crit").length} críticos</span></div>
     <div class="sac">
-    <section class="card"><div class="hd"><h2>${title}</h2><small>${list.length}</small></div><div class="q">${queue}</div></section>
+    <section class="card"><div class="hd"><h2>Fila</h2><small>${list.length} ${list.length === 1 ? "atendimento" : "atendimentos"}</small></div><div class="q" id="queue" role="listbox" aria-label="Fila de atendimentos">${queue}</div><div class="hint-keys">Use as setas ↑ ↓ para trocar de atendimento.</div></section>
     ${center}
     <aside class="ctx">${ctx}
       <section class="card"><div class="hd"><h2>Notificações</h2><small>${S.notifications.filter(n=>n.unread).length} novas</small></div>
@@ -535,7 +611,7 @@ function managerView(){
   const all = group.map(wm), T = teamAvg(group), n = Math.max(1, group.length), count = k => all.filter(m => m.f[k]).length;
   const cards = FLAGS.map(f => `<button class="scard ${flt === f.k ? "on" : ""}" data-flt="${f.k}">
       <span class="bubble t-${f.k}">${ic(f.k)}</span><span><span class="n">${count(f.k)}</span><b class="l">${f.label}</b><small>${f.desc}</small></span>
-      ${count(f.k) ? '<span class="rdot pulse"></span>' : ""}</button>`).join("");
+</button>`).join("");
   const kpis = `<div class="kpis">${summary(group, S.tasks.filter(t => t.status !== "done")).map(([v,l]) => `<div class="kpi"><div class="n">${v}</div><small>${l}</small></div>`).join("")}</div>`;
   const chips = `<button class="fchip ${flt==="all" ? "on" : ""}" data-flt="all">Todas as situações</button>` + FLAGS.map(f => `<button class="fchip ${flt===f.k ? "on" : ""}" data-flt="${f.k}">${ic(f.k)}${f.one}</button>`).join("") +
     `<input class="search" id="q" type="search" placeholder="Buscar pessoa" value="${esc(q)}" aria-label="Buscar pessoa">`;
@@ -550,7 +626,7 @@ function managerView(){
           <button class="btn soft small" data-pick="move:${t.id}">${pick === "move:" + t.id ? "Fechar" : "Mover"}</button></div>${pick === "move:" + t.id ? picker(t, "move") : ""}`).join("") || "Sem tarefas abertas."}</td></tr>`;
     }
     return `<tr class="wk ${openWorker === m.w.id ? "open" : ""}" data-w="${m.w.id}">
-      <td><div class="pname"><span class="av">${initials(m.w.name)}</span><div><b>${esc(m.w.name)}</b>${m.n ? '<span class="rdot pulse"></span>' : ""}<br><span class="tag">${AREA[m.w.area]}</span></div></div></td>
+      <td><div class="pname"><span class="av">${initials(m.w.name)}</span><div><b>${esc(m.w.name)}</b><br><span class="tag">${AREA[m.w.area]}</span></div></div></td>
       <td><div class="ics">${icons}</div></td><td>${agora}</td>
       <td><div class="load ${m.crit ? "hot" : ""}"><i style="width:${Math.min(100, m.ts.length * 100 / Math.max(1, cfgOf(m.w.area).maxOpen))}%"></i></div><span class="why">${m.ts.length} de ${cfgOf(m.w.area).maxOpen}${m.crit ? ` · <b>${m.crit} crítica(s)</b>` : ""}</span></td>
       <td><b>${m.st.resolved}</b></td><td>${m.avg ? Math.round(m.avg) + " min" : "—"}${trend}</td></tr>${ctl}`;
@@ -567,10 +643,10 @@ function managerView(){
         <tfoot><tr class="avgrow"><td>Média ${a === "all" ? "da equipe" : "da área"}</td><td></td><td></td><td>${(open.filter(t => t.assignee).length / n).toFixed(1)} abertas</td><td>${(T.resolved / n).toFixed(1)}</td><td>${T.avg ? Math.round(T.avg) + " min" : "—"}</td></tr></tfoot></table>
       <div class="legend">${legend}</div></section>
     <aside class="sidecol">
-      <section class="card"><div class="hd"><h2>Precisa de decisão${unassigned.length ? '<span class="rdot pulse"></span>' : ""}</h2><small>${unassigned.length} sem responsável</small></div>
+      <section class="card"><div class="hd"><h2>Precisa de decisão${unassigned.length ? '<span class="rdot"></span>' : ""}</h2><small>${unassigned.length} sem responsável</small></div>
         ${unassigned.length ? `<div class="autobar"><button class="btn" data-auto="${a}">Distribuir automaticamente</button><span>Vai para quem tem menos tarefas, sem passar do limite.</span></div>` : ""}
         <div class="dec">${unassigned.length ? unassigned.map(t => `<div class="di lvl ${level(t)}">${chip(t)} <span class="tag">${AREA[t.area]}</span><br><b>${esc(t.title)}</b><div class="why">${t.type} · ${esc(t.detail)} · ${dueText(t).toLowerCase()}</div><div style="margin-top:8px"><button class="btn soft small" data-pick="assign:${t.id}">${pick === "assign:" + t.id ? "Fechar" : "Atribuir manualmente"}</button></div>${pick === "assign:" + t.id ? picker(t, "assign") : ""}</div>`).join("") : '<div class="empty">Tudo atribuído nesta área.</div>'}</div></section>
-      ${a === "operacional" ? "" : `<section class="card"><div class="hd"><h2>Clientes esperando resposta</h2><small>${wc.length} conversas</small></div>
+      ${a === "operacional" ? "" : `<section class="card"><div class="hd"><h2>Clientes esperando</h2><small>${wc.length} conversas</small></div>
         <div class="feed">${wc.length ? wc.map(c => `<div class="fi conv"><span class="grow"><b>${esc(c.t.title)}</b> · ${esc(nameOf(c.t.assignee))}<small>“${esc(c.last.text)}”</small></span><span class="wait ${c.wait >= 5 ? "late" : ""}">${c.wait < 1 ? "agora" : c.wait + " min"}</span></div>`).join("") : '<div class="empty">Nenhum cliente esperando.</div>'}</div></section>`}
       <section class="card"><div class="hd"><h2>Atividade recente</h2></div>
         <div class="feed">${S.activity.slice(0,6).map(x => `<div class="fi"><b>${esc(x.who)}</b> ${esc(x.text)}<small>${ago(x.when)}</small></div>`).join("")}</div></section>
@@ -682,15 +758,19 @@ function renderBell(){
   panel.innerHTML = `<div class="ph"><span>Itens de atenção</span><span style="color:var(--muted);font-weight:600">${items.length}</span></div>` +
     (items.length ? items.map(i => `<div class="pi"><span class="t-${i.k}" style="background:none">${ic(i.k)}</span><span>${esc(i.text)}</span></div>`).join("") : '<div class="empty">Nada precisa de atenção agora.</div>');
 }
-function closePanel(){ panel.classList.add("hidden"); }
-bell.addEventListener("click", e => { e.stopPropagation(); if(panel.classList.contains("hidden")){ panel.classList.remove("hidden"); seen = sigOf(attentionItems()); try{ localStorage.setItem("ops-seen", seen); }catch(e){} renderBell(); } else closePanel(); });
+function closePanel(){ panel.classList.add("hidden"); bell.setAttribute("aria-expanded", "false"); }
+bell.addEventListener("click", e => { e.stopPropagation(); if(panel.classList.contains("hidden")){ panel.classList.remove("hidden"); bell.setAttribute("aria-expanded", "true"); seen = sigOf(attentionItems()); try{ localStorage.setItem("ops-seen", seen); }catch(e){} renderBell(); } else closePanel(); });
 gear.addEventListener("click", () => { cfgArea = area() === "operacional" ? "operacional" : "atendimento"; openConfig(); });
 document.addEventListener("click", e => { if(!panel.contains(e.target)) closePanel(); });
 
 /* ---------- Render e eventos ---------- */
 const view = document.getElementById("view");
+let lastScreen = "", lastFocus = null;
 function render(){
   if(!session) return;
+  const qEl = document.getElementById("queue"), msEl = document.getElementById("msgs");
+  const keepQ = qEl ? qEl.scrollTop : 0, keepM = msEl ? msEl.scrollTop : 0, atBottom = !msEl || msEl.scrollHeight - msEl.scrollTop - msEl.clientHeight < 60;
+  const qHadFocus = document.activeElement && document.activeElement.classList.contains("qi");
   const isM = session.role === "manager";
   const draft = document.getElementById("txt") ? document.getElementById("txt").value : "", typingFocus = document.activeElement && document.activeElement.id === "txt";
   document.getElementById("roleTag").textContent = isM ? "Gestor do turno · CD SP-1" : "Atendimento (SAC) · turno das 8h às 17h";
@@ -699,7 +779,14 @@ function render(){
   document.getElementById("live").textContent = "ao vivo · " + new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
   renderSide();
   view.innerHTML = (isM ? (menu === "pessoas" ? peopleView() : managerView()) : atendimentoView()) + `<div class="foot"><span>Protótipo para o desafio, com dados fictícios. Os dados ficam só neste navegador.</span><button class="link" id="reset">Reiniciar dados de exemplo</button></div>`;
-  const ms = document.getElementById("msgs"); if(ms) ms.scrollTop = ms.scrollHeight;
+  const screen = session.role + ":" + menu, sameFocus = focusId === lastFocus;
+  view.classList.remove("enter", "swap");
+  if(screen !== lastScreen){ void view.offsetWidth; view.classList.add("enter"); }
+  else if(!sameFocus){ void view.offsetWidth; view.classList.add("swap"); }
+  const q2 = document.getElementById("queue"); if(q2 && screen === lastScreen) q2.scrollTop = keepQ;
+  const ms = document.getElementById("msgs"); if(ms) ms.scrollTop = (screen === lastScreen && sameFocus && !atBottom) ? keepM : ms.scrollHeight;
+  if(qHadFocus){ const sel = view.querySelector(".qi.sel"); if(sel) sel.focus({ preventScroll:true }); }
+  lastScreen = screen; lastFocus = focusId;
   const tx = document.getElementById("txt"); if(tx){ tx.value = draft; if(typingFocus){ tx.focus(); tx.setSelectionRange(draft.length, draft.length); } }
   renderBell();
 }
@@ -745,6 +832,13 @@ view.addEventListener("click", e => {
   if(ds.focus){ focusId = ds.focus; chatTab = "cli"; render(); return; }
   if(ds.w){ openWorker = openWorker === ds.w ? null : ds.w; render(); }
 });
+view.addEventListener("keydown", e => {
+  const cur = e.target.closest && e.target.closest(".qi"); if(!cur || (e.key !== "ArrowDown" && e.key !== "ArrowUp")) return;
+  const all = [...view.querySelectorAll(".qi")], i = all.indexOf(cur), nx = all[i + (e.key === "ArrowDown" ? 1 : -1)];
+  e.preventDefault(); if(!nx) return; focusId = nx.dataset.focus; chatTab = "cli"; render();
+  const sel = view.querySelector(".qi.sel"); if(sel){ sel.focus(); sel.scrollIntoView({ block:"nearest" }); }
+});
+document.addEventListener("keydown", e => { if(e.key === "Escape" && !panel.classList.contains("hidden")){ closePanel(); bell.focus(); } });
 view.addEventListener("input", e => { if(e.target.id !== "q") return; q = e.target.value; render(); const i = document.getElementById("q"); i.focus(); i.setSelectionRange(i.value.length, i.value.length); });
 addEventListener("storage", e => { if(e.key === KEY){ S = load(); if(!dlg.open) render(); } });
 setInterval(() => { if(session && !dlg.open && !(document.activeElement && document.activeElement.matches("select,#q"))){ S = load(); render(); } }, 20000);

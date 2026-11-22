@@ -156,7 +156,47 @@
   #call .cb.end{background:#E31B23}
   #call .note{font-size:13px;color:#9FAAB6;margin-top:26px}
   .toast{position:absolute;left:16px;right:16px;bottom:86px;background:var(--squid);color:#fff;border-radius:14px;padding:14px 16px;z-index:9;font-size:15px;font-weight:600}
-  @media (prefers-reduced-motion:reduce){ .btn{transition:none} }
+  /* ---------- leitura e toque ---------- */
+  .chip{font-size:13px} .ub{font-size:12px} .msg small{font-size:12.5px} .lg-top .credit{font-size:12px}
+  .num span{font-size:13px} .item .b small{font-size:14px}
+  .nav{padding-bottom:max(6px, env(safe-area-inset-bottom))}
+  .nav button{font-size:13px;min-height:58px}
+  .demo button{display:inline-block;padding:4px 0}
+  .demo button:focus-visible{outline:3px solid var(--orange);outline-offset:2px;border-radius:4px}
+  .box .err{margin-top:6px}
+  .btn.half{padding:0 12px;white-space:nowrap}
+  .thread .b b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* ---------- movimento ---------- */
+  :root{--ease:cubic-bezier(.2,.8,.2,1)}
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  @keyframes slidein{from{transform:translateX(100%)}to{transform:none}}
+  @keyframes slideout{from{transform:none}to{transform:translateX(100%)}}
+  @keyframes pop{from{opacity:0;transform:translateY(8px) scale(.96)}to{opacity:1;transform:none}}
+  @keyframes shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-6px)}40%,60%{transform:translateX(6px)}}
+  @keyframes toastin{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  #det.in{animation:slidein .32s var(--ease) both}
+  #det.out{animation:slideout .2s ease-in both}
+  #det.in .db > *{animation:rise .4s var(--ease) both;animation-delay:.12s}
+  #scr.swap .sec,#scr.swap .seg{animation:rise .38s var(--ease) both}
+  #scr.swap .sec + .sec{animation-delay:.07s}
+  #scr.swap .list > *{animation:rise .38s var(--ease) both;animation-delay:.12s}
+  #scr.swap .list > *:nth-child(2){animation-delay:.16s} #scr.swap .list > *:nth-child(3){animation-delay:.2s} #scr.swap .list > *:nth-child(n+4){animation-delay:.24s}
+  #app[style*="flex"] .bar{animation:fade .35s ease both}
+  #login:not([style*="none"]) .lg-top > *,#login:not([style*="none"]) form,#login:not([style*="none"]) .demo{animation:rise .5s var(--ease) both}
+  #login:not([style*="none"]) form{animation-delay:.08s} #login:not([style*="none"]) .demo{animation-delay:.14s}
+  #call:not(.hidden){animation:fade .25s ease both}
+  #call:not(.hidden) .av{animation:pop .4s var(--ease) both}
+  .msg.new{animation:pop .3s var(--ease) both}
+  .typing{animation:fade .2s ease both}
+  .shake{animation:shake .4s both}
+  .err:not(:empty){animation:fade .2s ease both}
+  .item,.thread,.seg button,.ctabs button,.quick button,.nav button,#call .cb{transition:background-color .16s ease,color .16s ease,transform .12s ease}
+  .item:active,.thread:active,.seg button:active,.quick button:active,.nav button:active,#call .cb:active{transform:scale(.97)}
+  .toast{animation:toastin .3s var(--ease) both;transition:opacity .25s ease,transform .25s ease;cursor:pointer}
+  .toast.out{opacity:0;transform:translateY(10px)}
+  @media (prefers-reduced-motion:reduce){ *,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:.01ms!important} }
 </style>
 </head>
 <body>
@@ -171,8 +211,8 @@
       <p class="credit">Foto: <a href="https://www.rawpixel.com/image/3298148/free-photo-image-warehouse-aisle-book" target="_blank" rel="noopener">“Binders boxes shelves large archive”</a>, CC0, via rawpixel.</p>
     </div>
     <form id="lform" autocomplete="off">
-      <label for="u">Usuário</label><input id="u" required>
-      <label for="p">Senha</label><input id="p" type="password" required>
+      <label for="u">Usuário</label><input id="u" required autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="username">
+      <label for="p">Senha</label><input id="p" type="password" required autocomplete="current-password">
       <div id="lerr" role="alert"></div>
       <button class="btn dark full" type="submit" style="margin-top:6px">Entrar</button>
     </form>
@@ -208,7 +248,8 @@ P.hang = '<path d="M3 15c5-5 13-5 18 0l-2.5 2.5-3.5-2v-3a10 10 0 0 0-6 0v3l-3.5 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" })[c]);
 
 let session = null; try{ session = JSON.parse(sessionStorage.getItem("ops-app-session")); }catch(e){}
-let tab = "fila", tipo = "todas", detId = null, chatOrder = null, pending = "", who = "cli", callTimer = null;
+let tab = "fila", tipo = "todas", detId = null, chatOrder = null, pending = "", pendingFail = "", who = "cli", callTimer = null, lastTab = "", lastDet = null, shakeNext = null;
+const shown = {};
 const scr = document.getElementById("scr"), det = document.getElementById("det"), appEl = document.getElementById("app");
 
 document.querySelector(".demo").addEventListener("click", e => {
@@ -227,13 +268,18 @@ document.getElementById("lform").addEventListener("submit", e => {
 function logout(){
   session = null; try{ sessionStorage.removeItem("ops-app-session"); }catch(e){}
   appEl.style.display = "none"; appEl.classList.add("hidden"); document.getElementById("login").style.display = "";
-  document.getElementById("p").value = ""; document.getElementById("lerr").textContent = ""; detId = null; chatOrder = null;
+  document.getElementById("p").value = ""; document.getElementById("lerr").textContent = ""; detId = null; chatOrder = null; lastTab = ""; lastDet = null;
 }
 
 const mapLinks = addr => ({ waze:"https://waze.com/ul?q=" + encodeURIComponent(addr) + "&navigate=yes", gmaps:"https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(addr) + "&travelmode=driving" });
 const mine = () => S.tasks.filter(t => t.assignee === session.user && t.status !== "done" && t.area === "operacional").sort(sorter);
 const typeIcon = t => ic(t.type === "Entrega" ? "truck" : "box");
-function toast(msg){ const d = document.createElement("div"); d.className = "toast"; d.textContent = msg; document.getElementById("phone").appendChild(d); setTimeout(() => d.remove(), 2600); }
+function toast(msg){
+  const ph = document.getElementById("phone"); ph.querySelectorAll(".toast").forEach(o => o.remove());
+  const d = document.createElement("div"); d.className = "toast"; d.setAttribute("role", "status"); d.textContent = msg; ph.appendChild(d);
+  const bye = () => { d.classList.add("out"); setTimeout(() => d.remove(), 260); };
+  d.onclick = bye; setTimeout(bye, 3000);
+}
 const fmtTime = w => new Date(w).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
 /* Conversas por pedido de entrega seu: com o cliente (dest:) e com o SAC (ent:). */
 const keyOf = (w, order) => (w === "cli" ? "dest:" : "ent:") + order;
@@ -289,7 +335,8 @@ const QUICK = {
 };
 function chatBox(order){
   const t = S.tasks.find(x => x.order === order && x.area === "operacional"), k = keyOf(who, order), cname = t ? t.customer : "Cliente";
-  const msgs = thread(k).map(x => x.from === "sistema" ? `<div class="msg sys">${esc(x.text)}</div>` : `<div class="msg ${x.from === "entregador" ? "mine" : "them"}">${esc(x.text)}<small>${x.from === "entregador" ? "Você" : esc(x.name) + (who === "sac" ? " · SAC" : "")} · ${fmtTime(x.when)}</small></div>`).join("")
+  const all = thread(k), before = shown[k], nw = i => before !== undefined && i >= before ? " new" : ""; shown[k] = all.length;
+  const msgs = all.map((x, i) => x.from === "sistema" ? `<div class="msg sys${nw(i)}">${esc(x.text)}</div>` : `<div class="msg ${x.from === "entregador" ? "mine" : "them"}${nw(i)}">${esc(x.text)}<small>${x.from === "entregador" ? "Você" : esc(x.name) + (who === "sac" ? " · SAC" : "")} · ${fmtTime(x.when)}</small></div>`).join("")
     || `<div class="why" style="text-align:center;padding:8px">${who === "cli" ? "Avise o cliente quando estiver chegando." : "Nenhuma mensagem do SAC sobre este pedido."}</div>`;
   const ty = typingNow(k), uO = unreadFor(keyOf(who === "cli" ? "sac" : "cli", order), session.user);
   markRead(k, session.user);
@@ -329,7 +376,7 @@ function detailView(t){
         <div class="hint">Peça o código de 4 dígitos ao cliente (demonstração: ${t.code}).</div><div class="err" id="err">${pending}</div>
         <button class="btn full" data-confirm="${t.id}">Confirmar entrega</button></div>
       <div class="card box"><h3>Não consegui entregar</h3><select id="why"><option value="">Escolha o motivo</option><option>Cliente ausente, reagendar</option><option>Endereço não encontrado</option><option>Cliente recusou</option></select>
-        <button class="btn danger full" data-fail="${t.id}" style="margin-top:10px">Registrar problema</button></div>`;
+        <div class="err" id="errf">${pendingFail}</div><button class="btn danger full" data-fail="${t.id}" style="margin-top:6px">Registrar problema</button></div>`;
   } else {
     body += `<div class="card box code"><h3>Volumes conferidos</h3><input id="cnt" inputmode="numeric" maxlength="3" autocomplete="off" placeholder="0" style="letter-spacing:.1em" aria-label="Volumes conferidos">
         <div class="hint">Esperado: ${t.expected} volumes.</div><div class="err" id="err">${pending}</div>
@@ -345,6 +392,8 @@ function chatOnlyView(order){
 
 function render(){
   if(!session) return;
+  const detKey = detId || (chatOrder && "c:" + chatOrder), keepVals = {}, detWas = !det.classList.contains("hidden");
+  if(detKey && detKey === lastDet) ["cod","cnt","why"].forEach(id => { const el = document.getElementById(id); if(el) keepVals[id] = el.value; });
   const st = S.stats[session.user], all = mine(), u = unreadTotal();
   const draft = document.getElementById("txt") ? document.getElementById("txt").value : "", hadFocus = document.activeElement && document.activeElement.id === "txt";
   const keepDb = document.getElementById("db") ? document.getElementById("db").scrollTop : 0;
@@ -354,13 +403,19 @@ function render(){
   document.getElementById("nFila").innerHTML = ic("list") + "Fila"; document.getElementById("nEu").innerHTML = ic("user") + "Eu";
   document.getElementById("nMsg").innerHTML = ic("chat") + "Mensagens" + (u ? `<span class="ub">${u}</span>` : "");
   ["Fila","Msg","Eu"].forEach(n => document.getElementById("n" + n).classList.toggle("on", tab === ({Fila:"fila",Msg:"msg",Eu:"eu"})[n]));
-  const keep = scr.scrollTop; scr.innerHTML = tab === "fila" ? filaView() : tab === "msg" ? msgView() : euView(); scr.scrollTop = keep;
+  const keep = scr.scrollTop; scr.innerHTML = tab === "fila" ? filaView() : tab === "msg" ? msgView() : euView(); scr.scrollTop = tab === lastTab ? keep : 0;
   const t = detId && S.tasks.find(x => x.id === detId);
   if(t && t.status !== "done"){ det.classList.remove("hidden"); det.innerHTML = detailView(t); }
   else if(chatOrder){ det.classList.remove("hidden"); det.innerHTML = chatOnlyView(chatOrder); }
   else { det.classList.add("hidden"); det.innerHTML = ""; if(t) detId = null; }
   const db = document.getElementById("db"); if(db) db.scrollTop = chatOrder ? db.scrollHeight : keepDb;
   const tx = document.getElementById("txt"); if(tx){ tx.value = draft; if(hadFocus){ tx.focus(); } }
+  Object.keys(keepVals).forEach(id => { const el = document.getElementById(id); if(el) el.value = keepVals[id]; });
+  const detNow = !det.classList.contains("hidden");
+  if(detNow && !detWas){ det.classList.remove("in"); void det.offsetWidth; det.classList.add("in"); } else det.classList.remove("in");
+  if(tab !== lastTab){ scr.classList.remove("swap"); void scr.offsetWidth; scr.classList.add("swap"); } else scr.classList.remove("swap");
+  if(shakeNext){ const el = document.getElementById(shakeNext); if(el){ el.classList.add("shake"); el.focus({ preventScroll:true }); } shakeNext = null; }
+  lastTab = tab; lastDet = detNow ? detKey : null;
 }
 function sendFromApp(order, text){
   if(!text.trim()) return; sendMsg(keyOf(who, order), "entregador", session.name, text);
@@ -371,6 +426,11 @@ function sendFromApp(order, text){
 document.getElementById("nFila").onclick = () => { tab = "fila"; detId = null; chatOrder = null; render(); };
 document.getElementById("nMsg").onclick = () => { tab = "msg"; detId = null; chatOrder = null; render(); };
 document.getElementById("nEu").onclick = () => { tab = "eu"; detId = null; chatOrder = null; render(); };
+appEl.addEventListener("keydown", e => {
+  if(e.key !== "Enter") return;
+  const b = e.target.id === "cod" ? appEl.querySelector("[data-confirm]") : e.target.id === "cnt" ? appEl.querySelector("[data-count]") : null;
+  if(b){ e.preventDefault(); b.click(); }
+});
 appEl.addEventListener("submit", e => { if(e.target.id === "compose"){ e.preventDefault(); sendFromApp(e.target.dataset.order, document.getElementById("txt").value); } });
 appEl.addEventListener("click", e => {
   const t = e.target.closest("[data-open],[data-tipo],[data-start],[data-confirm],[data-count],[data-fail],[data-chat],[data-quick],[data-who],[data-call],#back,#out");
@@ -380,25 +440,25 @@ appEl.addEventListener("click", e => {
   if(d.who){ who = d.who; render(); const db = document.getElementById("db"); if(db) db.scrollTop = db.scrollHeight; return; }
   if(d.call){ const [w, order] = d.call.split(":"), k = S.tasks.find(x => x.order === order && x.area === "operacional"); openCall(w === "cli" ? k.customer : "Central do SAC", w === "cli" ? "Cliente · " + k.title : "Atendimento · " + k.title, keyOf(w, order)); return; }
   if(d.chat){ const [w, order] = d.chat.split(":"); who = w; chatOrder = order; detId = null; render(); return; }
-  if(d.open){ detId = d.open; chatOrder = null; pending = ""; who = "cli"; render(); return; }
-  if(t.id === "back"){ detId = null; chatOrder = null; pending = ""; render(); return; }
+  if(d.open){ detId = d.open; chatOrder = null; pending = ""; pendingFail = ""; who = "cli"; render(); return; }
+  if(t.id === "back"){ det.classList.remove("in"); det.classList.add("out"); setTimeout(() => { det.classList.remove("out"); detId = null; chatOrder = null; pending = ""; pendingFail = ""; render(); }, 190); return; }
   if(t.id === "out"){ logout(); return; }
-  if(d.start){ startTask(d.start, session.user); pending = ""; render(); return; }
+  if(d.start){ startTask(d.start, session.user); pending = ""; pendingFail = ""; render(); return; }
   if(d.confirm){
     const k = S.tasks.find(x => x.id === d.confirm), v = document.getElementById("cod").value.trim();
-    if(v !== k.code){ pending = "Código incorreto. Confira com o cliente."; render(); return; }
+    if(v !== k.code){ pendingFail = ""; pending = "Código incorreto. Confira com o cliente."; shakeNext = "cod"; render(); return; }
     finishTask(k.id, session.user); if(k.order && thread("ent:" + k.order).length) sendMsg("ent:" + k.order, "entregador", session.name, "Entrega concluída com o código do cliente.");
-    detId = null; pending = ""; render(); toast("Entrega confirmada."); return;
+    detId = null; pending = ""; pendingFail = ""; render(); toast("Entrega confirmada."); return;
   }
   if(d.count){
     const k = S.tasks.find(x => x.id === d.count), v = parseInt(document.getElementById("cnt").value, 10);
-    if(isNaN(v)){ pending = "Informe a quantidade conferida."; render(); return; }
-    finishTask(k.id, session.user, v !== k.expected ? `divergência: ${v} de ${k.expected} volumes` : ""); detId = null; pending = ""; render();
+    if(isNaN(v)){ pending = "Informe a quantidade conferida."; shakeNext = "cnt"; render(); return; }
+    finishTask(k.id, session.user, v !== k.expected ? `divergência: ${v} de ${k.expected} volumes` : ""); detId = null; pending = ""; pendingFail = ""; render();
     toast(v !== k.expected ? "Recebimento registrado com divergência." : "Recebimento confirmado."); return;
   }
   if(d.fail){
-    const r = document.getElementById("why").value; if(!r){ pending = "Escolha o motivo."; render(); return; }
-    failTask(d.fail, session.user, r); detId = null; pending = ""; render(); toast("Problema registrado. O gestor foi avisado."); return;
+    const r = document.getElementById("why").value; if(!r){ pending = ""; pendingFail = "Escolha o motivo."; shakeNext = "why"; render(); return; }
+    failTask(d.fail, session.user, r); detId = null; pending = ""; pendingFail = ""; render(); toast("Problema registrado. O gestor foi avisado."); return;
   }
 });
 addEventListener("storage", e => { if(e.key === KEY){ const before = session ? unreadTotal() : 0; S = load(); if(!document.activeElement.matches("#cod,#cnt,select")) render(); if(session && unreadTotal() > before) toast("Nova mensagem."); } });
