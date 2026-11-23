@@ -10,6 +10,8 @@ const nextConfig: NextConfig = {
       { source: "/canastrium", destination: "https://canastrium.com.br", permanent: true },
       { source: "/canastrium/:path*", destination: "https://canastrium.com.br/:path*", permanent: true },
       { source: "/redline-test", destination: "/redline-test/index.html", permanent: false },
+      // protótipo do site da Fazenda Um: link escondido (sem link no site, fora do sitemap, páginas com noindex)
+      { source: "/fazenda-um", destination: "/fazenda-um/index.html", permanent: false },
     ];
   },
   // protótipos em inglês do desafio: endereço curto, arquivos em public/cc/ (as páginas usam <base href="/cc/">)
