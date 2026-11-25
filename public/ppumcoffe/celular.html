@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Um Coffee Co. — Home premium no celular</title>
+<link href="https://fonts.googleapis.com/css2?family=Dosis:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;min-height:100vh;background:#e9dfd2;font-family:Dosis,sans-serif;color:#240700}
+  h1{margin:0;padding:28px 24px 0;text-align:center;font-size:13px;font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:#a5814f}
+  .fila{display:flex;flex-wrap:wrap;justify-content:center;gap:36px;padding:28px 24px 48px}
+  figure{margin:0;text-align:center}
+  .tel{width:390px;height:780px;border:12px solid #1a0500;border-radius:44px;overflow:hidden;background:#1a0500;box-shadow:0 30px 60px rgba(36,7,0,.25)}
+  iframe{display:block;width:390px;height:780px;border:0}
+  figcaption{margin-top:14px;font-size:13px;letter-spacing:.2em;text-transform:uppercase}
+</style>
+</head>
+<body>
+<h1>Proposta de home · celular</h1>
+<div class="fila">
+  <figure><div class="tel"><iframe src="index.html" data-alvo="" title="Topo"></iframe></div><figcaption>Topo e carrossel</figcaption></figure>
+  <figure><div class="tel"><iframe src="index.html" data-alvo=".umh-selecao" title="Seleção"></iframe></div><figcaption>Seleção dos campeões</figcaption></figure>
+  <figure><div class="tel"><iframe src="index.html" data-alvo=".umh-destaque" title="Destaque"></iframe></div><figcaption>Destaque do mês</figcaption></figure>
+</div>
+<script>
+document.querySelectorAll('iframe').forEach(function (f) {
+  f.addEventListener('load', function () {
+    var d = f.contentDocument, alvo = f.getAttribute('data-alvo');
+    d.documentElement.style.scrollBehavior = 'auto';
+    d.querySelectorAll('.umh-anima').forEach(function (e) { e.classList.add('is-visivel'); });
+    d.querySelectorAll('img[loading=lazy]').forEach(function (i) { i.loading = 'eager'; });
+    if (alvo) setTimeout(function () { var el = d.querySelector(alvo); f.contentWindow.scrollTo(0, el.getBoundingClientRect().top + f.contentWindow.scrollY - 64); }, 400);
+  });
+});
+</script>
+</body>
+</html>

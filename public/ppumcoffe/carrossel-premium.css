@@ -1,0 +1,85 @@
+/* =========================================================
+   Carrossel do topo — proposta premium
+   Mesmos slides e campos do um-carrossel (chamada, título, texto, botão, link, imagem, imagem no celular).
+   Muda: tipografia leve, troca em fade com zoom lento, numeração e barras de progresso com o nome do slide.
+   ========================================================= */
+.umx{--cafe:#240700;--cafe-2:#1a0500;--ouro:#a5814f;--ouro-vivo:#e0b57a;--creme:#f2e3cd;--ease:cubic-bezier(.22,1,.36,1);--tempo:9s;
+  position:relative;background:var(--cafe);color:var(--creme);font-family:Dosis,sans-serif;overflow:hidden}
+.umx *{box-sizing:border-box}
+.umx-palco{position:relative;display:grid;grid-template-columns:minmax(420px,40%) 1fr;height:clamp(560px,calc(100vh - 84px),780px)}
+
+/* ---- textos ---- */
+.umx-textos{position:relative;z-index:2;display:grid;padding:0 clamp(32px,4vw,72px) 0 max(40px,calc((100vw - 1320px)/2 + 56px))}
+.umx-texto{grid-area:1/1;display:flex;flex-direction:column;justify-content:center;padding-bottom:170px;visibility:hidden}
+.umx-texto.is-ativo{visibility:visible}
+.umx-texto>*{opacity:0;transform:translateY(22px);transition:opacity .6s var(--ease),transform .9s var(--ease)}
+.umx-texto.is-ativo>*{opacity:1;transform:none}
+.umx-texto.is-ativo>*:nth-child(2){transition-delay:.12s}
+.umx-texto.is-ativo>*:nth-child(3){transition-delay:.22s}
+.umx-texto.is-ativo>*:nth-child(4){transition-delay:.32s}
+.umx-chamada{display:flex;align-items:center;gap:14px;margin:0 0 26px;font-size:12px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:var(--ouro-vivo)}
+.umx-chamada::before{content:"";width:36px;height:1px;background:currentColor}
+.umx .umx-titulo{margin:0;font:300 clamp(42px,min(4.4vw,8.6vh),76px)/1.02 Dosis,sans-serif;letter-spacing:-.015em;color:#fff;text-wrap:balance}
+.umx-desc{max-width:27em;margin:26px 0 0;font-size:18px;font-weight:300;line-height:1.6;color:rgba(242,227,205,.86)}
+.umx-botao{position:relative;display:inline-flex;align-items:center;gap:18px;align-self:flex-start;min-height:56px;margin-top:40px;padding:0 30px 0 34px;box-shadow:inset 0 0 0 1px var(--ouro-vivo);color:var(--creme);font:600 12.5px/1 Dosis,sans-serif;letter-spacing:.24em;text-transform:uppercase;text-decoration:none;overflow:hidden;isolation:isolate;transition:color .45s var(--ease)}
+.umx-botao::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--ouro-vivo);transform:scaleX(0);transform-origin:left;transition:transform .6s var(--ease)}
+.umx-botao:hover{color:var(--cafe)}
+.umx-botao:hover::before{transform:scaleX(1)}
+.umx-botao svg{width:18px;height:10px;fill:none;stroke:currentColor;stroke-width:1.3;transition:transform .5s var(--ease)}
+.umx-botao:hover svg{transform:translateX(5px)}
+
+/* ---- imagens ---- */
+.umx-fotos{position:relative;overflow:hidden}
+.umx-foto{position:absolute;inset:0;margin:0;opacity:0;transition:opacity 1.1s var(--ease)}
+.umx-foto.is-ativo{opacity:1;z-index:1}
+.umx-foto img{width:100%;height:100%;object-fit:cover;transform:scale(1.07);transition:transform 1.6s var(--ease)}
+.umx-foto.is-ativo img{transform:scale(1);transition:transform calc(var(--tempo) + 1.5s) linear}
+/* véu fino na borda esquerda para costurar texto e imagem */
+.umx-fotos::after{content:"";position:absolute;inset:0 auto 0 0;z-index:2;width:22%;background:linear-gradient(90deg,var(--cafe),rgba(36,7,0,0));pointer-events:none}
+
+/* ---- base da coluna de texto: contador, progresso com nome do slide e setas (a foto fica livre) ---- */
+.umx-base{position:absolute;left:0;bottom:0;z-index:3;display:flex;flex-wrap:wrap;align-items:center;gap:20px 12px;width:max(420px,40%);padding:0 clamp(32px,4vw,72px) 44px max(40px,calc((100vw - 1320px)/2 + 56px))}
+.umx-ctrl{display:contents}
+.umx-cont{order:1;margin-right:auto;font-size:13px;font-weight:500;letter-spacing:.24em;color:rgba(242,227,205,.55);white-space:nowrap}
+.umx-cont b{font-weight:600;color:#fff}
+.umx-barras{order:0;flex:0 0 100%;display:grid;grid-template-columns:repeat(var(--n,3),1fr);gap:14px}
+.umx-seta{order:2;display:grid;place-items:center;flex:none;width:44px;height:44px;padding:0;border:0;border-radius:50%;background:none;box-shadow:inset 0 0 0 1px rgba(242,227,205,.35);color:var(--creme);cursor:pointer;transition:box-shadow .3s,background .3s,color .3s}
+.umx-seta--ant{margin-right:0}
+.umx-seta:hover{background:var(--creme);color:var(--cafe);box-shadow:none}
+.umx-seta svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+.umx-barra{display:flex;flex-direction:column;align-items:flex-start;gap:10px;min-width:0;padding:10px 0;border:0;background:none;color:rgba(242,227,205,.5);font:600 10.5px/1 Dosis,sans-serif;letter-spacing:.18em;text-transform:uppercase;text-align:left;white-space:nowrap;cursor:pointer;transition:color .3s}
+.umx-barra:hover,.umx-barra[aria-current="true"]{color:var(--creme)}
+.umx-barra i{position:relative;display:block;width:100%;height:2px;background:rgba(242,227,205,.18);overflow:hidden}
+.umx-barra i::after{content:"";position:absolute;inset:0;background:var(--ouro-vivo);transform-origin:left;transform:scaleX(var(--p,0))}
+.umx-barra.is-visto i::after{--p:1}
+.umx :focus-visible{outline:2px solid var(--ouro-vivo);outline-offset:4px}
+
+/* ---- tablet ---- */
+@media (max-width:1100px){
+  .umx-palco{grid-template-columns:minmax(360px,44%) 1fr}
+  .umx-textos,.umx-base{padding-left:40px}
+  .umx-base{width:max(360px,44%);padding-right:32px;gap:18px}
+  .umx-barra{font-size:9.5px;letter-spacing:.14em}
+}
+
+/* ---- celular: imagem em cima, texto embaixo ---- */
+@media (max-width:749px){
+  .umx-palco{display:flex;flex-direction:column;height:auto}
+  .umx-fotos{order:-1;aspect-ratio:4/3}
+  .umx-fotos::after{inset:auto 0 0 0;width:auto;height:30%;background:linear-gradient(0deg,var(--cafe),rgba(36,7,0,0))}
+  .umx-textos{padding:4px 20px 0}
+  .umx-texto{justify-content:flex-start;padding-bottom:0}
+  .umx-chamada{margin-bottom:16px;font-size:11px;letter-spacing:.26em}
+  .umx-chamada::before{width:24px}
+  .umx .umx-titulo{font-size:40px}
+  .umx-desc{margin-top:14px;font-size:16.5px}
+  .umx-botao{align-self:stretch;justify-content:space-between;margin-top:26px}
+  .umx-base{position:static;width:auto;flex-wrap:wrap;gap:18px 14px;padding:28px 20px 30px}
+  .umx-barras{order:0;flex:0 0 100%}
+  .umx-cont{order:1;margin-right:auto}
+  .umx-seta--ant{margin-right:0}
+  .umx-barra{font-size:10px;letter-spacing:.16em}
+}
+@media (prefers-reduced-motion:reduce){
+  .umx-texto>*,.umx-foto,.umx-foto img,.umx-foto.is-ativo img{transition:none;transform:none}
+}

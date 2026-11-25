@@ -12,6 +12,8 @@ const nextConfig: NextConfig = {
       { source: "/redline-test", destination: "/redline-test/index.html", permanent: false },
       // protótipo do site da Fazenda Um: link escondido (sem link no site, fora do sitemap, páginas com noindex)
       { source: "/fazenda-um", destination: "/fazenda-um/index.html", permanent: false },
+      // proposta de home premium da UM Coffee Co.: link escondido (sem link no site, páginas com noindex)
+      { source: "/ppumcoffe", destination: "/ppumcoffe/index.html", permanent: false },
     ];
   },
   // protótipos em inglês do desafio: endereço curto, arquivos em public/cc/ (as páginas usam <base href="/cc/">)
