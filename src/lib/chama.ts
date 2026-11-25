@@ -6,6 +6,10 @@
 
 export const CAMINHO_CHAMA = "/wefit-chama-k7x9/";
 
+// a caixa secreta abre a página de processo (desafio, benchmark, fluxograma, wireframes, design system);
+// de lá, o botão "Abrir protótipo" leva às telas
+export const DESTINO_SECRETO = `${CAMINHO_CHAMA}processo`;
+
 // nomes aceitos na caixa "Qual o nome do projeto secreto?" (sem acento, maiúscula ou espaço)
 const NOMES_SECRETOS = ["wefit"];
 

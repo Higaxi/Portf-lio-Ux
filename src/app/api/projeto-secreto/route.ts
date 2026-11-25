@@ -1,4 +1,4 @@
-import { CAMINHO_CHAMA, nomeConfere } from "@/lib/chama";
+import { DESTINO_SECRETO, nomeConfere } from "@/lib/chama";
 import { SEM_INDICE } from "@/lib/escritorio";
 
 // POST { nome }: se for o nome do projeto secreto, devolve o endereço escondido (que não está no código do site)
@@ -8,5 +8,5 @@ export async function POST(req: Request) {
   if (!nomeConfere(nome)) {
     return Response.json({ erro: "Não é esse o nome." }, { status: 404, headers: SEM_INDICE });
   }
-  return Response.json({ destino: CAMINHO_CHAMA }, { headers: SEM_INDICE });
+  return Response.json({ destino: DESTINO_SECRETO }, { headers: SEM_INDICE });
 }
