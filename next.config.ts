@@ -21,6 +21,17 @@ const nextConfig: NextConfig = {
     return [
       { source: "/ccdesktop", destination: "/cc/desktop.html" },
       { source: "/ccmobile", destination: "/cc/app.html" },
+      // Chama (desafio WeFit): app de página única em public/wefit-chama-k7x9/. Os arquivos existentes são
+      // servidos antes; qualquer outra rota dele (/loja, /admin, /entregador, /processo) abre o index.html
+      { source: "/wefit-chama-k7x9", destination: "/wefit-chama-k7x9/index.html" },
+      { source: "/wefit-chama-k7x9/:path*", destination: "/wefit-chama-k7x9/index.html" },
+    ];
+  },
+  // link escondido: fora de buscadores
+  headers() {
+    return [
+      { source: "/wefit-chama-k7x9/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }] },
+      { source: "/wefit-chama-k7x9", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }] },
     ];
   },
   images: {

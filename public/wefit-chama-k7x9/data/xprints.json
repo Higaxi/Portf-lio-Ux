@@ -1,0 +1,38 @@
+{
+  "breakpoints": {
+    "desktop": {
+      "width": 1440,
+      "height": 960
+    },
+    "tablet": {
+      "width": 1024,
+      "height": 1366
+    },
+    "mobile": {
+      "height": 844,
+      "width": 390
+    }
+  },
+  "previews": [
+    {
+      "title": "Escolha de perfil",
+      "description": "Entrada do protótipo: escolher entre loja, entregador e admin",
+      "path": "/"
+    },
+    {
+      "title": "Loja parceira",
+      "description": "Pedir contato com o entregador informando o código do pedido",
+      "path": "/loja"
+    },
+    {
+      "title": "Entregador",
+      "description": "Caixa de chamados com push simulado e ligação protegida",
+      "path": "/entregador"
+    },
+    {
+      "title": "Admin",
+      "description": "Lista de pedidos de contato com filtros, atrasos e configurações",
+      "path": "/admin"
+    }
+  ]
+}
