@@ -15,7 +15,8 @@ export const COOKIE = "escritorio_chave";
 
 // o banco "Redis" da Vercel entrega só uma REDIS_URL (conexão TCP); o Upstash entrega a API REST acima
 // com prefixo próprio o nome muda (ex.: OBARDOSEUZE_URL); por isso vale também qualquer variável cujo valor seja redis://
-const REDIS_TCP = process.env.REDIS_URL || variavel(/(^|_)REDIS_URL$/) || Object.values(process.env).find((v) => /^rediss?:\/\//.test(v || "")) || "";
+// CHAMA_REDIS_URL (banco criado em 25/11/2026) vem primeiro: a REDIS_URL antiga aponta para um banco que não existe mais
+const REDIS_TCP = process.env.CHAMA_REDIS_URL || process.env.REDIS_URL || variavel(/(^|_)REDIS_URL$/) || Object.values(process.env).find((v) => /^rediss?:\/\//.test(v || "")) || "";
 
 // para quem tem o token: os NOMES (nunca os valores) das variáveis que parecem de banco, para achar o que faltou
 export const nomesDeBanco = () => Object.keys(process.env).filter((k) => /REDIS|KV_|UPSTASH|STORAGE|DATABASE|OBARDO/i.test(k));
