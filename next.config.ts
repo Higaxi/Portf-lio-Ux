@@ -25,6 +25,9 @@ const nextConfig: NextConfig = {
       // servidos antes; qualquer outra rota dele (/loja, /admin, /entregador, /processo) abre o index.html
       { source: "/wefit-chama-k7x9", destination: "/wefit-chama-k7x9/index.html" },
       { source: "/wefit-chama-k7x9/:path*", destination: "/wefit-chama-k7x9/index.html" },
+      // Trilhão (projeto secreto, nome "Trilhão" na tecla L): fluxograma estático em public/trilhao-r4q8/
+      { source: "/trilhao-r4q8", destination: "/trilhao-r4q8/index.html" },
+      { source: "/trilhao-r4q8/", destination: "/trilhao-r4q8/index.html" },
     ];
   },
   // link escondido: fora de buscadores
@@ -32,6 +35,8 @@ const nextConfig: NextConfig = {
     return [
       { source: "/wefit-chama-k7x9/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }] },
       { source: "/wefit-chama-k7x9", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }] },
+      { source: "/trilhao-r4q8/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }] },
+      { source: "/trilhao-r4q8", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }] },
     ];
   },
   images: {

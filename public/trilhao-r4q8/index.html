@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>Trilhão · fluxograma do protótipo</title>
+<link rel="icon" href="img/brasao-gold.svg">
+<style>
+  @font-face { font-family: "Instrument Sans"; src: url(fontes/InstrumentSans-Variable.woff2) format("woff2"); font-weight: 400 700; font-display: swap; }
+  @font-face { font-family: "Morganite"; src: url(fontes/Morganite-Bold.woff2) format("woff2"); font-weight: 700; font-display: swap; }
+  :root {
+    --bg: #140404; --panel: #4c0a15; --panel-l: #6b1722; --surface: #210a0e; --line: #3a1219;
+    --cream: #fff4e8; --muted: #c9b2a6; --gold: #f5b76f; --gold-l: #fbd9a8; --copper: #cb7349; --vivid: #f9b233;
+    --grad: linear-gradient(135deg, #fbd9a8 0%, #f5b76f 45%, #cb7349 100%);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; font-family: "Instrument Sans", system-ui, sans-serif; color: var(--cream); letter-spacing: -0.01em;
+    background: radial-gradient(80% 50% at 50% -8%, rgba(245,183,111,.12), transparent 60%), radial-gradient(120% 80% at 50% 0%, #2a0610 0%, var(--bg) 62%), var(--bg); min-height: 100vh; }
+  a { color: var(--gold-l); }
+  .display { font-family: "Morganite", Impact, sans-serif; text-transform: uppercase; letter-spacing: .005em; line-height: .92; font-weight: 700; }
+  header.top { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 16px; padding: 12px 24px; background: rgba(13,2,3,.86); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(255,255,255,.07); }
+  header.top img { height: 38px; }
+  header.top .t { flex: 1; min-width: 0; }
+  header.top b { display: block; font-size: 15px; }
+  header.top small { color: var(--muted); font-size: 12.5px; }
+  nav.tabs { display: flex; gap: 4px; overflow-x: auto; }
+  nav.tabs a { white-space: nowrap; text-decoration: none; color: var(--muted); padding: 8px 12px; border-radius: 10px; font-size: 13.5px; font-weight: 600; }
+  nav.tabs a:hover { color: var(--cream); background: rgba(255,255,255,.05); }
+  main { max-width: 1180px; margin: 0 auto; padding: 32px 24px 90px; }
+  section { padding-top: 26px; scroll-margin-top: 70px; }
+  h2.sec { font-size: 54px; margin: 0 0 6px; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  p.lead { color: var(--muted); font-size: 15px; line-height: 1.55; max-width: 820px; margin: 0 0 22px; }
+  .card { background: rgba(255,244,232,.035); border: 1px solid rgba(255,255,255,.08); border-radius: 20px; padding: 20px; margin-bottom: 22px; }
+  .card h3 { margin: 0 0 6px; font-size: 17px; }
+  .hero { position: relative; overflow: hidden; border-radius: 26px; border: 1px solid rgba(245,183,111,.25); background: linear-gradient(160deg, var(--panel) 0%, #2a0610 60%, var(--bg) 100%); padding: 34px; }
+  .hero::after { content: ""; position: absolute; right: -80px; top: -80px; width: 340px; height: 340px; border-radius: 50%; background: radial-gradient(circle, rgba(245,183,111,.28), transparent 65%); }
+  .hero h1 { font-size: 92px; margin: 10px 0 8px; position: relative; z-index: 1; }
+  .hero .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .24em; text-transform: uppercase; color: var(--gold-l); position: relative; z-index: 1; }
+  .hero p { position: relative; z-index: 1; max-width: 640px; color: var(--muted); font-size: 16px; line-height: 1.55; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-top: 22px; position: relative; z-index: 1; }
+  .stat { background: rgba(0,0,0,.25); border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 14px; }
+  .stat b { font-size: 46px; color: var(--gold); }
+  .stat span { display: block; color: var(--muted); font-size: 13px; }
+  svg.arq { width: 100%; height: auto; display: block; }
+  svg.arq .b { fill: #210a0e; stroke: #5a2530; stroke-width: 1.5; }
+  svg.arq .t { font: 600 13px "Instrument Sans", sans-serif; fill: var(--cream); }
+  svg.arq .q { font: 11px "Instrument Sans", sans-serif; fill: var(--muted); }
+  svg.arq .l { stroke: #8a6a5e; stroke-width: 1.6; fill: none; }
+  svg.arq .lk { font: 600 10.5px "Instrument Sans", sans-serif; fill: var(--gold); }
+  svg.arq .x { fill: #170507; stroke: #6b4a44; stroke-dasharray: 5 4; }
+  svg.arq g[data-go] { cursor: pointer; }
+  svg.arq g[data-go]:hover .b { stroke: var(--gold); stroke-width: 2.4; }
+  .mod { border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,.08); background: rgba(255,244,232,.03); margin-bottom: 22px; scroll-margin-top: 80px; }
+  .mod > header { display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap; padding: 14px 20px; }
+  .mod > header b { font-size: 30px; }
+  .mod > header span { color: rgba(255,244,232,.85); font-size: 13.5px; }
+  .lane { padding: 6px 20px 16px; }
+  .lane .lbl { font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--gold-l); margin: 8px 0 10px; opacity: .85; }
+  .flow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .flow .arw { color: var(--copper); font-size: 22px; }
+  .scr { width: 150px; margin: 0; cursor: zoom-in; }
+  .scr img { display: block; width: 150px; height: 300px; object-fit: cover; object-position: top; border-radius: 16px; border: 1px solid rgba(255,255,255,.1); box-shadow: 0 10px 26px -12px rgba(0,0,0,.8); background: #210a0e; }
+  .scr figcaption { font-size: 12.5px; font-weight: 600; margin-top: 7px; }
+  .scr figcaption small { display: block; font-weight: 400; color: var(--muted); font-size: 11.5px; line-height: 1.35; margin-top: 2px; }
+  .scr.wide { width: 320px; } .scr.wide img { width: 320px; height: 180px; }
+  .note { margin: 0 20px 16px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.07); color: var(--muted); font-size: 13.5px; }
+  .note b { color: var(--cream); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--gold-l); padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,.1); }
+  td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,.06); vertical-align: top; }
+  td b.xp { color: var(--gold); }
+  .mundos { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 14px; }
+  .mundo { border-radius: 18px; overflow: hidden; border: 1px solid rgba(255,255,255,.08); background: rgba(255,244,232,.03); }
+  .mundo img { width: 100%; height: 120px; object-fit: cover; display: block; }
+  .mundo .c { padding: 12px 14px; }
+  .mundo .c b { font-size: 26px; }
+  .mundo ol { margin: 8px 0 0; padding-left: 20px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+  .mundo ol li b { color: var(--cream); font-size: 13px; font-family: inherit; text-transform: none; }
+  .pipeline { display: flex; flex-wrap: wrap; align-items: stretch; gap: 10px; }
+  .pipeline .p { flex: 1 1 150px; border-radius: 16px; padding: 14px; background: linear-gradient(160deg, var(--panel-l), #2a0610); border: 1px solid rgba(245,183,111,.2); }
+  .pipeline .p b { display: block; font-size: 15px; } .pipeline .p span { color: var(--muted); font-size: 12.5px; }
+  .pipeline .ar { align-self: center; color: var(--copper); font-size: 24px; }
+  .gal { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; }
+  .duas { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 800px) { .duas { grid-template-columns: 1fr; } .hero h1 { font-size: 64px; } h2.sec { font-size: 42px; } header.top nav { display: none; } }
+  .pill { display: inline-block; font-size: 11.5px; font-weight: 700; padding: 3px 9px; border-radius: 99px; background: rgba(245,183,111,.14); color: var(--gold-l); margin: 2px 4px 2px 0; }
+  .pill.x { background: rgba(255,255,255,.06); color: var(--muted); }
+  #lb { position: fixed; inset: 0; z-index: 50; display: none; align-items: center; justify-content: center; flex-direction: column; gap: 10px; background: rgba(8,1,2,.9); cursor: zoom-out; padding: 24px; }
+  #lb.on { display: flex; } #lb img { max-width: 96vw; max-height: 86vh; border-radius: 14px; } #lb div { font-size: 14px; color: var(--muted); }
+  footer { text-align: center; color: rgba(201,178,166,.6); font-size: 12px; padding: 30px; }
+</style>
+</head>
+<body>
+<header class="top">
+  <img src="img/horizontal-gold.svg" alt="Trilha de Prêmios">
+  <div class="t"><b>Trilhão · fluxograma do protótipo</b><small>Familhão decupado no visual da Trilha de Prêmios · 27/11/2026</small></div>
+  <nav class="tabs">
+    <a href="#arquitetura">Arquitetura</a><a href="#fluxograma">Fluxograma</a><a href="#trilha">Trilha e personagem</a><a href="#telas">Telas</a><a href="#decupagem">Decupagem</a>
+  </nav>
+</header>
+
+<main>
+  <div class="hero">
+    <span class="eyebrow">Projeto secreto</span>
+    <h1 class="display">Trilhão</h1>
+    <p>Protótipo que pega o produto do Familhão (assinatura, sorteios, pacotes, cupons, Lojão, álbum e missões), veste com a identidade da Trilha de Prêmios e junta duas coisas da Trilha: os <b>social games</b> e a <b>personalização do personagem</b>, ligadas por uma trilha de prêmios com baús. Tudo com dados mocados, sem backend.</p>
+    <div class="stats">
+      <div class="stat"><b class="display">23</b><span>rotas no app</span></div>
+      <div class="stat"><b class="display">12</b><span>módulos</span></div>
+      <div class="stat"><b class="display">10</b><span>social games da Trilha</span></div>
+      <div class="stat"><b class="display">6×5</b><span>mundos e paradas na trilha</span></div>
+      <div class="stat"><b class="display">23</b><span>roupas trancadas em baús</span></div>
+    </div>
+  </div>
+
+  <section id="arquitetura">
+    <h2 class="sec display">Arquitetura</h2>
+    <p class="lead">O app como sistema: entrada, módulos abertos pela barra de baixo e pelo menu, os motores que ligam um módulo ao outro e o que sai do app. Clique numa caixa para ir ao fluxo do módulo.</p>
+    <div class="card">
+      <svg class="arq" viewBox="0 0 1130 560" role="img" aria-label="Arquitetura do Trilhão">
+        <defs><marker id="aq" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#8a6a5e"/></marker></defs>
+        <text class="q" x="10" y="16" style="font-weight:700;fill:#fbd9a8">ENTRADA</text>
+        <g data-go="m-casca"><rect class="b" x="330" y="24" width="190" height="46" rx="10"/><text class="t" x="425" y="44" text-anchor="middle">App (sessão mocada)</text><text class="q" x="425" y="60" text-anchor="middle">localStorage, sem login</text></g>
+        <g data-go="m-casca"><rect x="560" y="24" width="230" height="46" rx="10" fill="#4c0a15" stroke="#f5b76f"/><text class="t" x="675" y="44" text-anchor="middle">Casca</text><text class="q" x="675" y="60" text-anchor="middle">logo · créditos · sino · barra · menu</text></g>
+        <path class="l" d="M520 47H558" marker-end="url(#aq)"/>
+        <path class="l" d="M675 70V98"/><path class="l" d="M68 98H1062"/>
+        <text class="q" x="10" y="120" style="font-weight:700;fill:#fbd9a8">MÓDULOS</text>
+        <!-- módulos: x = 12 + i*105 -->
+        <g data-go="m-home"><path class="l" d="M68 98V128" marker-end="url(#aq)"/><rect class="b" x="18" y="130" width="100" height="52" rx="10"/><text class="t" x="68" y="152" text-anchor="middle">Início</text><text class="q" x="68" y="169" text-anchor="middle">hub</text></g>
+        <g data-go="m-trilha"><path class="l" d="M173 98V128" marker-end="url(#aq)"/><rect class="b" x="123" y="130" width="100" height="52" rx="10" style="stroke:#f5b76f"/><text class="t" x="173" y="152" text-anchor="middle">Trilha</text><text class="q" x="173" y="169" text-anchor="middle">mapa + baús</text></g>
+        <g data-go="m-personagem"><path class="l" d="M278 98V128" marker-end="url(#aq)"/><rect class="b" x="228" y="130" width="100" height="52" rx="10" style="stroke:#f5b76f"/><text class="t" x="278" y="152" text-anchor="middle">Personagem</text><text class="q" x="278" y="169" text-anchor="middle">editor</text></g>
+        <g data-go="m-jogos"><path class="l" d="M383 98V128" marker-end="url(#aq)"/><rect class="b" x="333" y="130" width="100" height="52" rx="10" style="stroke:#f5b76f"/><text class="t" x="383" y="152" text-anchor="middle">Social Games</text><text class="q" x="383" y="169" text-anchor="middle">10 jogos</text></g>
+        <g data-go="m-sorteios"><path class="l" d="M488 98V128" marker-end="url(#aq)"/><rect class="b" x="438" y="130" width="100" height="52" rx="10"/><text class="t" x="488" y="152" text-anchor="middle">Sorteios</text><text class="q" x="488" y="169" text-anchor="middle">chances</text></g>
+        <g data-go="m-beneficios"><path class="l" d="M593 98V128" marker-end="url(#aq)"/><rect class="b" x="543" y="130" width="100" height="52" rx="10"/><text class="t" x="593" y="152" text-anchor="middle">Mais benefícios</text><text class="q" x="593" y="169" text-anchor="middle">pacotes</text></g>
+        <g data-go="m-missoes"><path class="l" d="M698 98V128" marker-end="url(#aq)"/><rect class="b" x="648" y="130" width="100" height="52" rx="10"/><text class="t" x="698" y="152" text-anchor="middle">Missões</text><text class="q" x="698" y="169" text-anchor="middle">quiz</text></g>
+        <g data-go="m-album"><path class="l" d="M803 98V128" marker-end="url(#aq)"/><rect class="b" x="753" y="130" width="100" height="52" rx="10"/><text class="t" x="803" y="152" text-anchor="middle">Álbum</text><text class="q" x="803" y="169" text-anchor="middle">48 figuras</text></g>
+        <g data-go="m-lojao"><path class="l" d="M908 98V128" marker-end="url(#aq)"/><rect class="b" x="858" y="130" width="100" height="52" rx="10"/><text class="t" x="908" y="152" text-anchor="middle">Lojão</text><text class="q" x="908" y="169" text-anchor="middle">créditos</text></g>
+        <g data-go="m-cupons"><path class="l" d="M1013 98V128" marker-end="url(#aq)"/><rect class="b" x="963" y="130" width="100" height="52" rx="10"/><text class="t" x="1013" y="152" text-anchor="middle">Cupons</text><text class="q" x="1013" y="169" text-anchor="middle">1 por mês</text></g>
+        <g data-go="m-conta"><rect class="b" x="1068" y="130" width="56" height="52" rx="10"/><text class="t" x="1096" y="152" text-anchor="middle">Conta</text><text class="q" x="1096" y="169" text-anchor="middle">menu</text></g>
+        <text class="q" x="10" y="240" style="font-weight:700;fill:#fbd9a8">MOTORES</text>
+        <g data-go="m-trilha"><rect class="b" x="128" y="270" width="150" height="56" rx="10" style="stroke:#f9b233;fill:#2a0610"/><text class="t" x="203" y="293" text-anchor="middle">XP da trilha</text><text class="q" x="203" y="311" text-anchor="middle">toda ação soma XP</text></g>
+        <g data-go="m-beneficios"><rect class="b" x="470" y="270" width="140" height="56" rx="10" style="stroke:#d9831e;fill:#2a0610"/><text class="t" x="540" y="293" text-anchor="middle">Pagamento</text><text class="q" x="540" y="311" text-anchor="middle">Pix ou cartão (simulado)</text></g>
+        <g data-go="m-pacote"><rect class="b" x="650" y="270" width="170" height="56" rx="10" style="stroke:#6b4eff;fill:#2a0610"/><text class="t" x="735" y="293" text-anchor="middle">Pacote de boas notícias</text><text class="q" x="735" y="311" text-anchor="middle">números · figuras · créditos</text></g>
+        <g data-go="m-lojao"><rect class="b" x="860" y="270" width="130" height="56" rx="10" style="stroke:#22c55e;fill:#2a0610"/><text class="t" x="925" y="293" text-anchor="middle">Créditos</text><text class="q" x="925" y="311" text-anchor="middle">saldo do Lojão</text></g>
+        <path class="l" d="M173 182V268" marker-end="url(#aq)"/><text class="lk" x="178" y="232">avança</text>
+        <path class="l" d="M200 270C230 230 260 210 268 186" marker-end="url(#aq)"/><text class="lk" x="226" y="222">roupas</text>
+        <path class="l" d="M383 182L270 284" marker-end="url(#aq)"/><text class="lk" x="306" y="246">+20 XP</text>
+        <path class="l" d="M593 182L548 268" marker-end="url(#aq)"/><text class="lk" x="584" y="232">compra</text>
+        <path class="l" d="M610 298H648" marker-end="url(#aq)"/>
+        <path class="l" d="M698 182L722 268" marker-end="url(#aq)"/><text class="lk" x="716" y="222">recompensa</text>
+        <path class="l" d="M680 270L500 184" marker-end="url(#aq)"/><text class="lk" x="560" y="246" style="fill:#c9b2a6">números</text>
+        <path class="l" d="M780 270L800 184" marker-end="url(#aq)"/><text class="lk" x="800" y="246">figuras</text>
+        <path class="l" d="M830 182L900 268" marker-end="url(#aq)"/><text class="lk" x="858" y="222">metas</text>
+        <path class="l" d="M925 270V184" marker-end="url(#aq)"/><text class="lk" x="930" y="232">troca</text>
+        <path class="l" d="M650 312C420 360 300 350 230 328" marker-end="url(#aq)" style="stroke-dasharray:4 3"/><text class="lk" x="430" y="360">abrir pacote, missão, cupom, Lojão, álbum, check-in: XP</text>
+        <text class="q" x="10" y="410" style="font-weight:700;fill:#fbd9a8">FORA DO APP</text>
+        <g data-go="m-jogos"><rect class="x" x="240" y="430" width="200" height="54" rx="10"/><text class="t" x="340" y="453" text-anchor="middle">Jogos da Trilha (iframe)</text><text class="q" x="340" y="471" text-anchor="middle">build em /games/&lt;slug&gt;, modo treino</text></g>
+        <g data-go="m-lojao"><rect class="x" x="470" y="430" width="180" height="54" rx="10"/><text class="t" x="560" y="453" text-anchor="middle">Ubook · BeFly · Fluency</text><text class="q" x="560" y="471" text-anchor="middle">livros, viagens, app de inglês</text></g>
+        <g data-go="m-cupons"><rect class="x" x="680" y="430" width="180" height="54" rx="10"/><text class="t" x="770" y="453" text-anchor="middle">Parceiros dos cupons</text><text class="q" x="770" y="471" text-anchor="middle">código usado no site deles</text></g>
+        <path class="l" d="M383 182V428" marker-end="url(#aq)" style="stroke-dasharray:4 3"/>
+        <path class="l" d="M1013 182L800 428" marker-end="url(#aq)" style="stroke-dasharray:4 3"/>
+        <text class="q" x="10" y="540">Linha cheia: dado que passa de um módulo a outro. Tracejada: sai do app ou é efeito indireto. Tudo mocado no navegador.</text>
+      </svg>
+    </div>
+  </section>
+
+  <section id="fluxograma">
+    <h2 class="sec display">Fluxograma completo</h2>
+    <p class="lead">Cada módulo com as telas na ordem em que aparecem. Clique num print para ampliar.</p>
+    <div id="mods"></div>
+  </section>
+
+  <section id="trilha">
+    <h2 class="sec display">Trilha e personagem</h2>
+    <p class="lead">A mistura pedida: a personalização de avatar da Trilha de Prêmios (o editor inteiro, com o kit de SVG em camadas) ligada a uma trilha de prêmios alimentada pelas ações do produto.</p>
+    <div class="card">
+      <h3>O ciclo</h3>
+      <div class="pipeline" style="margin-top:12px">
+        <div class="p"><b>Ação no app</b><span>abrir pacote, missão, cupom, jogar...</span></div><span class="ar">→</span>
+        <div class="p"><b>XP</b><span>soma na barra da trilha</span></div><span class="ar">→</span>
+        <div class="p"><b>Parada</b><span>o personagem anda no mapa</span></div><span class="ar">→</span>
+        <div class="p"><b>Baú</b><span>abre com animação</span></div><span class="ar">→</span>
+        <div class="p"><b>Roupa nova</b><span>destrancada no editor; "Vestir agora"</span></div><span class="ar">→</span>
+        <div class="p"><b>Personagem</b><span>aparece no mapa, na Home e no rosto</span></div>
+      </div>
+    </div>
+    <div class="duas">
+      <div class="card">
+        <h3>Quanto XP cada ação dá</h3>
+        <table><thead><tr><th>Ação</th><th>XP</th></tr></thead><tbody id="xp"></tbody></table>
+        <p style="color:var(--muted);font-size:13px;margin:12px 0 0">Cada parada pede mais XP que a anterior (100 + 20 por parada). A temporada inteira pede 13.200 XP.</p>
+      </div>
+      <div class="card">
+        <h3>Telas da mistura</h3>
+        <div class="flow" style="margin-top:12px" id="mixflow"></div>
+      </div>
+    </div>
+    <h3 style="margin:8px 0 12px;font-size:17px">Os 6 mundos e o que sai em cada baú</h3>
+    <div class="mundos" id="mundos"></div>
+  </section>
+
+  <section id="telas">
+    <h2 class="sec display">Todas as telas</h2>
+    <p class="lead">Prints do protótipo rodando, em tamanho de celular, com um progresso de demonstração.</p>
+    <div class="gal" id="gal"></div>
+  </section>
+
+  <section id="decupagem">
+    <h2 class="sec display">Decupagem</h2>
+    <p class="lead">O que veio de onde, e o que ainda precisa virar Trilha.</p>
+    <div class="duas">
+      <div class="card"><h3>Já é Trilha de Prêmios</h3><p style="color:var(--muted);font-size:14px;line-height:1.6;margin:8px 0 0">
+        <span class="pill">Logo e nome</span><span class="pill">Cores, fontes e componentes</span><span class="pill">Moldura de celular no PC</span><span class="pill">10 social games</span><span class="pill">Editor de personagem</span><span class="pill">Mapas e baús</span><span class="pill">Textos sem "Familhão"</span><span class="pill">Vale Trilha</span><span class="pill">Códigos de cupom</span></p></div>
+      <div class="card"><h3>Ainda é regra do Familhão</h3><p style="color:var(--muted);font-size:14px;line-height:1.6;margin:8px 0 0">
+        <span class="pill x">Assinatura de R$ 20 com pacote mensal</span><span class="pill x">Sorteios do milhão pela Loteria Federal</span><span class="pill x">Pacotes de celebridades</span><span class="pill x">Fluency como benefício</span><span class="pill x">1 cupom por mês</span><span class="pill x">Lojão em créditos</span><span class="pill x">Álbum de 48 figuras</span><span class="pill x">Pix de 24 h</span></p></div>
+    </div>
+  </section>
+</main>
+<footer>Trilhão · protótipo de estudo com dados mocados · página escondida, fora de buscadores</footer>
+<div id="lb"><img alt=""><div></div></div>
+
+<script>
+const T = (f) => "telas/" + f;
+const MOD = [
+  { id: "m-casca", t: "Casca do app", s: "aparece em toda tela", c: "#1d1b26", lanes: [["Navegação", [["home.jpg", "Cabeçalho", "logo da Trilha, créditos e sino"], ["social-games.jpg", "Barra de baixo", "Início · Trilha · Jogos · Lojão · Mais"]]]], note: "O <b>menu</b> (Mais) leva a Trilha, Personagem, Sorteios, Mais benefícios, Cupons, Lojão, Álbum, Missões, Social Games, Conta, Vale, Indique e Ajuda. O <b>sino</b> abre as notificações." },
+  { id: "m-home", t: "Início", s: "o hub", c: "#2b4fa8", lanes: [["Abrir o app", [["home.jpg", "Home", "pacote para abrir, card da trilha, campanhas, recompensas, social games, missões, cupons e livros"]]]], note: "Tudo começa aqui: cada card leva a um módulo." },
+  { id: "m-trilha", t: "Trilha de Prêmios", s: "mapa, XP e baús", c: "#a8641f", lanes: [["Andar e abrir baús", [["trilha.jpg", "Mapa do mundo", "personagem na última parada alcançada"], ["bau-aberto.jpg", "Baú aberto", "a roupa ganha e Vestir agora"]]]], note: "6 mundos com 5 paradas cada. Check-in do dia, histórico de XP e a lista de como ganhar XP ficam na mesma tela." },
+  { id: "m-personagem", t: "Meu personagem", s: "o editor da Trilha", c: "#7a2bd1", lanes: [["Vestir", [["personagem.jpg", "Editor", "corpo, pele, cabelo, barba, olhos, looks"], ["editor-trancadas.jpg", "Roupas trancadas", "cadeado nas peças da trilha"], ["editor-peca-trancada.jpg", "Peça trancada", "em que parada sai e quanto XP falta"]]]], note: "As 23 roupas do catálogo que saem nos baús ficam trancadas até o baú certo. Quatro peças são livres desde o início." },
+  { id: "m-jogos", t: "Social Games", s: "10 jogos da Trilha", c: "#6b1722", lanes: [["Jogar", [["social-games.jpg", "Lobby", "filtro por tipo e jogo em destaque"], ["jogo-memoria.jpg", "Jogo em tela cheia", "Memória, no modo treino", true], ["jogo-sinuca.jpg", "Sinuca", "só na horizontal", true]]]], note: "Sinuca, Dominó, Memória, Pênaltis, Poker, Blackjack, Bacará, Bac Bo, Roleta e Jockey Club, compilados do repositório dos jogos. Abrir um jogo dá <b>+20 XP</b> na trilha." },
+  { id: "m-sorteios", t: "Sorteios", s: "chances e ganhadores", c: "#1f7a5c", lanes: [["Conferir", [["sorteios.jpg", "Sorteios", "meses, cards, números da sorte, ganhadores e vídeo"]]]], note: "Os números da sorte chegam pelos pacotes e pelos baús da trilha." },
+  { id: "m-beneficios", t: "Mais benefícios", s: "pacotes extras", c: "#b02f6a", lanes: [["Comprar", [["mais-beneficios.jpg", "Pacotes", "7 pacotes de R$ 20, quantidade e total"]]]], note: "Pagamento simulado por Pix (QR de mentira) ou cartão: vira um pacote para abrir e +60 XP por unidade." },
+  { id: "m-pacote", t: "Pacote de boas notícias", s: "o motor que entrega", c: "#5a3ad1", lanes: [["Abrir", [["pacote.jpg", "Pacotes fechados", "da mensalidade, extra, missão, vale ou trilha"], ["meus-pacotes.jpg", "Meus pacotes", "histórico aberto e fechado"]]]], note: "Abrir um pacote dá +40 XP e entrega números, figuras, créditos e cupom." },
+  { id: "m-missoes", t: "Missões", s: "quiz", c: "#c2384f", lanes: [["Cumprir", [["missoes.jpg", "Lista", "pendentes e cumpridas"], ["missao.jpg", "Missão", "recompensa e Fazer a missão"]]]], note: "Respondeu certo: valida, manda a figura num pacote e dá +80 XP." },
+  { id: "m-album", t: "Álbum", s: "48 figuras", c: "#2b8a6e", lanes: [["Completar", [["album.jpg", "Álbum", "metas 16, 32 e 48, repetidas e detalhe"]]]], note: "Cada meta dá créditos no Lojão e +100 XP." },
+  { id: "m-lojao", t: "Lojão", s: "troca de créditos", c: "#cb7349", lanes: [["Resgatar", [["lojao.jpg", "Vitrine", "vitrines por marca, viagens e livros"], ["produto.jpg", "Produto", "frete por CEP e Eu quero"], ["pedidos.jpg", "Meus pedidos", "o Fluency mora aqui"]]]], note: "Resgatar um produto dá +30 XP." },
+  { id: "m-cupons", t: "Cupons", s: "1 por mês", c: "#2b8aa8", lanes: [["Resgatar", [["cupons.jpg", "Vitrine", "disponíveis e resgatados"], ["cupom.jpg", "Cupom", "regras, prazo e resgate com e-mail"]]]], note: "Resgatar o cupom do mês dá +50 XP. O cupom aparece em Resgatados na hora." },
+  { id: "m-conta", t: "Conta", s: "pelo menu", c: "#3a1219", lanes: [["Sua conta", [["conta.jpg", "Meus Dados", "assinatura, pagamento, e-mail, endereço"], ["historico.jpg", "Histórico", "filtro de meses e comprovante"], ["vale.jpg", "Vale Trilha", "código TRILHA2026"], ["indique.jpg", "Indique e Ganhe", "+10 créditos"], ["ajuda.jpg", "Dúvidas", "FAQ"]]]], note: "O cancelamento mostra o fluxo inteiro, mas não faz nada de propósito." },
+];
+const XP = [["Abrir um pacote de boas notícias", 40], ["Cumprir uma missão", 80], ["Resgatar o cupom do mês", 50], ["Comprar um pacote extra (por unidade)", 60], ["Resgatar um produto no Lojão", 30], ["Bater uma meta do álbum", 100], ["Jogar uma partida nos Social Games", 20], ["Fazer o check-in do dia", 15]];
+const MUNDOS = [
+  ["praia", "Praia do Rio", "Dezembro", ["Regata Marinho", "+10 créditos", "Camisa Havaiana", "1 figura", "Bermuda Cargo Marinho + 2 números"]],
+  ["cidade", "Cidade Grande", "Janeiro", ["Jaqueta Jeans", "1 número da sorte", "Calça Jeans", "+15 créditos", "Moletom com Capuz Azul + pacote"]],
+  ["futebol", "Estádio dos Campeões", "Fevereiro", ["Camisa Canarinho", "Camisa Colorada", "1 figura", "Camisa Rubro-Negra", "Camisa Alvinegra Listrada + 30 créditos"]],
+  ["floresta", "Floresta Encantada", "Março", ["Suéter Verde", "Camisa Alviverde Listrada", "2 números", "Camisa Branca com Faixa Verde", "Camisa Alviverde com Faixa + pacote"]],
+  ["halloween", "Noite das Bruxas", "Abril", ["Camiseta Alien", "+20 créditos", "Camisa Preta Riscada", "Camisa Tricolor Grená", "Moletom Vermelho + 1 figura"]],
+  ["lava", "Terras de Lava", "Maio", ["Camiseta Raglan Vinho", "Camisa Tricolor Azul", "Camisa Celeste Estrelada", "Camisa Tricolor Azul e Vermelha", "Polo Creme Rubro-Negra + 50 créditos"]],
+];
+const shot = ([f, t, s, wide]) => `<figure class="scr${wide ? " wide" : ""}" data-src="${T(f)}" data-cap="${t} · ${s}"><img src="${T(f)}" alt="${t}" loading="lazy"><figcaption>${t}<small>${s}</small></figcaption></figure>`;
+document.getElementById("mods").innerHTML = MOD.map((m) => `<div class="mod" id="${m.id}"><header style="background:linear-gradient(90deg,${m.c},transparent)"><b class="display">${m.t}</b><span>${m.s}</span></header>${m.lanes.map(([l, ss]) => `<div class="lane"><div class="lbl">${l}</div><div class="flow">${ss.map((s, i) => (i ? '<span class="arw">→</span>' : "") + shot(s)).join("")}</div></div>`).join("")}<div class="note">${m.note}</div></div>`).join("");
+document.getElementById("xp").innerHTML = XP.map(([a, x]) => `<tr><td>${a}</td><td><b class="xp">+${x}</b></td></tr>`).join("");
+document.getElementById("mixflow").innerHTML = [["trilha.jpg", "Trilha", "mapa"], ["bau-aberto.jpg", "Baú", "roupa ganha"], ["editor-trancadas.jpg", "Editor", "cadeados"]].map((s, i) => (i ? '<span class="arw">→</span>' : "") + shot(s)).join("");
+document.getElementById("mundos").innerHTML = MUNDOS.map(([id, n, mes, p]) => `<div class="mundo"><img src="img/${id}.webp" alt="" loading="lazy"><div class="c"><b class="display">${n}</b> <span class="pill x">${mes}</span><ol>${p.map((x, i) => `<li>${i === 4 ? "<b>Baú grande:</b> " : ""}${x}</li>`).join("")}</ol></div></div>`).join("");
+const todas = [...new Map(MOD.flatMap((m) => m.lanes.flatMap(([, ss]) => ss)).map((s) => [s[0], s])).values()];
+document.getElementById("gal").innerHTML = todas.map(shot).join("");
+const lb = document.getElementById("lb");
+document.addEventListener("click", (e) => {
+  const f = e.target.closest(".scr");
+  if (f) { lb.querySelector("img").src = f.dataset.src; lb.querySelector("div").textContent = f.dataset.cap; lb.classList.add("on"); return; }
+  if (e.target.closest("#lb")) { lb.classList.remove("on"); return; }
+  const g = e.target.closest("[data-go]");
+  if (g) document.getElementById(g.dataset.go)?.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+addEventListener("keydown", (e) => e.key === "Escape" && lb.classList.remove("on"));
+</script>
+</body>
+</html>

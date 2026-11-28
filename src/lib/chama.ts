@@ -10,16 +10,27 @@ export const CAMINHO_CHAMA = "/wefit-chama-k7x9/";
 // de lá, o botão "Abrir protótipo" leva às telas
 export const DESTINO_SECRETO = `${CAMINHO_CHAMA}processo`;
 
-// nomes aceitos na caixa "Qual o nome do projeto secreto?" (sem acento, maiúscula ou espaço)
-const NOMES_SECRETOS = ["wefit"];
+// Trilhão: fluxograma do protótipo do Familhão no visual da Trilha de Prêmios, em public/trilhao-r4q8/
+export const CAMINHO_TRILHAO = "/trilhao-r4q8/";
 
-export function nomeConfere(nome: string) {
+// nomes aceitos na caixa "Qual o nome do projeto secreto?" (sem acento, maiúscula ou espaço) e para onde cada um leva
+const PROJETOS_SECRETOS: Record<string, string> = {
+  wefit: DESTINO_SECRETO,
+  trilhao: CAMINHO_TRILHAO,
+};
+
+/** O destino escondido do projeto com esse nome, ou null se o nome não confere. */
+export function destinoDoNome(nome: string): string | null {
   const limpo = nome
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "")
     .replace(/\s+/g, "")
     .toLowerCase();
-  return NOMES_SECRETOS.includes(limpo);
+  return PROJETOS_SECRETOS[limpo] ?? null;
+}
+
+export function nomeConfere(nome: string) {
+  return destinoDoNome(nome) !== null;
 }
 
 export const CHAVE_ESTADO = "chama:estado";
