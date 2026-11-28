@@ -1,0 +1,10 @@
+lobby.mp3
+
+Faixa gerada por `tools/lobby-music/generate.mjs` neste repositório, sem material de terceiros.
+
+Síntese 100% em código (pads, baixo, piano elétrico FM, percussão leve), semente fixa 20261028.
+Para regenerar (o áudio sai idêntico a cada execução, os bytes do MP3 mudam com a versão do ffmpeg), na raiz do repositório:
+
+    node shared/tools/lobby-music/generate.mjs
+
+Requer Node e ffmpeg (com libmp3lame) no PATH.

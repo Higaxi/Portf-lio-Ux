@@ -28,6 +28,10 @@ const nextConfig: NextConfig = {
       // Trilhão (projeto secreto, nome "Trilhão" na tecla L): fluxograma estático em public/trilhao-r4q8/
       { source: "/trilhao-r4q8", destination: "/trilhao-r4q8/index.html" },
       { source: "/trilhao-r4q8/", destination: "/trilhao-r4q8/index.html" },
+      // o protótipo do Trilhão, exportado estático (FamilhaoTrilha: npm run exportar) em public/trilhao-r4q8/app:
+      // os arquivos existentes são servidos antes; cada tela abre o index.html da pasta dela
+      { source: "/trilhao-r4q8/app", destination: "/trilhao-r4q8/app/index.html" },
+      { source: "/trilhao-r4q8/app/:path*", destination: "/trilhao-r4q8/app/:path*/index.html" },
     ];
   },
   // link escondido: fora de buscadores

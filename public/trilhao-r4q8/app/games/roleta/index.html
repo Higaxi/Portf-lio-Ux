@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/trilhao-r4q8/app/games/roleta/favicon.svg" />
+    <!-- A mesa é um app de tela cheia, não uma página: o zoom do navegador
+         não tem função nenhuma aqui e só atrapalha. `maximum-scale=1` +
+         `user-scalable=no` matam o duplo-toque/duplo-clique que dava zoom
+         no feltro no meio de uma mão (o par com `touch-action: manipulation`
+         no index.css, que é o que resolve no Safari, onde estas duas
+         chaves são ignoradas). -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#140404" />
+
+    <!-- Tipografia dos jogos: Oswald (condensada, no lugar do
+         Morganite proprietário) para display; Instrument Sans para corpo.
+         Servidas pelo próprio jogo (public/fonts, @font-face no index.css): sem
+         CSS de terceiro bloqueando a pintura e o script. O recorte latino do
+         Oswald é pré-carregado — é a fonte do botão Jogar e dos títulos. -->
+    <link rel="preload" href="/trilhao-r4q8/app/games/roleta/fonts/oswald-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <!-- Fundo do salão (camada 0 do cenário): pré-carregado para o
+         ambiente nascer completo, sem "pop" da foto sobre o gradiente. -->
+    <link rel="preload" href="/trilhao-r4q8/app/games/roleta/fundopoker.webp" as="image" type="image/webp" fetchpriority="high" />
+
+    <meta
+      name="description"
+      content="Roleta Arena — sala de roleta em tempo real com créditos virtuais."
+    />
+    <title>Roleta Arena</title>
+    <script type="module" crossorigin src="/trilhao-r4q8/app/games/roleta/assets/index-CS4Y1SZK.js"></script>
+    <link rel="modulepreload" crossorigin href="/trilhao-r4q8/app/games/roleta/assets/rolldown-runtime-CNC7AqOf.js">
+    <link rel="modulepreload" crossorigin href="/trilhao-r4q8/app/games/roleta/assets/vendor-CLfq6o6N.js">
+    <link rel="stylesheet" crossorigin href="/trilhao-r4q8/app/games/roleta/assets/index-B7TGCJn8.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

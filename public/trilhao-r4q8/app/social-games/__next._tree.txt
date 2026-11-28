@@ -1,0 +1,6 @@
+:HL["/trilhao-r4q8/app/_next/static/chunks/07d-iub4tx3yb.css","style"]
+:HL["/trilhao-r4q8/app/_next/static/media/KumbhSans_Variable-s.p.0yf4sg8sxfmdk.ttf","font",{"crossOrigin":"","type":"font/ttf"}]
+:HL["/trilhao-r4q8/app/_next/static/media/PublicSans_Variable-s.p.343g4259bx6y1.ttf","font",{"crossOrigin":"","type":"font/ttf"}]
+2:[["children",{"s":"__PAGE__","h":160}]]
+1:[["children",{"s":"social-games","h":96,"c":"$Q2"}]]
+0:{"b":"TW9WQCkpVxJ8ziTaLHbM0","t":{"t":{"s":"","h":80,"c":"$Q1"}}}

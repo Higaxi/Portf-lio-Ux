@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/trilhao-r4q8/app/games/bacara/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#140404" />
+
+    <!-- Tipografia dos jogos: Oswald (condensada, no lugar do
+         Morganite proprietário) para display; Instrument Sans para corpo.
+         Servidas pelo próprio jogo (public/fonts, @font-face no index.css): sem
+         CSS de terceiro bloqueando a pintura e o script. O recorte latino do
+         Oswald é pré-carregado — é a fonte do botão Jogar e dos títulos. -->
+    <link rel="preload" href="/trilhao-r4q8/app/games/bacara/fonts/oswald-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <!-- Fundo do salão (camada 0 do cenário): pré-carregado para o
+         ambiente nascer completo, sem "pop" da foto sobre o gradiente. -->
+    <link rel="preload" href="/trilhao-r4q8/app/games/bacara/fundobacara.webp" as="image" type="image/webp" fetchpriority="high" />
+
+    <meta
+      name="description"
+      content="Bacará Arena — duelo de bacará em tempo real com créditos virtuais."
+    />
+    <title>Bacará Arena</title>
+    <script type="module" crossorigin src="/trilhao-r4q8/app/games/bacara/assets/index-PdZ58VIO.js"></script>
+    <link rel="modulepreload" crossorigin href="/trilhao-r4q8/app/games/bacara/assets/rolldown-runtime-CNC7AqOf.js">
+    <link rel="modulepreload" crossorigin href="/trilhao-r4q8/app/games/bacara/assets/vendor-kqmvSRoc.js">
+    <link rel="stylesheet" crossorigin href="/trilhao-r4q8/app/games/bacara/assets/index-RbAhhJRa.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

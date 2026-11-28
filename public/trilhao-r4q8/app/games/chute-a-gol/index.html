@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/trilhao-r4q8/app/games/chute-a-gol/favicon.svg" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#140404" />
+
+    <!-- Tipografia dos jogos: Oswald (condensada, no lugar do
+         Morganite proprietário) para display; Instrument Sans para corpo.
+         Servidas pelo próprio jogo (public/fonts, @font-face no index.css): sem
+         CSS de terceiro bloqueando a pintura e o script. O recorte latino do
+         Oswald é pré-carregado — é a fonte do botão Jogar e dos títulos. -->
+    <link rel="preload" href="/trilhao-r4q8/app/games/chute-a-gol/fonts/oswald-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <!-- Fundos da camada 0 do cenário, pré-carregados para o ambiente
+         nascer completo, sem "pop" da imagem sobre o gradiente. O MENU é a
+         primeira tela e tem arte própria (o goleiro,
+         docs/imagemmenupenalti.md): é ela a urgente. A boca do túnel do
+         vestiário, onde a crupiê recebe os duelistas (docs/vestiario.md),
+         só aparece depois de tocar em jogar (busca, negociação, sorteio) e
+         vem em prioridade baixa; a disputa em si troca para o estádio. -->
+    <link
+      rel="preload"
+      href="/trilhao-r4q8/app/games/chute-a-gol/penaltimenu.webp"
+      as="image"
+      type="image/webp"
+      fetchpriority="high"
+    />
+    <link
+      rel="preload"
+      href="/trilhao-r4q8/app/games/chute-a-gol/vestiario.webp"
+      as="image"
+      type="image/webp"
+      fetchpriority="low"
+    />
+
+    <meta
+      name="description"
+      content="Pênaltis Arena — disputa de pênaltis em tempo real com créditos virtuais."
+    />
+    <title>Chute a Gol</title>
+    <script type="module" crossorigin src="/trilhao-r4q8/app/games/chute-a-gol/assets/index-DU8lmxig.js"></script>
+    <link rel="modulepreload" crossorigin href="/trilhao-r4q8/app/games/chute-a-gol/assets/rolldown-runtime-CNC7AqOf.js">
+    <link rel="modulepreload" crossorigin href="/trilhao-r4q8/app/games/chute-a-gol/assets/vendor-CLfq6o6N.js">
+    <link rel="stylesheet" crossorigin href="/trilhao-r4q8/app/games/chute-a-gol/assets/index-BVc8biEQ.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
